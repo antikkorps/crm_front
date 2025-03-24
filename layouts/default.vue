@@ -17,6 +17,10 @@
           <NuxtLink to="/activities" class="text-gray-700 hover:text-blue-600">
             Activités
           </NuxtLink>
+          <div class="flex items-center space-x-4">
+            <!-- Theme toggle positioned on the right side of navbar -->
+            <ThemeToggle />
+          </div>
           <div class="relative" v-if="isAuthenticated">
             <button @click="toggleUserMenu" class="flex items-center space-x-2">
               <span>{{ user?.firstName }} {{ user?.lastName }}</span>

@@ -20,7 +20,7 @@ export default defineNuxtConfig({
       appName: process.env.NUXT_PUBLIC_APP_NAME || "CRM Client Portal",
     },
   },
-  css: ["~/assets/css/main.css"],
+  css: ["~/assets/css/main.css", "~/assets/css/dark-mode.css"],
   shadcn: {
     /**
      * Prefix for all the imported component

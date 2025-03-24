@@ -1,7 +1,7 @@
 <template>
   <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
     <div class="text-center">
-      <h1 class="text-2xl font-bold">Connexion</h1>
+      <h1 class="text-2xl font-bold dark:text-gray-700 ">Connexion</h1>
       <p class="text-gray-600">Accédez à votre espace client</p>
     </div>
 

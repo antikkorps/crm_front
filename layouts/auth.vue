@@ -1,17 +1,24 @@
 <template>
   <div class="min-h-screen flex flex-col">
-    <main class="flex-grow flex items-center justify-center">
-      <slot />
-    </main>
-    <footer class="bg-gray-100 py-4">
-      <div class="container mx-auto px-4 text-center text-gray-600 text-sm">
-        &copy; {{ new Date().getFullYear() }} {{ appName }}
+    <!-- Header with theme toggle in the top right -->
+    <header class="p-4 flex justify-end">
+      <ThemeToggle />
+    </header>
+
+    <!-- Main content -->
+    <main class="flex-1 flex items-center justify-center">
+      <div class="w-full max-w-md">
+        <slot />
       </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="p-4 text-center text-sm text-gray-500">
+      <p>© {{ new Date().getFullYear() }} CRM Client Portal</p>
     </footer>
   </div>
 </template>
 
 <script setup>
-const config = useRuntimeConfig()
-const appName = config.public.appName || "CRM Client Portal"
+// No additional script needed
 </script>

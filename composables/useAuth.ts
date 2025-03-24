@@ -7,7 +7,6 @@ export const useAuth = () => {
   const { api } = useApiService()
   const tokenCookie = useCookie<string | null>("auth_token")
 
-  // Helper function to properly type API responses
   const parseApiResponse = <T>(response: any): ApiResponse<T> => {
     return response.data as ApiResponse<T>
   }
