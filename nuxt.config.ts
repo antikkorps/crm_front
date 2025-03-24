@@ -13,6 +13,13 @@ export default defineNuxtConfig({
     "@nuxtjs/tailwindcss",
     "shadcn-nuxt",
   ],
+
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || "http://localhost:3030/api",
+      appName: process.env.NUXT_PUBLIC_APP_NAME || "CRM Client Portal",
+    },
+  },
   css: ["~/assets/css/main.css"],
   shadcn: {
     /**
@@ -24,5 +31,13 @@ export default defineNuxtConfig({
      * @default "./components/ui"
      */
     componentDir: "./components/ui",
+  },
+  app: {
+    head: {
+      title: "CRM Client Portal",
+      meta: [
+        { name: "description", content: "Portal client pour accéder à vos données CRM" },
+      ],
+    },
   },
 })
