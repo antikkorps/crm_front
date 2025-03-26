@@ -17,7 +17,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || "http://localhost:3030",
-      appName: process.env.NUXT_PUBLIC_APP_NAME || "CRM Client Portal",
+      appName: process.env.NUXT_PUBLIC_APP_NAME || "CRM",
     },
   },
   css: ["~/assets/css/main.css", "~/assets/css/dark-mode.css"],
@@ -34,10 +34,8 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: "CRM Client Portal",
-      meta: [
-        { name: "description", content: "Portal client pour accéder à vos données CRM" },
-      ],
+      title: "CRM",
+      meta: [{ name: "description", content: "Portal pour accéder à vos données CRM" }],
     },
   },
 })

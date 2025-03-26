@@ -65,7 +65,7 @@
 import { onClickOutside } from "@vueuse/core"
 
 const config = useRuntimeConfig()
-const appName = config.public.appName || "CRM Client Portal"
+const appName = config.public.appName || "CRM"
 const { user, isAuthenticated, logout } = useAuth()
 const showUserMenu = ref(false)
 const userMenuRef = ref(null)

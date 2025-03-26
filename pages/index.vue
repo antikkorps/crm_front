@@ -1,4 +1,3 @@
-<!-- pages/index.vue -->
 <template>
   <div>
     <h1 class="text-3xl font-bold mb-6">Tableau de bord</h1>
