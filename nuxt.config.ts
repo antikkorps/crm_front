@@ -16,7 +16,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || "http://localhost:3030/api",
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || "http://localhost:3030",
       appName: process.env.NUXT_PUBLIC_APP_NAME || "CRM Client Portal",
     },
   },

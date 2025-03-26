@@ -7,3 +7,8 @@ export interface LoginResponse {
 export interface ApiResponse<T> {
   data: T
 }
+
+export interface ApiResponseType {
+  data?: any
+  [key: string]: any
+}

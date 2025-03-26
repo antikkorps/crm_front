@@ -1,4 +1,4 @@
-import type { ApiResponse, LoginResponse } from "~/types/response"
+import type { ApiResponseType, LoginResponse } from "~/types/response"
 import type { User } from "~/types/user"
 
 export const useAuth = () => {
@@ -7,20 +7,21 @@ export const useAuth = () => {
   const { api } = useApiService()
   const tokenCookie = useCookie<string | null>("auth_token")
 
-  const parseApiResponse = <T>(response: any): ApiResponse<T> => {
-    return response.data as ApiResponse<T>
-  }
-
   const login = async (email: string, password: string) => {
     try {
-      const response = await api.post("/auth/login", {
+      const response = (await api.post("/auth/login", {
         email,
         password,
-      })
+      })) as ApiResponseType
 
-      const responseData = parseApiResponse<LoginResponse>(response)
-      tokenCookie.value = responseData.data.token
-      user.value = responseData.data.user
+      console.log("API response:", response)
+
+      const responseData = (response.data || response) as LoginResponse
+
+      console.log("Response data:", responseData)
+
+      tokenCookie.value = responseData.token
+      user.value = responseData.user
       return responseData
     } catch (error) {
       console.error("Login error:", error)
@@ -37,10 +38,10 @@ export const useAuth = () => {
   const checkAuth = async () => {
     if (tokenCookie.value) {
       try {
-        const response = await api.get("/auth/me")
-        const userData = parseApiResponse<User>(response)
-        user.value = userData.data
-        return userData.data
+        const response = (await api.get("/auth/me")) as ApiResponseType
+        const userData = (response.data || response) as User
+        user.value = userData
+        return userData
       } catch (error) {
         console.error("Auth check failed:", error)
         logout()
