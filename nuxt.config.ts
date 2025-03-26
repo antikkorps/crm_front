@@ -11,7 +11,6 @@ export default defineNuxtConfig({
     "@nuxt/scripts",
     "@nuxt/test-utils",
     "@nuxtjs/tailwindcss",
-    "shadcn-nuxt",
   ],
 
   runtimeConfig: {
@@ -21,17 +20,6 @@ export default defineNuxtConfig({
     },
   },
   css: ["~/assets/css/main.css", "~/assets/css/dark-mode.css"],
-  shadcn: {
-    /**
-     * Prefix for all the imported component
-     */
-    prefix: "",
-    /**
-     * Directory that the component lives in.
-     * @default "./components/ui"
-     */
-    componentDir: "./components/ui",
-  },
   app: {
     head: {
       title: "CRM",
