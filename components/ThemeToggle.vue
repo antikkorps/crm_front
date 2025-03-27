@@ -42,11 +42,50 @@
 </template>
 
 <script setup>
-const { isDark, toggleDarkMode } = useDarkMode()
+import { onMounted, ref } from "vue"
+
+const isDark = ref(true)
+
+// Vérifier le thème actuel au chargement
+onMounted(() => {
+  isDark.value = document.documentElement.classList.contains("dark")
+})
 
 const toggleTheme = () => {
-  toggleDarkMode()
+  isDark.value = !isDark.value
+
+  if (isDark.value) {
+    document.documentElement.classList.add("dark")
+    localStorage.setItem("theme", "dark")
+  } else {
+    document.documentElement.classList.remove("dark")
+    localStorage.setItem("theme", "light")
+  }
+
+  // Accéder à l'instance PrimeVue pour mettre à jour son état
+  const nuxtApp = useNuxtApp()
+  if (nuxtApp.$primevue) {
+    nuxtApp.$primevue.config.darkMode = isDark.value
+  }
 }
+
+onMounted(() => {
+  const storedTheme = localStorage.getItem("theme")
+
+  if (storedTheme) {
+    isDark.value = storedTheme === "dark"
+  } else {
+    isDark.value = window.matchMedia("(prefers-color-scheme: dark)").matches || true
+
+    if (isDark.value) {
+      document.documentElement.classList.add("dark")
+    } else {
+      document.documentElement.classList.remove("dark")
+    }
+
+    localStorage.setItem("theme", isDark.value ? "dark" : "light")
+  }
+})
 </script>
 
 <style scoped>

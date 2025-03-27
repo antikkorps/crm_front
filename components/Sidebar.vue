@@ -248,12 +248,21 @@
         </div>
       </template>
     </Drawer>
-    <Button icon="pi pi-bars" @click="visible = true" />
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue"
+const props = defineProps({
+  visible: {
+    type: Boolean,
+    default: false,
+  },
+})
 
-const visible = ref(false)
+const emit = defineEmits(["update:visible"])
+
+const visible = computed({
+  get: () => props.visible,
+  set: (value) => emit("update:visible", value),
+})
 </script>

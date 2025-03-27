@@ -1,0 +1,10 @@
+html.theme-loading body {
+  visibility: hidden;
+  opacity: 0;
+}
+
+html.theme-ready body {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}

@@ -1,10 +1,10 @@
 <template>
   <div class="min-h-screen flex flex-col">
     <header>
-      <Navbar />
+      <Navbar v-model="sidebarVisible" />
     </header>
     <main class="flex-grow container mx-auto px-4 py-8">
-      <Sidebar />
+      <Sidebar :visible="sidebarVisible" @update:visible="sidebarVisible = $event" />
       <slot />
     </main>
     <footer class="bg-gray-100 py-6">
@@ -22,6 +22,7 @@ const appName = config.public.appName || "CRM"
 const { user, isAuthenticated, logout } = useAuth()
 const showUserMenu = ref(false)
 const userMenuRef = ref(null)
+const sidebarVisible = ref(false)
 
 const userInitials = computed(() => {
   if (!user.value) return ""

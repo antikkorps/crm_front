@@ -25,6 +25,7 @@
     "eslint": "^9.23.0",
     "lucide-vue-next": "^0.483.0",
     "nuxt": "^3.16.1",
+    "primeicons": "^7.0.0",
     "primevue": "^4.3.3",
     "tailwindcss-animate": "^1.0.7",
     "vue": "^3.5.13",

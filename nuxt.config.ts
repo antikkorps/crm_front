@@ -28,8 +28,11 @@ export default defineNuxtConfig({
     options: {
       theme: {
         preset: Aura,
+        options: {
+          darkModeSelector: "html.dark",
+          dark: true,
+        },
       },
-      unstyled: false,
     },
   },
 
@@ -39,11 +42,39 @@ export default defineNuxtConfig({
       appName: process.env.NUXT_PUBLIC_APP_NAME || "CRM",
     },
   },
-  css: ["~/assets/css/main.css", "~/assets/css/dark-mode.css"],
+  css: [
+    "~/assets/css/main.css",
+    "~/assets/css/dark-mode.css",
+    "~/assets/css/theme-loader.css",
+  ],
   app: {
     head: {
       title: "CRM",
       meta: [{ name: "description", content: "Portal pour accéder à vos données CRM" }],
+      script: [
+        {
+          innerHTML: `
+          (function() {
+            // Add loading class immediately
+            document.documentElement.classList.add("theme-loading");
+            
+            const storedTheme = localStorage.getItem("theme");
+            
+            if (storedTheme === "dark" || 
+                (!storedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+              document.documentElement.classList.add("dark");
+            }
+            
+            // Wait for DOM to be ready then remove loading class
+            window.addEventListener("DOMContentLoaded", () => {
+              document.documentElement.classList.remove("theme-loading");
+              document.documentElement.classList.add("theme-ready");
+            });
+          })();
+        `,
+          type: "text/javascript;charset=utf-8",
+        },
+      ],
     },
   },
 })
