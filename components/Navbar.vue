@@ -66,7 +66,13 @@
               shape="circle"
             />
           </Button>
-          <Menu ref="menu" id="overlay_menu" :model="userMenu" :popup="true">
+          <Menu
+            ref="menu"
+            id="overlay_menu"
+            :model="userMenu"
+            :popup="true"
+            class="cursor-pointer"
+          >
             <template #item="{ item }">
               <div class="flex items-center gap-2 py-2 px-3" @click="item.command">
                 <Icon v-if="item.iconName" :name="item.iconName" class="w-5 h-5" />
