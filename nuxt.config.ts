@@ -17,9 +17,7 @@ export default defineNuxtConfig({
   ],
 
   tailwindcss: {
-    // Explicitly set the config path
     configPath: "~/tailwind.config.js",
-    // Set to false if you're using PostCSS 8
     exposeConfig: true,
     viewer: true,
   },
@@ -33,6 +31,9 @@ export default defineNuxtConfig({
           dark: true,
         },
       },
+    },
+    directives: {
+      include: ["ripple", "styleclass"],
     },
   },
 

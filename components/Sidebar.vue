@@ -1,5 +1,5 @@
 <template>
-  <Drawer v-model:visible="visible">
+  <Drawer v-model:visible="visible" position="left" :style="{ width: '300px' }">
     <template #container="{ closeCallback }">
       <div class="flex flex-col h-full">
         <div class="flex items-center justify-between px-6 pt-4 shrink-0">
@@ -250,6 +250,7 @@
 </template>
 
 <script setup>
+import { computed } from "vue"
 const props = defineProps({
   visible: {
     type: Boolean,
