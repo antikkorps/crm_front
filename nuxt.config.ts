@@ -1,3 +1,5 @@
+import Aura from "@primeuix/themes/aura"
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
@@ -11,7 +13,25 @@ export default defineNuxtConfig({
     "@nuxt/scripts",
     "@nuxt/test-utils",
     "@nuxtjs/tailwindcss",
+    "@primevue/nuxt-module",
   ],
+
+  tailwindcss: {
+    // Explicitly set the config path
+    configPath: "~/tailwind.config.js",
+    // Set to false if you're using PostCSS 8
+    exposeConfig: true,
+    viewer: true,
+  },
+
+  primevue: {
+    options: {
+      theme: {
+        preset: Aura,
+      },
+      unstyled: false,
+    },
+  },
 
   runtimeConfig: {
     public: {

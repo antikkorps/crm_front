@@ -56,6 +56,7 @@
         <div v-else class="text-center py-8 text-gray-500">Aucune activité récente</div>
       </div>
     </div>
+    <Button label="Submit" />
   </div>
 </template>
 
