@@ -1,19 +1,19 @@
 <template>
   <div>
-    <h1 class="text-3xl font-bold mb-6">Tableau de bord</h1>
+    <h1 class="text-3xl font-bold mt-3 mb-6">Tableau de bord</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-      <DashboardCard
+      <StatsCard
         title="Contacts"
         :value="dashboardData.counts?.contacts || 0"
         icon="carbon:user"
       />
-      <DashboardCard
+      <StatsCard
         title="Entreprises"
         :value="dashboardData.counts?.companies || 0"
         icon="carbon:enterprise"
       />
-      <DashboardCard
+      <StatsCard
         title="Notes"
         :value="dashboardData.counts?.notes || 0"
         icon="carbon:document"
@@ -21,42 +21,31 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="bg-white p-6 rounded-lg shadow">
-        <h2 class="text-xl font-semibold mb-4">Rappels à venir</h2>
-        <div v-if="loading" class="flex justify-center py-8">
-          <div
-            class="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"
-          ></div>
-        </div>
-        <div
-          v-else-if="dashboardData.counts?.reminders?.upcoming === 0"
-          class="text-center py-8 text-gray-500"
-        >
-          Aucun rappel à venir
-        </div>
-        <ul v-else class="divide-y">
-          <!-- Ici on afficherait les rappels -->
-          <li
-            v-for="i in dashboardData.counts?.reminders?.upcoming"
-            :key="i"
-            class="py-3"
-          >
-            Rappel #{{ i }}
-          </li>
-        </ul>
-      </div>
+      <!-- Rappels à venir avec le composant réutilisable -->
+      <ReminderCard
+        title="Rappels à venir"
+        :loading="loading"
+        :items="formattedReminders"
+        empty-message="Aucun rappel à venir"
+        footer-button-label="Voir tous"
+        icon-name="mdi:calendar"
+        @add="handleAddReminder"
+        @options="handleReminderOptions"
+        @view-all="navigateToReminders"
+      />
 
-      <div class="bg-white p-6 rounded-lg shadow">
-        <h2 class="text-xl font-semibold mb-4">Activités récentes</h2>
-        <div v-if="loading" class="flex justify-center py-8">
-          <div
-            class="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"
-          ></div>
-        </div>
-        <div v-else class="text-center py-8 text-gray-500">Aucune activité récente</div>
-      </div>
+      <!-- Activités récentes avec le même composant -->
+      <ReminderCard
+        title="Activités récentes"
+        :loading="loading"
+        :items="formattedActivities"
+        empty-message="Aucune activité récente"
+        footer-button-label="Historique"
+        :show-add-button="false"
+        icon-name="mdi:history"
+        @view-all="navigateToActivities"
+      />
     </div>
-    <Button label="Submit" />
   </div>
 </template>
 
@@ -68,6 +57,40 @@ definePageMeta({
 const { api } = useApiService()
 const dashboardData = ref({})
 const loading = ref(true)
+
+const formattedReminders = computed(() => {
+  if (!dashboardData.value.reminders?.upcoming) return []
+
+  // Transformer les données brutes en format attendu par le composant
+  return Array.from(
+    { length: dashboardData.value.counts?.reminders?.upcoming || 0 },
+    (_, i) => ({
+      id: i + 1,
+      title: `Rappel #${i + 1}`,
+      subtitle: "10 mars 2025 - 14:00",
+    })
+  )
+})
+
+// De même pour les activités
+const formattedActivities = computed(() => {
+  // Similaire à formattedReminders, mais pour les activités
+  return []
+})
+
+// Fonctions de gestion des événements
+const handleAddReminder = () => {
+  // Logique pour ajouter un rappel
+  navigateTo("/reminders/new")
+}
+
+const handleReminderOptions = (reminder) => {
+  // Logique pour gérer les options d'un rappel
+  console.log("Options for reminder:", reminder)
+}
+
+const navigateToReminders = () => navigateTo("/reminders")
+const navigateToActivities = () => navigateTo("/activities")
 
 onMounted(async () => {
   try {

@@ -3,15 +3,11 @@
     <header>
       <Navbar v-model="sidebarVisible" />
     </header>
-    <main class="flex-grow container mx-auto px-4 py-8">
-      <Sidebar :visible="sidebarVisible" @update:visible="sidebarVisible = $event" />
+    <Sidebar :visible="sidebarVisible" @update:visible="sidebarVisible = $event" />
+    <main class="flex-1 sm:mx-3">
       <slot />
     </main>
-    <footer class="bg-gray-100 py-6">
-      <div class="container mx-auto px-4 text-center text-gray-600">
-        &copy; {{ new Date().getFullYear() }} {{ appName }}
-      </div>
-    </footer>
+    <AppFooter />
   </div>
 </template>
 <script setup>

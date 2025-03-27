@@ -68,7 +68,7 @@
           </Button>
           <Menu ref="menu" id="overlay_menu" :model="userMenu" :popup="true">
             <template #item="{ item }">
-              <div class="flex items-center gap-2" @click="item.command">
+              <div class="flex items-center gap-2 py-2 px-3" @click="item.command">
                 <Icon v-if="item.iconName" :name="item.iconName" class="w-5 h-5" />
                 <span>{{ item.label }}</span>
               </div>
