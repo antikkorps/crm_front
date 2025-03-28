@@ -24,19 +24,34 @@ export default defineNuxtConfig({
 
   primevue: {
     options: {
+      ripple: true,
+      inputStyle: "filled",
+      // Configuration du thème de PrimeVue
       theme: {
+        dark: true,
         preset: Aura,
         options: {
           darkModeSelector: "html.dark",
-          dark: true,
         },
       },
     },
     components: {
-      include: ["Button", "InputText", "Password", "Toast", "Drawer"],
+      include: [
+        "Button",
+        "InputText",
+        "Password",
+        "Toast",
+        "Drawer",
+        "Menu",
+        "Menubar",
+        "Avatar",
+        "Badge",
+        "Sidebar",
+        "Dialog",
+      ],
     },
     directives: {
-      include: ["ripple", "styleclass"],
+      include: ["ripple", "styleclass", "tooltip"],
     },
   },
 
@@ -59,24 +74,15 @@ export default defineNuxtConfig({
         {
           innerHTML: `
           (function() {
-            // Add loading class immediately
-            document.documentElement.classList.add("theme-loading");
-            
             const storedTheme = localStorage.getItem("theme");
             
             if (storedTheme === "dark" || 
                 (!storedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
               document.documentElement.classList.add("dark");
             }
-            
-            // Wait for DOM to be ready then remove loading class
-            window.addEventListener("DOMContentLoaded", () => {
-              document.documentElement.classList.remove("theme-loading");
-              document.documentElement.classList.add("theme-ready");
-            });
           })();
         `,
-          type: "text/javascript;charset=utf-8",
+          type: "text/javascript",
         },
       ],
     },
