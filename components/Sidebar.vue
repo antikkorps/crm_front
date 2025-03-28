@@ -1,5 +1,5 @@
 <template>
-  <Drawer v-model:visible="visible" position="left" :style="{ width: '300px' }">
+  <Drawer v-model:visible="visible">
     <template #container="{ closeCallback }">
       <div class="flex flex-col h-full">
         <div class="flex items-center justify-between px-6 pt-4 shrink-0">
@@ -23,12 +23,8 @@
             <span class="font-semibold text-2xl text-primary">Your Logo</span>
           </span>
           <span>
-            <Button
-              type="button"
-              @click="closeCallback"
-              icon="pi pi-times"
-              rounded
-              outlined
+            <Button type="button" @click="closeCallback" rounded outlined>
+              <template #icon> <Icon name="mdi:close" class="w-5 h-5" /> </template
             ></Button>
           </span>
         </div>

@@ -11,6 +11,7 @@
   </div>
 </template>
 <script setup>
+import Sidebar from "@/components/Sidebar.vue"
 import { onClickOutside } from "@vueuse/core"
 
 const config = useRuntimeConfig()

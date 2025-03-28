@@ -32,6 +32,9 @@ export default defineNuxtConfig({
         },
       },
     },
+    components: {
+      include: ["Button", "InputText", "Password", "Toast", "Drawer"],
+    },
     directives: {
       include: ["ripple", "styleclass"],
     },
