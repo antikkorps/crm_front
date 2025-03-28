@@ -41,6 +41,25 @@ html.dark .p-dialog {
   color: #f1f1f1;
 }
 
+/* Correction des couleurs du Drawer */
+html.dark .p-drawer-mask {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+html.dark .p-drawer.p-component {
+  background-color: #1e1e1e;
+  color: #f1f1f1;
+  border-color: #333;
+}
+
+html.dark .p-drawer .p-drawer-header,
+html.dark .p-drawer .p-drawer-content,
+html.dark .p-drawer .p-drawer-footer {
+  background-color: #1e1e1e;
+  color: #f1f1f1;
+  border-color: #333;
+}
+
 html.dark .p-dropdown-panel,
 html.dark .p-autocomplete-panel,
 html.dark .p-multiselect-panel {
@@ -75,7 +94,7 @@ html.dark .menu-link:hover {
   transition: transform 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6);
 }
 
-.theme-toggle-icon.sun-to-moon {
+theme-toggle-icon.sun-to-moon {
   transform: rotate(360deg) scale(0.8);
 }
 

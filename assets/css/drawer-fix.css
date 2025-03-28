@@ -1,0 +1,50 @@
+/* Cette feuille de style contient des overrides spécifiques pour le Drawer */
+
+html.dark .p-component.p-drawer,
+html.dark .p-drawer .p-drawer-content,
+html.dark .p-drawer .p-drawer-header,
+html.dark .p-drawer .p-drawer-footer {
+  background-color: #1e1e1e !important;
+  color: #f1f1f1 !important;
+  border-color: #333 !important;
+}
+
+html.dark .p-drawer-mask {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+html.dark .sidebar-drawer .border-gray-200 {
+  border-color: #374151 !important; /* dark:border-gray-800 */
+}
+
+html.dark .p-component.p-drawer .p-drawer-header .p-drawer-title,
+html.dark .p-component.p-drawer .font-medium,
+html.dark .p-component.p-drawer .text-xl {
+  color: #f1f1f1 !important;
+}
+
+html.dark .p-drawer .menu-header,
+html.dark .p-drawer .menu-link {
+  color: #f1f1f1 !important;
+}
+
+html.dark .p-drawer .hover\:bg-gray-100:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html.dark .dark\:bg-gray-900,
+html.dark .p-drawer .dark\:bg-gray-900 {
+  background-color: #1e1e1e !important;
+}
+
+html.dark .p-drawer .dark\:hover\:bg-gray-800:hover {
+  background-color: #2a2a2a !important;
+}
+
+html.dark .p-drawer .dark\:text-gray-400 {
+  color: #9ca3af !important;
+}
+
+html.dark .p-drawer .dark\:border-gray-800 {
+  border-color: #374151 !important;
+}

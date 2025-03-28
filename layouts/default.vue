@@ -1,43 +1,29 @@
 <template>
-  <div class="min-h-screen flex flex-col">
-    <header>
-      <Navbar v-model="sidebarVisible" />
-    </header>
+  <v-app>
+    <Navbar v-model="sidebarVisible" />
     <Sidebar :visible="sidebarVisible" @update:visible="sidebarVisible = $event" />
-    <main class="flex-1 sm:mx-3">
-      <slot />
-    </main>
-    <AppFooter />
-  </div>
+
+    <v-main>
+      <v-container fluid>
+        <slot />
+      </v-container>
+    </v-main>
+
+    <v-footer app>
+      <v-container>
+        <div class="text-center text-body-2 text-grey">
+          &copy; {{ new Date().getFullYear() }} {{ appName }}
+        </div>
+      </v-container>
+    </v-footer>
+  </v-app>
 </template>
+
 <script setup>
 import Sidebar from "@/components/Sidebar.vue"
-import { onClickOutside } from "@vueuse/core"
 
 const config = useRuntimeConfig()
 const appName = config.public.appName || "CRM"
-const { user, isAuthenticated, logout } = useAuth()
-const showUserMenu = ref(false)
-const userMenuRef = ref(null)
+const { user, isAuthenticated } = useAuth()
 const sidebarVisible = ref(false)
-
-const userInitials = computed(() => {
-  if (!user.value) return ""
-  return `${user.value.firstName?.[0] || ""}${
-    user.value.lastName?.[0] || ""
-  }`.toUpperCase()
-})
-
-const toggleUserMenu = () => {
-  showUserMenu.value = !showUserMenu.value
-}
-
-const handleLogout = () => {
-  logout()
-}
-
-// Fermer le menu lorsqu'on clique ailleurs
-onClickOutside(userMenuRef, () => {
-  showUserMenu.value = false
-})
 </script>

@@ -1,10 +1,9 @@
-import Aura from "@primeuix/themes/aura"
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
 
+  // Définir les modules une seule fois
   modules: [
     "@nuxt/eslint",
     "@nuxt/fonts",
@@ -13,7 +12,6 @@ export default defineNuxtConfig({
     "@nuxt/scripts",
     "@nuxt/test-utils",
     "@nuxtjs/tailwindcss",
-    "@primevue/nuxt-module",
   ],
 
   tailwindcss: {
@@ -22,36 +20,46 @@ export default defineNuxtConfig({
     viewer: true,
   },
 
-  primevue: {
-    options: {
-      ripple: true,
-      inputStyle: "filled",
-      // Configuration du thème de PrimeVue
+  vuetify: {
+    moduleOptions: {
+      // Options spécifiques au module
+      includeTransformAssetsUrls: {
+        // Ajoute le support des assets dans les templates
+        "v-img": ["src", "lazy-src"],
+        "v-carousel-item": ["src", "lazy-src"],
+      },
+      ssrClientHints: {
+        reloadOnFirstRequest: false,
+        prefersColorScheme: true,
+      },
+      styles: { configFile: "assets/vuetify.scss" },
+      /* autres options du module */
+    },
+    vuetifyOptions: {
+      // Options de Vuetify (équivalent à ce que vous passeriez à createVuetify)
       theme: {
-        dark: true,
-        preset: Aura,
-        options: {
-          darkModeSelector: "html.dark",
+        defaultTheme: "light",
+        themes: {
+          light: {
+            dark: false,
+            colors: {
+              primary: "#1867C0",
+              secondary: "#5CBBF6",
+            },
+          },
+          dark: {
+            dark: true,
+            colors: {
+              primary: "#2196F3",
+              secondary: "#03A9F4",
+            },
+          },
         },
       },
-    },
-    components: {
-      include: [
-        "Button",
-        "InputText",
-        "Password",
-        "Toast",
-        "Drawer",
-        "Menu",
-        "Menubar",
-        "Avatar",
-        "Badge",
-        "Sidebar",
-        "Dialog",
-      ],
-    },
-    directives: {
-      include: ["ripple", "styleclass", "tooltip"],
+      // Autres options (icons, components, etc.)
+      icons: {
+        defaultSet: "mdi", // Utilisera @mdi/font
+      },
     },
   },
 
@@ -61,11 +69,15 @@ export default defineNuxtConfig({
       appName: process.env.NUXT_PUBLIC_APP_NAME || "CRM",
     },
   },
+
   css: [
     "~/assets/css/main.css",
     "~/assets/css/dark-mode.css",
     "~/assets/css/theme-loader.css",
+    // Remplacer par la ligne commentée ci-dessous une fois le package correctement installé
+    // "@mdi/font/css/materialdesignicons.min.css",
   ],
+
   app: {
     head: {
       title: "CRM",

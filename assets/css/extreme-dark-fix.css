@@ -1,0 +1,45 @@
+/* Styles globaux extrêmes pour forcer le mode sombre */
+
+/* Sélecteur universel pour attraper tous les éléments du drawer */
+html.dark .p-drawer *,
+html.dark .p-drawer-content *,
+html.dark .p-drawer-header *,
+html.dark .p-drawer-footer * {
+  color: #f1f1f1 !important;
+}
+
+html.dark .p-drawer,
+html.dark .p-drawer-content,
+html.dark .p-drawer-header,
+html.dark .p-drawer-footer {
+  background-color: #1e1e1e !important;
+  color: #f1f1f1 !important;
+  border-color: #333 !important;
+}
+
+html.dark .p-drawer-mask {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+html.dark .p-component .p-button.p-button-text,
+html.dark .p-component .p-button.p-button-outlined {
+  color: #f1f1f1 !important;
+  border-color: #444 !important;
+}
+
+html.dark .p-button-icon,
+html.dark .p-drawer .pi {
+  color: #f1f1f1 !important;
+}
+
+/* Force les couleurs pour tous les textes dans la sidebar */
+html.dark [class*="text-gray-"],
+html.dark .p-drawer [class*="text-gray-"] {
+  color: #a0aec0 !important;
+}
+
+html.dark .p-drawer .font-medium,
+html.dark .p-drawer .font-semibold,
+html.dark .p-drawer .text-xl {
+  color: #f1f1f1 !important;
+}
