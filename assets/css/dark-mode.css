@@ -89,12 +89,26 @@ html.dark .menu-link:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
+/* Intégration avec Vuetify */
+.v-application.v-theme--dark {
+  background-color: #121212 !important;
+  color: #f1f1f1 !important;
+}
+
+/* Force correct dark palette for Vuetify components */
+html.dark .v-card,
+html.dark .v-list,
+html.dark .v-navigation-drawer,
+html.dark .v-app-bar {
+  color-scheme: dark;
+}
+
 /* Animations du bouton de changement de thème */
 .theme-toggle-icon {
   transition: transform 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6);
 }
 
-theme-toggle-icon.sun-to-moon {
+.theme-toggle-icon.sun-to-moon {
   transform: rotate(360deg) scale(0.8);
 }
 

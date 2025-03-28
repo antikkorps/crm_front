@@ -2,4 +2,5 @@
 $font-family: "Inter", sans-serif;
 $border-radius-root: 6px;
 
-// Import de Vuetify (sera géré par le module Vuetify)
+// Ne pas tenter d'importer les styles ici - ils seront gérés par le module
+// Les variables ci-dessus seront utilisées par le module Vuetify

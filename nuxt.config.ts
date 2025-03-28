@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     "@nuxt/scripts",
     "@nuxt/test-utils",
     "@nuxtjs/tailwindcss",
+    "vuetify-nuxt-module",
   ],
 
   tailwindcss: {
@@ -22,29 +23,30 @@ export default defineNuxtConfig({
 
   vuetify: {
     moduleOptions: {
-      // Options spécifiques au module
       includeTransformAssetsUrls: {
-        // Ajoute le support des assets dans les templates
         "v-img": ["src", "lazy-src"],
-        "v-carousel-item": ["src", "lazy-src"],
       },
-      ssrClientHints: {
-        reloadOnFirstRequest: false,
-        prefersColorScheme: true,
-      },
-      styles: { configFile: "assets/vuetify.scss" },
-      /* autres options du module */
     },
     vuetifyOptions: {
-      // Options de Vuetify (équivalent à ce que vous passeriez à createVuetify)
       theme: {
         defaultTheme: "light",
+        variations: {
+          colors: ["primary", "secondary"],
+          darken: 4,
+          lighten: 4,
+        },
         themes: {
           light: {
             dark: false,
             colors: {
               primary: "#1867C0",
               secondary: "#5CBBF6",
+              accent: "#4CAF50",
+              error: "#FF5252",
+              info: "#2196F3",
+              success: "#4CAF50",
+              warning: "#FB8C00",
+              background: "#FFFFFF",
             },
           },
           dark: {
@@ -52,16 +54,24 @@ export default defineNuxtConfig({
             colors: {
               primary: "#2196F3",
               secondary: "#03A9F4",
+              accent: "#81C784",
+              error: "#FF5252",
+              info: "#2196F3",
+              success: "#4CAF50",
+              warning: "#FB8C00",
+              background: "#121212",
             },
           },
         },
       },
-      // Autres options (icons, components, etc.)
       icons: {
-        defaultSet: "mdi", // Utilisera @mdi/font
+        defaultSet: "mdi",
       },
     },
   },
+
+  // Assurez-vous que les icônes MDI sont correctement chargées
+  plugins: ["~/plugins/mdi-icons.client.ts", "~/plugins/vuetify-theme.client.ts"],
 
   runtimeConfig: {
     public: {
@@ -74,8 +84,6 @@ export default defineNuxtConfig({
     "~/assets/css/main.css",
     "~/assets/css/dark-mode.css",
     "~/assets/css/theme-loader.css",
-    // Remplacer par la ligne commentée ci-dessous une fois le package correctement installé
-    // "@mdi/font/css/materialdesignicons.min.css",
   ],
 
   app: {

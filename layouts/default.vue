@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+
     <Navbar v-model="sidebarVisible" />
     <Sidebar :visible="sidebarVisible" @update:visible="sidebarVisible = $event" />
 
@@ -16,7 +16,7 @@
         </div>
       </v-container>
     </v-footer>
-  </v-app>
+  
 </template>
 
 <script setup>

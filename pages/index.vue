@@ -46,6 +46,7 @@
         @view-all="navigateToActivities"
       />
     </div>
+    <v-button>Hello</v-button>
   </div>
 </template>
 

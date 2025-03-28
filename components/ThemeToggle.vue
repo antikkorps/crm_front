@@ -10,6 +10,7 @@ import { onMounted, ref } from "vue"
 
 const isDark = ref(false)
 const nuxtApp = useNuxtApp()
+const { $toggleVuetifyTheme } = useNuxtApp()
 
 // Vérifier le thème actuel au chargement
 onMounted(() => {
@@ -22,13 +23,14 @@ const toggleTheme = () => {
   if (isDark.value) {
     document.documentElement.classList.add("dark")
     localStorage.setItem("theme", "dark")
-    // Changer le thème de Vuetify
-    nuxtApp.$vuetify.theme.global.name = "dark"
   } else {
     document.documentElement.classList.remove("dark")
     localStorage.setItem("theme", "light")
-    // Changer le thème de Vuetify
-    nuxtApp.$vuetify.theme.global.name = "light"
+  }
+
+  // Utiliser la fonction fournie par le plugin
+  if ($toggleVuetifyTheme) {
+    $toggleVuetifyTheme(isDark.value)
   }
 }
 
@@ -44,15 +46,13 @@ onMounted(() => {
   // Appliquer le thème
   if (isDark.value) {
     document.documentElement.classList.add("dark")
-    // Initialiser le thème de Vuetify
-    if (nuxtApp.$vuetify) {
-      nuxtApp.$vuetify.theme.global.name = "dark"
-    }
   } else {
     document.documentElement.classList.remove("dark")
-    if (nuxtApp.$vuetify) {
-      nuxtApp.$vuetify.theme.global.name = "light"
-    }
+  }
+
+  // Appliquer le thème à Vuetify
+  if ($toggleVuetifyTheme) {
+    $toggleVuetifyTheme(isDark.value)
   }
 })
 </script>
