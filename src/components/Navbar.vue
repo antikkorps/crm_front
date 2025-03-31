@@ -20,6 +20,28 @@
     <div class="flex-1">
       <a class="btn btn-ghost text-xl">daisyUI</a>
     </div>
+    <div v-if="isConnected" class="flex-none gap-2">
+      <div class="dropdown dropdown-end">
+        <label tabindex="0" class="btn btn-ghost btn-circle avatar">
+          <div class="w-10 rounded-full">
+            <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Avatar" />
+          </div>
+        </label>
+        <ul
+          tabindex="0"
+          class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+        >
+          <li>
+            <a class="justify-between">
+              Profile
+              <span class="badge">New</span>
+            </a>
+          </li>
+          <li><a>Settings</a></li>
+          <li><a @click="logout">Logout</a></li>
+        </ul>
+      </div>
+    </div>
     <div class="flex-none">
       <button class="btn btn-square btn-ghost">
         <svg
@@ -45,6 +67,13 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const isConnected = ref(false)
+
+const logout = () => {
+  console.log('Déconnexion')
+  localStorage.removeItem('token')
+  router.push('/')
+}
 
 const items = ref([
   {
