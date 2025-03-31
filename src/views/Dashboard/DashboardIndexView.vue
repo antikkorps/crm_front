@@ -1,14 +1,17 @@
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <CardComponent
-      v-for="(value, key) in stats"
-      :key="key"
-      :title="getTitle(key)"
-      :description="getDescription(key, value)"
-      :keyName="key"
-      actionLabel="Voir plus"
-      @action="handleAction(key)"
-    />
+  <div class="container mx-auto">
+    <!-- Grille responsive avec centrage -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 justify-items-center">
+      <div v-for="(value, key) in stats" :key="key" class="w-full max-w-sm">
+        <CardComponent
+          :title="getTitle(key)"
+          :description="getDescription(key, value)"
+          :keyName="key"
+          actionLabel="Voir plus"
+          @action="handleAction(key)"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
