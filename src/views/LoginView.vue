@@ -1,1 +1,6 @@
-<template>This is the login page</template>
+<template>
+  <Login />
+</template>
+<script setup>
+import Login from '@/components/Login.vue'
+</script>

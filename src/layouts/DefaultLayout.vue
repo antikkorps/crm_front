@@ -1,10 +1,8 @@
 <template>
   <div class="default-layout">
-    <header class="bg-primary text-white p-4">
-      <nav>
-        <Navbar />
-      </nav>
-    </header>
+    <nav>
+      <Navbar />
+    </nav>
 
     <main class="container h-100 mx-auto p-4">
       <slot />
