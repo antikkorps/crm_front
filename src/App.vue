@@ -6,6 +6,7 @@
 
 <script>
 import AuthLayout from './layouts/AuthLayout.vue'
+import DashboardLayout from './layouts/DashboardLayout.vue'
 import DefaultLayout from './layouts/DefaultLayout.vue'
 
 export default {
@@ -16,6 +17,7 @@ export default {
       return {
         default: DefaultLayout,
         auth: AuthLayout,
+        dashboard: DashboardLayout,
       }[layout]
     },
   },

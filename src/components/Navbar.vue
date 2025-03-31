@@ -42,6 +42,9 @@
         </ul>
       </div>
     </div>
+    <div v-else class="flex-none gap-2">
+      <button class="btn btn-primary" @click="router.push('/login')">Login</button>
+    </div>
     <div class="flex-none">
       <button class="btn btn-square btn-ghost">
         <svg
@@ -63,15 +66,29 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { AuthService } from '@/services/auth.service'
+import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const isConnected = ref(false)
 
+onMounted(() => {
+  isConnected.value = AuthService.isAuthenticated()
+  console.log('isAuthenticated() a retourné:', isConnected.value)
+})
+
+watch(
+  () => router.path,
+  () => {
+    checkAuth()
+  },
+)
+
 const logout = () => {
   console.log('Déconnexion')
-  localStorage.removeItem('token')
+  AuthService.logout()
+  isConnected.value = false
   router.push('/')
 }
 
