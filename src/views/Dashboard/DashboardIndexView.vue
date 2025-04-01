@@ -60,9 +60,9 @@ const getTitle = (key: string) => {
   return titles[key] || 'Statistique'
 }
 
-const getDescription = (key: string, value: any) => {
+const getDescription = (key: string, value: number | { upcoming: number; overdue: number }) => {
   if (key === 'reminders') {
-    return `Rappels à venir: ${value.upcoming}, Rappels en retard: ${value.overdue}`
+    return `Rappels à venir: ${(value as { upcoming: number; overdue: number }).upcoming}, Rappels en retard: ${(value as { upcoming: number; overdue: number }).overdue}`
   }
   return `Vous avez ${value} ${key === 'contacts' ? 'contact' : key}.`
 }
