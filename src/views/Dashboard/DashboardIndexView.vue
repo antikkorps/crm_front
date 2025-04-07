@@ -125,46 +125,104 @@ const keyMetrics = ref<KpiMetric[]>([
   { title: 'Revenus', value: '12.5k€', trend: 12, icon: 'mdi:currency-eur' },
   { title: 'Prospects', value: '54', trend: 9, icon: 'mdi:account-multiple-plus' },
   { title: 'Taux conversion', value: '18%', trend: -2, icon: 'mdi:chart-timeline-variant' },
-  { title: 'Tickets ouverts', value: '15', trend: -4, icon: 'mdi:ticket-outline' },
+  { title: 'Devis en cours', value: '15', trend: -4, icon: 'mdi:file-sign' },
 ])
 
-// Activités récentes
-const recentActivities = ref<Activity[]>([
-  {
-    title: 'Contact créé',
-    description: 'Marie Dupont a ajouté un nouveau contact',
-    time: 'Il y a 10 min',
-    icon: 'mdi:account-plus',
-  },
-  {
-    title: 'Contrat signé',
-    description: 'Contrat #45892 avec Entreprise ABC',
-    time: 'Il y a 2h',
-    icon: 'mdi:file-document',
-  },
-  {
-    title: 'Tâche complétée',
-    description: 'Paul a terminé "Préparation devis client"',
-    time: 'Il y a 5h',
-    icon: 'mdi:check-circle',
-  },
-  {
-    title: 'Appel planifié',
-    description: 'Rendez-vous téléphonique avec Jean Martin',
-    time: 'Hier, 16:30',
-    icon: 'mdi:phone',
-  },
-  {
-    title: 'Opportunité gagnée',
-    description: '25 000€ - Projet refonte site web',
-    time: 'Hier, 10:15',
-    icon: 'mdi:trophy',
-  },
-])
+// Activités récentes avec type approprié
+interface ApiActivity {
+  id: string
+  type: string
+  title: string
+  content: string
+  createdAt: string
+  updatedAt: string
+  Company?: { name: string }
+  Contact?: { firstName: string; lastName: string }
+  assignedTo?: { firstName: string; lastName: string }
+  createdBy: { firstName: string; lastName: string }
+  startTime?: string
+  endTime?: string
+  dueDate?: string
+  taskStatus?: string
+  callOutcome?: string
+  // Autres propriétés optionnelles...
+}
+
+const recentActivities = ref<Activity[]>([])
 
 const refreshActivities = async () => {
   console.log('Rafraîchissement des activités récentes')
-  // Implémenter la logique pour rafraîchir les activités
+  try {
+    const data = await apiRequest<{ items: ApiActivity[] }>('/v1/activities/recent')
+
+    // Transformation des données API en format attendu par le composant
+    recentActivities.value = data.items.map((item) => {
+      // Déterminer l'icône en fonction du type d'activité
+      let icon = 'mdi:information'
+      switch (item.type) {
+        case 'CALL':
+          icon = 'mdi:phone'
+          break
+        case 'MEETING':
+          icon = 'mdi:calendar-account'
+          break
+        case 'EMAIL':
+          icon = 'mdi:email'
+          break
+        case 'TASK':
+          icon = 'mdi:check-circle'
+          break
+        case 'NOTE':
+          icon = 'mdi:note-text'
+          break
+      }
+
+      // Formater le temps relatif
+      const createdDate = new Date(item.createdAt)
+      const now = new Date()
+      const diffMs = now.getTime() - createdDate.getTime()
+      const diffMins = Math.floor(diffMs / (1000 * 60))
+      const diffHours = Math.floor(diffMins / 60)
+      const diffDays = Math.floor(diffHours / 24)
+
+      let timeText = ''
+      if (diffMins < 60) {
+        timeText = `Il y a ${diffMins} min`
+      } else if (diffHours < 24) {
+        timeText = `Il y a ${diffHours}h`
+      } else if (diffDays === 1) {
+        timeText = 'Hier'
+      } else {
+        timeText = `Il y a ${diffDays} jours`
+      }
+
+      // Formater une description adaptée selon le type d'activité
+      let description = item.content || ''
+
+      if (item.type === 'CALL' && item.Contact) {
+        description = `Appel avec ${item.Contact.firstName} ${item.Contact.lastName}`
+        if (item.callOutcome) description += ` - ${item.callOutcome}`
+      } else if (item.type === 'MEETING') {
+        const contact = item.Contact ? `${item.Contact.firstName} ${item.Contact.lastName}` : ''
+        const company = item.Company ? `${item.Company.name}` : ''
+        description = `Réunion${contact ? ` avec ${contact}` : ''}${company ? ` de ${company}` : ''}`
+      } else if (item.type === 'TASK') {
+        description = `Tâche${item.taskStatus ? ` - ${item.taskStatus}` : ''}`
+        if (item.assignedTo) {
+          description += ` (assignée à ${item.assignedTo.firstName} ${item.assignedTo.lastName})`
+        }
+      }
+
+      return {
+        title: item.title,
+        description,
+        time: timeText,
+        icon,
+      }
+    })
+  } catch (error) {
+    console.error('Erreur lors du rafraîchissement des activités:', error)
+  }
 }
 
 // Tâches prioritaires
@@ -237,6 +295,7 @@ const handleEventClick = (index: number) => {
 
 onMounted(() => {
   fetchStats()
+  refreshActivities()
 })
 </script>
 
