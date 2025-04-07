@@ -9,7 +9,9 @@ import App from './App.vue'
 import router from './router'
 
 const app = createApp(App)
-app.component('IconifyIcon', Icon)
+
+// eslint-disable-next-line vue/multi-word-component-names
+app.component('Iconify', Icon)
 
 app.use(createPinia())
 app.use(router)

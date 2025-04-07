@@ -1,13 +1,7 @@
+import type { RequestOptions } from '../types/api.types'
 import { getToken } from '../utils/token'
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3030/api'
-
-interface RequestOptions {
-  method?: string
-  headers?: Record<string, string>
-  body?: any
-  includeAuth?: boolean
-}
 
 export async function apiRequest<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const { method = 'GET', headers = {}, body, includeAuth = true } = options

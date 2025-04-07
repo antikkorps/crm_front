@@ -5,23 +5,23 @@
       <h1 class="text-2xl font-bold mb-4">Tableau de bord</h1>
 
       <!-- Version desktop des KPIs (affiché uniquement sur écrans md et plus grands) -->
-      <div class="hidden md:grid md:grid-cols-4 gap-4">
+      <div class="hidden md:grid md:grid-cols-4 gap-2 lg:gap-4">
         <div
           v-for="(metric, idx) in keyMetrics"
           :key="`desktop-${idx}`"
-          class="stat bg-base-100 shadow-sm rounded-lg p-4"
+          class="stat bg-base-100 shadow-sm rounded-lg p-3 lg:p-4 overflow-hidden"
         >
-          <div class="flex items-center gap-3">
-            <div class="p-2 rounded-full bg-primary/10">
-              <Iconify :icon="metric.icon" class="w-6 h-6 text-primary" />
+          <div class="flex items-center gap-2 lg:gap-3">
+            <div class="p-1.5 lg:p-2 rounded-full bg-primary/10 flex-shrink-0">
+              <Iconify :icon="metric.icon" class="w-5 h-5 lg:w-6 lg:h-6 text-primary" />
             </div>
-            <div>
-              <div class="stat-title text-xs">{{ metric.title }}</div>
-              <div class="stat-value text-2xl">{{ metric.value }}</div>
+            <div class="min-w-0">
+              <div class="stat-title text-xs truncate">{{ metric.title }}</div>
+              <div class="stat-value text-lg lg:text-2xl font-bold">{{ metric.value }}</div>
             </div>
           </div>
           <div
-            class="stat-desc text-xs mt-2"
+            class="stat-desc text-xs mt-1 lg:mt-2 truncate"
             :class="metric.trend > 0 ? 'text-success' : 'text-error'"
           >
             {{ metric.trend > 0 ? '↗︎' : '↘︎' }} {{ Math.abs(metric.trend) }}% depuis le mois
@@ -35,16 +35,19 @@
         <div
           v-for="(metric, idx) in keyMetrics"
           :key="`mobile-${idx}`"
-          class="bg-base-100 shadow-sm rounded-lg p-3"
+          class="bg-base-100 shadow-sm rounded-lg p-3 overflow-hidden"
         >
           <div class="flex items-center gap-2 mb-1">
-            <div class="p-1 rounded-full bg-primary/10">
+            <div class="p-1 rounded-full bg-primary/10 flex-shrink-0">
               <Iconify :icon="metric.icon" class="w-4 h-4 text-primary" />
             </div>
-            <div class="text-xs font-medium">{{ metric.title }}</div>
+            <div class="text-xs font-medium truncate">{{ metric.title }}</div>
           </div>
           <div class="text-lg font-bold">{{ metric.value }}</div>
-          <div class="text-xs mt-1" :class="metric.trend > 0 ? 'text-success' : 'text-error'">
+          <div
+            class="text-xs mt-1 truncate"
+            :class="metric.trend > 0 ? 'text-success' : 'text-error'"
+          >
             {{ metric.trend > 0 ? '↗︎' : '↘︎' }} {{ Math.abs(metric.trend) }}%
           </div>
         </div>
@@ -206,21 +209,11 @@
 </template>
 
 <script setup lang="ts">
-import { Icon as Iconify } from '@iconify/vue'
 import { onMounted, ref } from 'vue'
 import CardComponent from '../../components/dashboard/cardSingle.vue'
 import OpportunitiesChart from '../../components/dashboard/OpportunitiesChart.vue'
 import { apiRequest } from '../../services/api.service'
-
-interface Stats {
-  contacts: number
-  companies: number
-  notes: number
-  reminders: {
-    upcoming: number
-    overdue: number
-  }
-}
+import type { Stats } from '../../types/dashboard.types'
 
 const stats = ref<Stats>({
   contacts: 0,
