@@ -5,7 +5,7 @@
         <h2 class="card-title">
           {{ title }}
         </h2>
-        <div class="bg-secondary opacity-35 rounded-full flex justify-center items-center p-2">
+        <div class="bg-secondary opacity-95 rounded-full flex justify-center items-center p-2">
           <Iconify :icon="getIcon(keyName)" class="w-8 h-8 text-white" />
         </div>
       </div>

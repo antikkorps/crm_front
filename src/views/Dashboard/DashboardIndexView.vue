@@ -34,7 +34,11 @@
       </div>
 
       <!-- Activités récentes -->
-      <ActivityTimeline :activities="recentActivities" @refresh="refreshActivities" />
+      <ActivityTimeline
+        :activities="recentActivities"
+        :is-refreshing="isRefreshingActivities"
+        @refresh="refreshActivities"
+      />
     </div>
 
     <!-- Tâches prioritaires et Calendrier -->
@@ -62,19 +66,20 @@
 </template>
 
 <script setup lang="ts">
+import type { Activity } from '@/components/dashboard/ActivityTimeline.vue'
+import ActivityTimeline from '@/components/dashboard/ActivityTimeline.vue'
+import CardComponent from '@/components/dashboard/cardSingle.vue'
+import type { KpiMetric } from '@/components/dashboard/DashboardKpis.vue'
+import DashboardKpis from '@/components/dashboard/DashboardKpis.vue'
+import type { CalendarEvent } from '@/components/dashboard/MiniCalendar.vue'
+import MiniCalendar from '@/components/dashboard/MiniCalendar.vue'
+import OpportunitiesChart from '@/components/dashboard/OpportunitiesChart.vue'
+import type { Task } from '@/components/dashboard/TasksList.vue'
+import TasksList from '@/components/dashboard/TasksList.vue'
+import { apiRequest } from '@/services/api.service'
+import { useToastStore } from '@/stores/toast'
+import type { Stats } from '@/types/dashboard.types'
 import { onMounted, ref } from 'vue'
-import type { Activity } from '../../components/dashboard/ActivityTimeline.vue'
-import ActivityTimeline from '../../components/dashboard/ActivityTimeline.vue'
-import CardComponent from '../../components/dashboard/cardSingle.vue'
-import type { KpiMetric } from '../../components/dashboard/DashboardKpis.vue'
-import DashboardKpis from '../../components/dashboard/DashboardKpis.vue'
-import type { CalendarEvent } from '../../components/dashboard/MiniCalendar.vue'
-import MiniCalendar from '../../components/dashboard/MiniCalendar.vue'
-import OpportunitiesChart from '../../components/dashboard/OpportunitiesChart.vue'
-import type { Task } from '../../components/dashboard/TasksList.vue'
-import TasksList from '../../components/dashboard/TasksList.vue'
-import { apiRequest } from '../../services/api.service'
-import type { Stats } from '../../types/dashboard.types'
 
 // Stats et récupération des données
 const stats = ref<Stats>({
@@ -149,9 +154,12 @@ interface ApiActivity {
 }
 
 const recentActivities = ref<Activity[]>([])
+const isRefreshingActivities = ref(false)
+const toastStore = useToastStore()
 
 const refreshActivities = async () => {
   console.log('Rafraîchissement des activités récentes')
+  isRefreshingActivities.value = true
   try {
     const data = await apiRequest<{ items: ApiActivity[] }>('/v1/activities/recent')
 
@@ -220,8 +228,13 @@ const refreshActivities = async () => {
         icon,
       }
     })
+
+    toastStore.success('Activités récentes mises à jour avec succès')
   } catch (error) {
     console.error('Erreur lors du rafraîchissement des activités:', error)
+    toastStore.error('Erreur lors de la mise à jour des activités')
+  } finally {
+    isRefreshingActivities.value = false
   }
 }
 
