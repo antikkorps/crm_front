@@ -1,8 +1,8 @@
 <template>
-  <div class="container mx-auto">
-    <!-- Grille responsive avec centrage -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 justify-items-center">
-      <div v-for="(value, key) in stats" :key="key" class="w-full max-w-sm">
+  <div class="dashboard-container mx-auto px-4">
+    <!-- Grille responsive avec meilleur espacement -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5 xl:gap-6">
+      <div v-for="(value, key) in stats" :key="key" class="card-wrapper">
         <CardComponent
           :title="getTitle(key)"
           :description="getDescription(key, value)"
@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import CardComponent from '../../components/dashboard/card.vue'
+import CardComponent from '../../components/dashboard/cardSingle.vue'
 import { apiRequest } from '../../services/api.service'
 
 interface Stats {
@@ -75,3 +75,27 @@ onMounted(() => {
   fetchStats()
 })
 </script>
+
+<style scoped>
+.dashboard-container {
+  max-width: 1400px;
+}
+
+/* Ajustements spécifiques pour la plage problématique */
+@media (min-width: 762px) and (max-width: 1022px) {
+  .dashboard-container {
+    max-width: 95%;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .grid {
+    column-gap: 20px !important;
+  }
+
+  .card-wrapper {
+    width: 100%;
+    max-width: none;
+  }
+}
+</style>

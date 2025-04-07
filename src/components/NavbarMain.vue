@@ -56,10 +56,23 @@
               class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
             >
               <li>
-                <a class="justify-between">Profile <span class="badge">New</span></a>
+                <router-link to="/profile" class="flex items-center gap-2">
+                  <Iconify icon="mdi:account" class="w-4 h-4" />
+                  <span>Profile</span>
+                </router-link>
               </li>
-              <li><a>Settings</a></li>
-              <li><a @click="handleLogout">Logout</a></li>
+              <li>
+                <router-link to="/settings" class="flex items-center gap-2">
+                  <Iconify icon="mdi:cog" class="w-4 h-4" />
+                  <span>Settings</span>
+                </router-link>
+              </li>
+              <li>
+                <a @click="handleLogout" class="flex items-center gap-2">
+                  <Iconify icon="mdi:logout" class="w-4 h-4" />
+                  <span>Logout</span>
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -99,29 +112,59 @@
     <div v-if="isAuthenticated" class="drawer-side z-[999] h-full">
       <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"> </label>
 
-      <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
+      <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content flex flex-col">
+        <!-- En-tête du menu avec bouton de fermeture à droite -->
+        <div class="flex justify-between items-center mb-4 pb-2 border-b border-base-300">
+          <span class="font-bold text-lg">Menu principal</span>
+          <label for="my-drawer-3" class="cursor-pointer">
+            <Iconify icon="mdi:close" class="w-6 h-6 btn btn-sm btn-circle btn-primary" />
+          </label>
+        </div>
+
         <li class="menu-title">Navigation</li>
         <li v-for="item in NavigationItems" :key="item.label">
-          <router-link :to="item.command">{{ item.label }}</router-link>
-          <span v-if="item.badge" class="badge badge-primary">{{ item.badge }}</span>
-          <ul v-if="item.items" class="submenu">
-            <li v-for="subItem in item.items" :key="subItem.label">
-              <router-link :to="subItem.command || ''">{{ subItem.label }}</router-link>
-              <span v-if="subItem.shortcut" class="badge badge-secondary">{{
-                subItem.shortcut
-              }}</span>
-            </li>
-          </ul>
+          <details open>
+            <summary>{{ item.label }}</summary>
+            <ul v-if="item.items" class="menu">
+              <li v-for="subItem in item.items" :key="subItem.label">
+                <router-link :to="subItem.command || '/'">
+                  <Iconify :icon="subItem.iconName" class="w-4 h-4" />
+                  {{ subItem.label }}
+                </router-link>
+              </li>
+            </ul>
+          </details>
         </li>
-
-        <li><router-link to="/dashboard">Dashboard</router-link></li>
-        <li><router-link to="/contacts">Contacts</router-link></li>
-        <li><router-link to="/companies">Entreprises</router-link></li>
-        <li><router-link to="/opportunities">Opportunités</router-link></li>
 
         <li class="menu-title mt-4">Paramètres</li>
         <li><router-link to="/settings">Configuration</router-link></li>
         <li><router-link to="/profile">Profil</router-link></li>
+
+        <!-- Carte utilisateur en bas du drawer -->
+        <div class="mt-auto pt-4 border-t border-base-300">
+          <div class="bg-base-100 rounded-box p-4 shadow-sm flex items-center gap-4">
+            <div class="avatar">
+              <div
+                class="w-10 h-10 rounded-full ring ring-primary ring-offset-2 ring-offset-base-100"
+              >
+                <img
+                  src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                />
+              </div>
+            </div>
+            <div class="flex-1">
+              <p class="font-medium">
+                {{ currentUser?.firstName || 'Utilisateur' }} {{ currentUser?.lastName || '' }}
+              </p>
+              <p class="text-xs opacity-70">
+                {{ currentUser?.email || 'utilisateur@exemple.com' }}
+              </p>
+            </div>
+            <button @click="handleLogout" class="btn btn-sm btn-error btn-outline">
+              <Iconify icon="mdi:logout" class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
       </ul>
     </div>
   </div>
@@ -129,17 +172,28 @@
 
 <script lang="ts" setup>
 import { AuthService } from '@/services/auth.service'
+import type { User } from '@/types/auth.types'
 import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const isAuthenticated = ref(false)
 const sidebarOpen = ref(false)
+const currentUser = ref<User | null>(null)
 
 // Fonction pour vérifier l'état d'authentification
-const checkAuth = () => {
+const checkAuth = async () => {
   isAuthenticated.value = AuthService.isAuthenticated()
   console.log("État d'authentification:", isAuthenticated.value)
+
+  // Si l'utilisateur est authentifié, récupérer ses informations
+  if (isAuthenticated.value) {
+    try {
+      currentUser.value = await AuthService.getCurrentUser()
+    } catch (error) {
+      console.error('Erreur lors de la récupération des informations utilisateur:', error)
+    }
+  }
 }
 
 // Vérifier l'authentification au chargement
@@ -149,7 +203,7 @@ onMounted(() => {
 
 // Surveiller les changements de route pour mettre à jour l'état d'authentification
 watch(
-  () => router.currentRoute.value.path, // Correction: router.path → router.currentRoute.value.path
+  () => router.currentRoute.value.path,
   () => {
     checkAuth()
   },
@@ -162,7 +216,6 @@ const handleLogin = () => {
 
 // Gérer la déconnexion
 const handleLogout = () => {
-  // Renommé de logout à handleLogout pour correspondre au template
   console.log('Déconnexion')
   AuthService.logout()
   isAuthenticated.value = false
@@ -179,12 +232,26 @@ const NavigationItems = ref([
     label: 'Home',
     iconName: 'mdi:home',
     command: '/',
+    items: [
+      {
+        label: 'Dashboard',
+        iconName: 'mdi:home',
+        shortcut: '⌘+D',
+        command: '/dashboard',
+      },
+      {
+        label: 'Settings',
+        iconName: 'mdi:cog',
+        shortcut: '⌘+S',
+        command: '/settings',
+      },
+    ],
   },
   {
     label: 'Projects',
     icon: 'pi pi-search',
     badge: 3,
-    command: '/projects',
+    command: '',
     items: [
       {
         label: 'Core',
@@ -199,9 +266,6 @@ const NavigationItems = ref([
         command: '/projects/blocks',
       },
       {
-        separator: true,
-      },
-      {
         label: 'UI Kit',
         iconName: 'mdi:pencil',
         shortcut: '⌘+U',
@@ -213,6 +277,20 @@ const NavigationItems = ref([
     label: 'A propos',
     iconName: 'mdi:information',
     command: '/about',
+    items: [
+      {
+        label: 'Documentation',
+        iconName: 'mdi:book-open',
+        shortcut: '⌘+D',
+        command: '/documentation',
+      },
+      {
+        label: 'Support',
+        iconName: 'mdi:headset-mic',
+        shortcut: '⌘+S',
+        command: '/support',
+      },
+    ],
   },
 ])
 </script>

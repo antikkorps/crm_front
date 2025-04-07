@@ -1,5 +1,5 @@
 <template>
-  <div class="card bg-base-100 w-96 shadow-sm">
+  <div class="card bg-base-100 shadow-sm w-full">
     <div class="card-body">
       <div class="flex justify-between items-center">
         <h2 class="card-title">
@@ -21,7 +21,7 @@
 import { defineProps } from 'vue'
 
 // Définir les props pour le composant
-const props = defineProps({
+defineProps({
   title: {
     type: String,
     required: true,
