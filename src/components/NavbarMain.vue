@@ -97,9 +97,41 @@
 
     <!-- Sidebar - seulement si connecté -->
     <div v-if="isAuthenticated" class="drawer-side z-[999]">
-      <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"></label>
+      <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"> </label>
+      <!-- close-button -->
+      <div class="flex-none">
+        <label for="my-drawer-3" aria-label="close sidebar" class="btn btn-square btn-ghost">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            class="inline-block h-5 w-5 stroke-current"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </label>
+      </div>
+      <!-- Menu de navigation -->
       <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
         <li class="menu-title">Navigation</li>
+        <li v-for="item in NavigationItems" :key="item.label">
+          <router-link :to="item.command">{{ item.label }}</router-link>
+          <span v-if="item.badge" class="badge badge-primary">{{ item.badge }}</span>
+          <ul v-if="item.items" class="submenu">
+            <li v-for="subItem in item.items" :key="subItem.label">
+              <router-link :to="subItem.command || ''">{{ subItem.label }}</router-link>
+              <span v-if="subItem.shortcut" class="badge badge-secondary">{{
+                subItem.shortcut
+              }}</span>
+            </li>
+          </ul>
+        </li>
+
         <li><router-link to="/dashboard">Dashboard</router-link></li>
         <li><router-link to="/contacts">Contacts</router-link></li>
         <li><router-link to="/companies">Entreprises</router-link></li>
@@ -113,7 +145,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { AuthService } from '@/services/auth.service'
 import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -160,26 +192,29 @@ const toggleSidebar = () => {
   sidebarOpen.value = !sidebarOpen.value
 }
 
-const items = ref([
+const NavigationItems = ref([
   {
     label: 'Home',
     iconName: 'mdi:home',
-    command: () => router.push('/'),
+    command: '/',
   },
   {
     label: 'Projects',
     icon: 'pi pi-search',
     badge: 3,
+    command: '/projects',
     items: [
       {
         label: 'Core',
         iconName: 'mdi:lightning-bolt',
         shortcut: '⌘+S',
+        command: '/projects/core',
       },
       {
         label: 'Blocks',
         iconName: 'mdi:server',
         shortcut: '⌘+B',
+        command: '/projects/blocks',
       },
       {
         separator: true,
@@ -188,13 +223,14 @@ const items = ref([
         label: 'UI Kit',
         iconName: 'mdi:pencil',
         shortcut: '⌘+U',
+        command: '/projects/ui-kit',
       },
     ],
   },
   {
     label: 'A propos',
     iconName: 'mdi:information',
-    command: () => router.push('/about'),
+    command: '/about',
   },
 ])
 </script>
