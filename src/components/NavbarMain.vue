@@ -121,7 +121,6 @@
           </label>
         </div>
 
-        <li class="menu-title">Navigation</li>
         <li v-for="item in NavigationItems" :key="item.label">
           <details open>
             <summary>{{ item.label }}</summary>
@@ -160,7 +159,7 @@
                 {{ currentUser?.email || 'utilisateur@exemple.com' }}
               </p>
             </div>
-            <button @click="handleLogout" class="btn btn-sm btn-error btn-outline">
+            <button @click="handleLogout" class="btn btn-sm btn-error btn-outline hover:text-white">
               <Iconify icon="mdi:logout" class="w-4 h-4" />
             </button>
           </div>
