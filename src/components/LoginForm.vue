@@ -81,7 +81,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { AuthService } from '@/services/auth.service'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -107,7 +107,7 @@ const handleLogin = async () => {
     router.push('/dashboard')
   } catch (error) {
     console.error('Login failed:', error)
-    errorMessage.value = error.message || 'Échec de la connexion. Veuillez réessayer.'
+    errorMessage.value = (error as Error).message || 'Échec de la connexion. Veuillez réessayer.'
   } finally {
     isLoading.value = false
   }

@@ -71,11 +71,7 @@
         <div class="card-body">
           <h2 class="card-title">Pipeline d'opportunités</h2>
           <div class="h-80 w-full">
-            <!-- Recommandation: utiliser Chart.js ou ApexCharts -->
-            <div class="flex items-center justify-center h-full bg-base-200 rounded-box">
-              <p class="text-center text-gray-500">Graphique du pipeline d'opportunités</p>
-              <!-- Graphique sera implémenté ici -->
-            </div>
+            <OpportunitiesChart />
           </div>
         </div>
       </div>
@@ -213,6 +209,7 @@
 import { Icon as Iconify } from '@iconify/vue'
 import { onMounted, ref } from 'vue'
 import CardComponent from '../../components/dashboard/cardSingle.vue'
+import OpportunitiesChart from '../../components/dashboard/OpportunitiesChart.vue'
 import { apiRequest } from '../../services/api.service'
 
 interface Stats {
