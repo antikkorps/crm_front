@@ -40,7 +40,10 @@
         </div>
 
         <!-- Section utilisateur - conditionnelle -->
-        <div v-if="isAuthenticated" class="flex gap-2">
+        <div v-if="isAuthenticated" class="flex items-center gap-2">
+          <!-- ThemeToggle-->
+          <ThemeToggle />
+
           <div class="dropdown dropdown-end">
             <label tabindex="0" class="btn btn-ghost btn-circle">
               <div class="avatar">
@@ -97,7 +100,8 @@
         </div>
 
         <!-- Bouton login - seulement si non connecté -->
-        <div v-else class="flex-none">
+        <div v-else class="flex items-center gap-2">
+          <ThemeToggle />
           <button class="btn btn-primary" @click="handleLogin">Login</button>
         </div>
       </div>
@@ -174,6 +178,7 @@ import { AuthService } from '@/services/auth.service'
 import type { User } from '@/types/auth.types'
 import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import ThemeToggle from './ThemeToggle.vue'
 
 const router = useRouter()
 const isAuthenticated = ref(false)
