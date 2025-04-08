@@ -233,18 +233,24 @@ const toggleSidebar = () => {
 
 const NavigationItems = ref([
   {
-    label: 'Home',
+    label: 'Accès rapide',
     iconName: 'mdi:home',
-    command: '/',
+    command: '',
     items: [
+    {
+        label: 'Accueil',
+        iconName: 'mdi:home',
+        shortcut: '⌘+D',
+        command: '/',
+      },
       {
         label: 'Dashboard',
-        iconName: 'mdi:home',
+        iconName: 'mdi:view-dashboard-outline',
         shortcut: '⌘+D',
         command: '/dashboard',
       },
       {
-        label: 'Settings',
+        label: 'Paramètres',
         iconName: 'mdi:cog',
         shortcut: '⌘+S',
         command: '/settings',
@@ -252,33 +258,33 @@ const NavigationItems = ref([
     ],
   },
   {
-    label: 'Projects',
+    label: 'Gestion Commerciale',
     icon: 'pi pi-search',
     badge: 3,
     command: '',
     items: [
       {
-        label: 'Core',
-        iconName: 'mdi:lightning-bolt',
+        label: 'Contacts',
+        iconName: 'mdi:account-multiple',
         shortcut: '⌘+S',
-        command: '/projects/core',
+        command: '/contacts',
       },
       {
-        label: 'Blocks',
-        iconName: 'mdi:server',
+        label: 'Entreprises',
+        iconName: 'mdi:office-building',
         shortcut: '⌘+B',
-        command: '/projects/blocks',
+        command: '/companies',
       },
       {
-        label: 'UI Kit',
-        iconName: 'mdi:pencil',
+        label: 'Notes',
+        iconName: 'mdi:note-text',
         shortcut: '⌘+U',
-        command: '/projects/ui-kit',
+        command: '/notes',
       },
     ],
   },
   {
-    label: 'A propos',
+    label: "Besoin d'aide ?",
     iconName: 'mdi:information',
     command: '/about',
     items: [

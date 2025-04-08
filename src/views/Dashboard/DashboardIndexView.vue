@@ -44,9 +44,9 @@
     <!-- Tâches prioritaires et Calendrier -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Tâches prioritaires - maintenant avec plus de fonctionnalités -->
-      <TasksList 
-        title="Tâches prioritaires"
-        :show-all-tasks="false" 
+      <TasksList
+        title="Tâches en cours"
+        :show-all-tasks="false"
         add-button-label="Ajouter une tâche"
       />
 
@@ -72,8 +72,8 @@ import type { CalendarEvent } from '@/components/dashboard/MiniCalendar.vue'
 import MiniCalendar from '@/components/dashboard/MiniCalendar.vue'
 import OpportunitiesChart from '@/components/dashboard/OpportunitiesChart.vue'
 import TasksList from '@/components/dashboard/TasksList.vue'
-import { apiRequest } from '@/services/api.service'
 import { ActivityService } from '@/services/activity.service'
+import { apiRequest } from '@/services/api.service'
 import { useToastStore } from '@/stores/toast'
 import type { Stats } from '@/types/dashboard.types'
 import { onMounted, ref } from 'vue'
@@ -138,7 +138,7 @@ const refreshActivities = async () => {
   isRefreshingActivities.value = true
   try {
     const items = await ActivityService.getRecentActivities()
-    
+
     // Transformation des données API en format attendu par le composant
     recentActivities.value = items.map((item) => {
       // Déterminer l'icône en fonction du type d'activité
@@ -204,8 +204,8 @@ const refreshActivities = async () => {
         icon,
       }
     })
-    
-    toastStore.success('Activités récentes mises à jour avec succès')
+
+    // toastStore.success('Activités récentes mises à jour avec succès')
   } catch (error) {
     console.error('Erreur lors du rafraîchissement des activités:', error)
     toastStore.error('Erreur lors de la mise à jour des activités')
