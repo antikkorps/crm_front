@@ -13,8 +13,8 @@
 
     <!-- Contenu principal -->
     <div :class="{ 'drawer-content': isAuthenticated, 'flex flex-col': true }">
-      <!-- Navbar avec apparence conditionnelle -->
-      <div class="navbar bg-base-100 shadow-sm w-full">
+      <!-- Navbar avec apparence conditionnelle - rendue fixe -->
+      <div class="navbar bg-base-100 shadow-sm w-full fixed top-0 z-30">
         <!-- Bouton sidebar - seulement pour les utilisateurs connectés -->
         <div v-if="isAuthenticated" class="flex-none">
           <label for="my-drawer-3" aria-label="open sidebar" class="btn btn-square btn-ghost">
@@ -106,8 +106,8 @@
         </div>
       </div>
 
-      <!-- Contenu principal -->
-      <main class="container mx-auto p-4">
+      <!-- Contenu principal avec padding-top pour compenser la navbar fixe -->
+      <main class="container mx-auto p-4 mt-16">
         <slot />
       </main>
     </div>
@@ -170,13 +170,23 @@
         </div>
       </ul>
     </div>
+
+    <!-- Bouton de retour en haut (optionnel) -->
+    <button
+      v-if="showScrollTop"
+      @click="scrollToTop"
+      class="btn btn-circle btn-primary fixed bottom-4 right-4 shadow-lg z-20"
+      aria-label="Retour en haut"
+    >
+      <Iconify icon="mdi:chevron-up" class="w-6 h-6" />
+    </button>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { AuthService } from '@/services/auth.service'
 import type { User } from '@/types/auth.types'
-import { onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ThemeToggle from './ThemeToggle.vue'
 
@@ -203,6 +213,7 @@ const checkAuth = async () => {
 // Vérifier l'authentification au chargement
 onMounted(() => {
   checkAuth()
+  window.addEventListener('scroll', handleScroll)
 })
 
 // Surveiller les changements de route pour mettre à jour l'état d'authentification
@@ -212,6 +223,11 @@ watch(
     checkAuth()
   },
 )
+
+// Retirer l'écouteur d'événement avant de démonter le composant
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 
 // Gérer la connexion
 const handleLogin = () => {
@@ -237,7 +253,7 @@ const NavigationItems = ref([
     iconName: 'mdi:home',
     command: '',
     items: [
-    {
+      {
         label: 'Accueil',
         iconName: 'mdi:home',
         shortcut: '⌘+D',
@@ -303,4 +319,31 @@ const NavigationItems = ref([
     ],
   },
 ])
+
+// Gestion du bouton de retour en haut
+const showScrollTop = ref(false)
+
+// Fonction pour détecter le défilement
+const handleScroll = () => {
+  if (window.scrollY > 300) {
+    showScrollTop.value = true
+  } else {
+    showScrollTop.value = false
+  }
+}
+
+// Fonction pour remonter en haut de la page
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  })
+}
 </script>
+
+<style scoped>
+/* Transition pour l'apparition du bouton de retour en haut */
+button {
+  transition: opacity 0.3s ease;
+}
+</style>
