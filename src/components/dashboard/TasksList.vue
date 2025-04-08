@@ -200,7 +200,7 @@ import { computed, onMounted, ref } from 'vue'
 const props = defineProps({
   title: {
     type: String,
-    default: 'Tâches prioritaires',
+    default: 'Tâches en cours',
   },
   addButtonLabel: {
     type: String,
