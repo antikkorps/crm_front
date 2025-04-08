@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits, defineProps } from 'vue'
+import { defineEmits } from 'vue'
 
 export interface Task {
   title: string

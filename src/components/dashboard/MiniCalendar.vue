@@ -34,8 +34,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
-
 export interface CalendarEvent {
   date: string
   title: string

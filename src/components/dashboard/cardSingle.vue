@@ -18,8 +18,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
-
 // Définir les props pour le composant
 defineProps({
   title: {

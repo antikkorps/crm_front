@@ -54,8 +54,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
-
 export interface KpiMetric {
   title: string
   value: string
