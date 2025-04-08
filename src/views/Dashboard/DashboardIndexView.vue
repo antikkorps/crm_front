@@ -43,14 +43,11 @@
 
     <!-- Tâches prioritaires et Calendrier -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Tâches prioritaires -->
-      <TasksList
-        :tasks="priorityTasks"
-        @add="addTask"
-        @edit="editTask"
-        @complete="completeTask"
-        @delete="deleteTask"
-        @toggle-status="toggleTaskStatus"
+      <!-- Tâches prioritaires - maintenant avec plus de fonctionnalités -->
+      <TasksList 
+        title="Tâches prioritaires"
+        :show-all-tasks="false" 
+        add-button-label="Ajouter une tâche"
       />
 
       <!-- Mini calendrier -->
@@ -74,11 +71,11 @@ import DashboardKpis from '@/components/dashboard/DashboardKpis.vue'
 import type { CalendarEvent } from '@/components/dashboard/MiniCalendar.vue'
 import MiniCalendar from '@/components/dashboard/MiniCalendar.vue'
 import OpportunitiesChart from '@/components/dashboard/OpportunitiesChart.vue'
-import type { Task } from '@/components/dashboard/TasksList.vue'
 import TasksList from '@/components/dashboard/TasksList.vue'
 import { apiRequest } from '@/services/api.service'
+import { ActivityService } from '@/services/activity.service'
 import { useToastStore } from '@/stores/toast'
-import type { ApiActivity, Stats } from '@/types/dashboard.types'
+import type { Stats } from '@/types/dashboard.types'
 import { onMounted, ref } from 'vue'
 
 // Stats et récupération des données
@@ -138,13 +135,12 @@ const isRefreshingActivities = ref(false)
 const toastStore = useToastStore()
 
 const refreshActivities = async () => {
-  console.log('Rafraîchissement des activités récentes')
   isRefreshingActivities.value = true
   try {
-    const data = await apiRequest<{ items: ApiActivity[] }>('/v1/activities/recent')
-
+    const items = await ActivityService.getRecentActivities()
+    
     // Transformation des données API en format attendu par le composant
-    recentActivities.value = data.items.map((item) => {
+    recentActivities.value = items.map((item) => {
       // Déterminer l'icône en fonction du type d'activité
       let icon = 'mdi:information'
       switch (item.type) {
@@ -208,7 +204,7 @@ const refreshActivities = async () => {
         icon,
       }
     })
-
+    
     toastStore.success('Activités récentes mises à jour avec succès')
   } catch (error) {
     console.error('Erreur lors du rafraîchissement des activités:', error)
@@ -216,58 +212,6 @@ const refreshActivities = async () => {
   } finally {
     isRefreshingActivities.value = false
   }
-}
-
-// Tâches prioritaires
-const priorityTasks = ref<Task[]>([
-  {
-    title: 'Appeler M. Dubois',
-    assignee: 'Vous',
-    dueDate: "Aujourd'hui",
-    isCompleted: false,
-    isOverdue: false,
-  },
-  {
-    title: 'Préparer proposition commerciale',
-    assignee: 'Julie',
-    dueDate: 'Demain',
-    isCompleted: false,
-    isOverdue: false,
-  },
-  {
-    title: 'Répondre aux emails en attente',
-    assignee: 'Vous',
-    dueDate: 'Hier',
-    isCompleted: false,
-    isOverdue: true,
-  },
-  {
-    title: 'Suivre facture client #3241',
-    assignee: 'Marc',
-    dueDate: '25/05/2023',
-    isCompleted: true,
-    isOverdue: false,
-  },
-])
-
-const addTask = () => {
-  console.log('Ajouter une tâche')
-}
-
-const editTask = (index: number) => {
-  console.log(`Modifier la tâche à l'index ${index}`)
-}
-
-const completeTask = (index: number) => {
-  console.log(`Terminer la tâche à l'index ${index}`)
-}
-
-const deleteTask = (index: number) => {
-  console.log(`Supprimer la tâche à l'index ${index}`)
-}
-
-const toggleTaskStatus = (index: number) => {
-  priorityTasks.value[index].isCompleted = !priorityTasks.value[index].isCompleted
 }
 
 // Événements du calendrier
