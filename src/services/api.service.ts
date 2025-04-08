@@ -1,5 +1,6 @@
+import router from '@/router'
 import type { RequestOptions } from '../types/api.types'
-import { getToken } from '../utils/token'
+import { getToken, removeToken } from '../utils/token'
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3030/api'
 
@@ -35,6 +36,20 @@ export async function apiRequest<T>(endpoint: string, options: RequestOptions = 
     // Gérer les erreurs HTTP
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
+
+      // Gestion spécifique des erreurs d'authentification
+      if (response.status === 401) {
+        console.error("Erreur d'authentification: Session expirée ou token invalide")
+        // Supprimer le token invalide
+        removeToken()
+
+        // Rediriger vers la page de connexion avec un paramètre de redirection
+        const currentPath = window.location.pathname
+        router.push(`/login?redirect=${encodeURIComponent(currentPath)}`)
+
+        throw new Error('Session expirée. Veuillez vous reconnecter.')
+      }
+
       throw new Error(errorData.error || `Erreur HTTP ${response.status}`)
     }
 
