@@ -78,7 +78,7 @@ import type { Task } from '@/components/dashboard/TasksList.vue'
 import TasksList from '@/components/dashboard/TasksList.vue'
 import { apiRequest } from '@/services/api.service'
 import { useToastStore } from '@/stores/toast'
-import type { Stats } from '@/types/dashboard.types'
+import type { ApiActivity, Stats } from '@/types/dashboard.types'
 import { onMounted, ref } from 'vue'
 
 // Stats et récupération des données
@@ -104,9 +104,9 @@ const fetchStats = async () => {
 // Helpers pour les stats
 const getTitle = (key: string) => {
   const titles: Record<string, string> = {
-    contacts: 'Nombre de Contacts',
-    companies: "Nombre d'Entreprises",
-    notes: 'Nombre de Notes',
+    contacts: 'Contacts',
+    companies: 'Entreprises',
+    notes: 'Notes',
     upcoming: 'Rappels à Venir',
     overdue: 'Rappels en Retard',
   }
@@ -132,26 +132,6 @@ const keyMetrics = ref<KpiMetric[]>([
   { title: 'Taux conversion', value: '18%', trend: -2, icon: 'mdi:chart-timeline-variant' },
   { title: 'Devis en cours', value: '15', trend: -4, icon: 'mdi:file-sign' },
 ])
-
-// Activités récentes avec type approprié
-interface ApiActivity {
-  id: string
-  type: string
-  title: string
-  content: string
-  createdAt: string
-  updatedAt: string
-  Company?: { name: string }
-  Contact?: { firstName: string; lastName: string }
-  assignedTo?: { firstName: string; lastName: string }
-  createdBy: { firstName: string; lastName: string }
-  startTime?: string
-  endTime?: string
-  dueDate?: string
-  taskStatus?: string
-  callOutcome?: string
-  // Autres propriétés optionnelles...
-}
 
 const recentActivities = ref<Activity[]>([])
 const isRefreshingActivities = ref(false)
