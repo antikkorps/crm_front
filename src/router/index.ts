@@ -34,6 +34,10 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+  // Force le scroll en haut de page pour chaque navigation
+  scrollBehavior() {
+    return { top: 0 }
+  },
 })
 
 export default router

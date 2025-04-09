@@ -36,7 +36,7 @@
 
         <!-- Titre - toujours affiché -->
         <div class="flex-1">
-          <a class="btn btn-ghost text-xl">MonCRM</a>
+          <RouterLink to="/" class="btn btn-ghost text-xl">MonCRM</RouterLink>
         </div>
 
         <!-- Section utilisateur - conditionnelle -->
@@ -48,9 +48,13 @@
             <label tabindex="0" class="btn btn-ghost btn-circle">
               <div class="avatar">
                 <div class="ring-primary ring-offset-base-100 w-8 rounded-full ring ring-offset-2">
-                  <img
-                    src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                  />
+                  <img v-if="currentUser?.avatarUrl" :src="currentUser.avatarUrl" alt="Avatar" />
+                  <div
+                    v-else
+                    class="bg-primary text-primary-content w-full h-full flex items-center justify-center"
+                  >
+                    {{ getUserInitials(currentUser) }}
+                  </div>
                 </div>
               </div>
             </label>
@@ -150,9 +154,13 @@
               <div
                 class="w-10 h-10 rounded-full ring ring-primary ring-offset-2 ring-offset-base-100"
               >
-                <img
-                  src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                />
+                <img v-if="currentUser?.avatarUrl" :src="currentUser.avatarUrl" alt="Avatar" />
+                <div
+                  v-else
+                  class="bg-primary text-primary-content w-full h-full flex items-center justify-center"
+                >
+                  {{ getUserInitials(currentUser) }}
+                </div>
               </div>
             </div>
             <div class="flex-1">
@@ -339,11 +347,27 @@ const scrollToTop = () => {
     behavior: 'smooth',
   })
 }
+
+// Obtenir les initiales d'un utilisateur
+const getUserInitials = (user: User | null): string => {
+  if (!user) return '??'
+
+  const firstInitial = user.firstName ? user.firstName.charAt(0).toUpperCase() : ''
+  const lastInitial = user.lastName ? user.lastName.charAt(0).toUpperCase() : ''
+
+  return firstInitial + lastInitial || '??'
+}
 </script>
 
 <style scoped>
 /* Transition pour l'apparition du bouton de retour en haut */
 button {
   transition: opacity 0.3s ease;
+}
+
+/* Style pour l'avatar avec initiales */
+.avatar .bg-primary {
+  font-weight: bold;
+  font-size: 0.875rem;
 }
 </style>
