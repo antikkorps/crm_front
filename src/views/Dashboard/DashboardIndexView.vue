@@ -137,7 +137,22 @@ const toastStore = useToastStore()
 const refreshActivities = async () => {
   isRefreshingActivities.value = true
   try {
+    console.log('Début du chargement des activités récentes')
     const items = await ActivityService.getRecentActivities()
+    console.log("Données reçues de l'API:", items)
+
+    if (items.length === 0) {
+      // Afficher un message lorsqu'il n'y a pas d'activités récentes
+      recentActivities.value = [
+        {
+          title: 'Aucune activité récente',
+          description: "Aucune activité n'a été enregistrée au cours des 7 derniers jours",
+          time: 'Maintenant',
+          icon: 'mdi:information-outline',
+        },
+      ]
+      return
+    }
 
     // Transformation des données API en format attendu par le composant
     recentActivities.value = items.map((item) => {
@@ -162,53 +177,72 @@ const refreshActivities = async () => {
       }
 
       // Formater le temps relatif
-      const createdDate = new Date(item.createdAt)
-      const now = new Date()
-      const diffMs = now.getTime() - createdDate.getTime()
-      const diffMins = Math.floor(diffMs / (1000 * 60))
-      const diffHours = Math.floor(diffMins / 60)
-      const diffDays = Math.floor(diffHours / 24)
+      let timeText = 'Récent'
+      try {
+        if (item.createdAt) {
+          const createdDate = new Date(item.createdAt)
+          const now = new Date()
+          const diffMs = now.getTime() - createdDate.getTime()
+          const diffMins = Math.floor(diffMs / (1000 * 60))
+          const diffHours = Math.floor(diffMins / 60)
+          const diffDays = Math.floor(diffHours / 24)
 
-      let timeText = ''
-      if (diffMins < 60) {
-        timeText = `Il y a ${diffMins} min`
-      } else if (diffHours < 24) {
-        timeText = `Il y a ${diffHours}h`
-      } else if (diffDays === 1) {
-        timeText = 'Hier'
-      } else {
-        timeText = `Il y a ${diffDays} jours`
+          if (diffMins < 60) {
+            timeText = `Il y a ${diffMins} min`
+          } else if (diffHours < 24) {
+            timeText = `Il y a ${diffHours}h`
+          } else if (diffDays === 1) {
+            timeText = 'Hier'
+          } else {
+            timeText = `Il y a ${diffDays} jours`
+          }
+        }
+      } catch (error) {
+        console.error('Erreur lors du calcul du temps relatif:', error)
       }
 
       // Formater une description adaptée selon le type d'activité
       let description = item.content || ''
 
       if (item.type === 'CALL' && item.Contact) {
-        description = `Appel avec ${item.Contact.firstName} ${item.Contact.lastName}`
+        const contactName = `${item.Contact.firstName || ''} ${item.Contact.lastName || ''}`.trim()
+        description = contactName ? `Appel avec ${contactName}` : 'Appel'
         if (item.callOutcome) description += ` - ${item.callOutcome}`
       } else if (item.type === 'MEETING') {
-        const contact = item.Contact ? `${item.Contact.firstName} ${item.Contact.lastName}` : ''
-        const company = item.Company ? `${item.Company.name}` : ''
-        description = `Réunion${contact ? ` avec ${contact}` : ''}${company ? ` de ${company}` : ''}`
+        const contactName = item.Contact
+          ? `${item.Contact.firstName || ''} ${item.Contact.lastName || ''}`.trim()
+          : ''
+        const companyName = item.Company ? `${item.Company.name || ''}`.trim() : ''
+        description = `Réunion${contactName ? ` avec ${contactName}` : ''}${companyName ? ` de ${companyName}` : ''}`
       } else if (item.type === 'TASK') {
         description = `Tâche${item.taskStatus ? ` - ${item.taskStatus}` : ''}`
         if (item.assignedTo) {
-          description += ` (assignée à ${item.assignedTo.firstName} ${item.assignedTo.lastName})`
+          const assigneeName =
+            `${item.assignedTo.firstName || ''} ${item.assignedTo.lastName || ''}`.trim()
+          if (assigneeName) {
+            description += ` (assignée à ${assigneeName})`
+          }
         }
       }
 
       return {
-        title: item.title,
-        description,
+        title: item.title || 'Activité sans titre',
+        description: description || 'Pas de description',
         time: timeText,
         icon,
       }
     })
-
-    // toastStore.success('Activités récentes mises à jour avec succès')
   } catch (error) {
     console.error('Erreur lors du rafraîchissement des activités:', error)
     toastStore.error('Erreur lors de la mise à jour des activités')
+    recentActivities.value = [
+      {
+        title: 'Erreur de chargement',
+        description: 'Impossible de charger les activités récentes',
+        time: 'Maintenant',
+        icon: 'mdi:alert',
+      },
+    ]
   } finally {
     isRefreshingActivities.value = false
   }
