@@ -1,33 +1,22 @@
 <template>
   <div class="h-full w-full">
-    <apexchart type="bar" height="100%" :options="chartOptions" :series="series"></apexchart>
+    <div v-if="isLoading" class="flex justify-center items-center h-full">
+      <span class="loading loading-spinner loading-md"></span>
+    </div>
+    <apexchart v-else type="bar" height="100%" :options="chartOptions" :series="series"></apexchart>
   </div>
 </template>
 
 <script setup lang="ts">
+import { PipelineService } from '@/services/pipeline.service'
 import { onMounted, ref } from 'vue'
 
-// Données du graphique (à remplacer par des données réelles de votre API)
+const isLoading = ref(true)
+
 const series = ref([
   {
-    name: 'Prospection',
-    data: [44, 55, 57, 56, 61, 58],
-  },
-  {
-    name: 'Qualification',
-    data: [76, 85, 101, 98, 87, 105],
-  },
-  {
-    name: 'Proposition',
-    data: [35, 41, 36, 26, 45, 48],
-  },
-  {
-    name: 'Négociation',
-    data: [35, 41, 36, 26, 45, 48],
-  },
-  {
-    name: 'Gagné',
-    data: [25, 31, 26, 36, 25, 28],
+    name: 'Chargement...',
+    data: [0, 0, 0, 0, 0, 0],
   },
 ])
 
@@ -89,13 +78,36 @@ const chartOptions = ref({
   },
 })
 
-// Remplacer par un appel API pour obtenir des données réelles
+// Récupérer les données réelles depuis l'API
 const fetchChartData = async () => {
   try {
-    // const response = await apiRequest('/v1/analytics/opportunities-pipeline')
-    // series.value = response.data
+    isLoading.value = true
+    const opportunitiesData = await PipelineService.getOpportunitiesByMonth()
+
+    // Mettre à jour les séries de données
+    series.value = opportunitiesData.series
+
+    // Mettre à jour les catégories (mois)
+    chartOptions.value = {
+      ...chartOptions.value,
+      xaxis: {
+        ...chartOptions.value.xaxis,
+        categories: opportunitiesData.categories,
+      },
+    }
+
+    // Récupérer les couleurs des statuts si disponibles
+    const statuses = await PipelineService.getStatusesByType('OPPORTUNITY')
+    if (statuses.length > 0 && statuses.every((status) => status.color)) {
+      chartOptions.value = {
+        ...chartOptions.value,
+        colors: statuses.map((status) => status.color || '#808080'),
+      }
+    }
   } catch (error) {
     console.error('Erreur lors du chargement des données du graphique:', error)
+  } finally {
+    isLoading.value = false
   }
 }
 
