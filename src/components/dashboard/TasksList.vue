@@ -1,6 +1,6 @@
 <template>
-  <div class="card bg-base-100 shadow-sm h-full">
-    <div class="card-body">
+  <div class="card bg-base-100 shadow-sm h-full flex flex-col">
+    <div class="card-body flex flex-col flex-1 p-4 sm:p-6">
       <!-- En-tête avec filtre amélioré -->
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
         <h2 class="card-title mb-2 sm:mb-0">{{ title }}</h2>
@@ -34,18 +34,18 @@
       </div>
 
       <!-- État de chargement -->
-      <div v-if="isLoading" class="flex justify-center my-4">
+      <div v-if="isLoading" class="flex justify-center my-4 flex-1">
         <span class="loading loading-spinner loading-md"></span>
       </div>
 
       <!-- Message si aucune tâche -->
-      <div v-else-if="tasks.length === 0" class="alert alert-info mt-4">
+      <div v-else-if="tasks.length === 0" class="alert alert-info mt-4 flex-1">
         <Iconify icon="mdi:information" class="w-5 h-5" />
         <span>Aucune tâche à afficher.</span>
       </div>
 
       <!-- Affichage des tâches en cartes -->
-      <div v-else class="grid grid-cols-1 gap-3 overflow-y-auto max-h-[65vh] px-1">
+      <div v-else class="grid grid-cols-1 gap-3 overflow-y-auto flex-1 px-1">
         <div
           v-for="task in tasks"
           :key="task.id"
@@ -494,5 +494,61 @@ onMounted(() => {
     opacity 0.3s ease,
     border-color 0.3s ease,
     box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Assurer que la liste des tâches prend tout l'espace vertical disponible */
+.dashboard-container .grid {
+  height: 100%;
+}
+
+/* Fixer la hauteur du conteneur principal pour qu'il corresponde au calendrier */
+.grid-cols-1.overflow-y-auto {
+  height: auto;
+  max-height: 600px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Style pour les barres de défilement du conteneur principal */
+.grid-cols-1.overflow-y-auto::-webkit-scrollbar {
+  width: 5px;
+}
+
+.grid-cols-1.overflow-y-auto::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.grid-cols-1.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.grid-cols-1.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Style pour les cartes de tâches - alignées en haut */
+.grid-cols-1 > .card {
+  margin-bottom: 12px;
+}
+
+.grid-cols-1 > .card:last-child {
+  margin-bottom: 0;
+}
+
+.grid-cols-1 > .card .card-body {
+  padding: 12px;
 }
 </style>

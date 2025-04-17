@@ -74,6 +74,12 @@ export const ActivityService = {
   // Récupérer les activités récentes
   async getRecentActivities(): Promise<ApiActivity[]> {
     const response = await apiRequest<{ items: ApiActivity[] }>('/v1/activities/recent')
+
+    // Si le tableau est vide, on peut retourner une activité synthétique pour informer l'utilisateur
+    if (response.items.length === 0) {
+      console.log('Aucune activité récente trouvée dans les 7 derniers jours')
+    }
+
     return response.items
   },
 }

@@ -27,16 +27,16 @@ const mounted = ref(false)
 const isDarkTheme = ref(false)
 
 // Fonction pour obtenir le thème actuel
-const getTheme = (): 'night' | 'bumblebee' => {
+const getTheme = (): 'business' | 'bumblebee' => {
   if (mounted.value) {
     // Vérifier le thème enregistré
     const savedTheme = localStorage.getItem('theme')
 
-    if (savedTheme === 'night' || savedTheme === 'bumblebee') {
+    if (savedTheme === 'business' || savedTheme === 'bumblebee') {
       return savedTheme
     } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       // Vérifier la préférence du système
-      return 'night'
+      return 'business'
     }
   }
 
@@ -44,15 +44,15 @@ const getTheme = (): 'night' | 'bumblebee' => {
 }
 
 // Fonction pour appliquer le thème
-const applyTheme = (theme: 'night' | 'bumblebee') => {
+const applyTheme = (theme: 'business' | 'bumblebee') => {
   document.documentElement.setAttribute('data-theme', theme)
   localStorage.setItem('theme', theme)
-  isDarkTheme.value = theme === 'night'
+  isDarkTheme.value = theme === 'business'
 }
 
 // Fonction pour basculer entre les thèmes
 const toggleTheme = () => {
-  const newTheme = isDarkTheme.value ? 'bumblebee' : 'night'
+  const newTheme = isDarkTheme.value ? 'bumblebee' : 'business'
   applyTheme(newTheme)
 }
 
@@ -68,7 +68,7 @@ onMounted(() => {
     mediaQuery.addEventListener('change', (e) => {
       if (!localStorage.getItem('theme')) {
         // Ne changer automatiquement que si l'utilisateur n'a pas explicitement choisi un thème
-        applyTheme(e.matches ? 'night' : 'bumblebee')
+        applyTheme(e.matches ? 'business' : 'bumblebee')
       }
     })
   }
