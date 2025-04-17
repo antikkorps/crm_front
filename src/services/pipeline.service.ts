@@ -27,6 +27,14 @@ export interface OpportunitiesByMonth {
   }>
 }
 
+export interface OpportunitiesValueSummary {
+  totalValue: number
+  averageValue: number
+  medianValue: number
+  winRate: number
+  percentChangeLastMonth: number
+}
+
 export const PipelineService = {
   // Récupérer tous les statuts
   async getAllStatuses(): Promise<Status[]> {
@@ -48,7 +56,7 @@ export const PipelineService = {
   // Récupérer les données de pipeline pour le graphique (opportunités par statut)
   async getOpportunitiesPipeline(): Promise<PipelineStage[]> {
     try {
-      // Cette route est hypothétique, à adapter selon l'API réelle
+      // Route mise à jour pour correspondre au backend
       const response = await apiRequest<{ items: PipelineStage[] }>(
         '/v1/analytics/opportunities-pipeline',
       )
@@ -70,7 +78,7 @@ export const PipelineService = {
   // Récupérer les données d'opportunités par mois pour le graphique
   async getOpportunitiesByMonth(): Promise<OpportunitiesByMonth> {
     try {
-      // Cette route est hypothétique, à adapter selon l'API réelle
+      // Route mise à jour pour correspondre au backend
       return await apiRequest<OpportunitiesByMonth>('/v1/analytics/opportunities-by-month')
     } catch (error) {
       console.error('Erreur lors de la récupération des données mensuelles:', error)
@@ -99,6 +107,25 @@ export const PipelineService = {
             data: [25, 31, 26, 36, 25, 28],
           },
         ],
+      }
+    }
+  },
+
+  // Récupérer le résumé des valeurs d'opportunités
+  async getOpportunitiesValueSummary(): Promise<OpportunitiesValueSummary> {
+    try {
+      return await apiRequest<OpportunitiesValueSummary>(
+        '/v1/analytics/opportunities-value-summary',
+      )
+    } catch (error) {
+      console.error('Erreur lors de la récupération du résumé des valeurs:', error)
+      // Retourner des données fictives en cas d'erreur
+      return {
+        totalValue: 245000,
+        averageValue: 35000,
+        medianValue: 28000,
+        winRate: 0.32,
+        percentChangeLastMonth: 0.15,
       }
     }
   },

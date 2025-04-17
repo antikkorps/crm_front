@@ -3,15 +3,52 @@
     <div v-if="isLoading" class="flex justify-center items-center h-full">
       <span class="loading loading-spinner loading-md"></span>
     </div>
-    <apexchart v-else type="bar" height="100%" :options="chartOptions" :series="series"></apexchart>
+    <div v-else>
+      <!-- Summary section at the top -->
+      <div v-if="valueSummary" class="grid grid-cols-4 gap-4 mb-4">
+        <div class="stat bg-base-200 rounded-lg p-4">
+          <div class="stat-title">Valeur totale</div>
+          <div class="stat-value">{{ formatCurrency(valueSummary.totalValue) }}</div>
+          <div class="stat-desc">
+            <span :class="valueSummary.percentChangeLastMonth > 0 ? 'text-success' : 'text-error'">
+              {{ valueSummary.percentChangeLastMonth > 0 ? '↗' : '↘' }}
+              {{ Math.abs(Math.round(valueSummary.percentChangeLastMonth * 100)) }}%
+            </span>
+            depuis le mois dernier
+          </div>
+        </div>
+        <div class="stat bg-base-200 rounded-lg p-4">
+          <div class="stat-title">Valeur moyenne</div>
+          <div class="stat-value">{{ formatCurrency(valueSummary.averageValue) }}</div>
+        </div>
+        <div class="stat bg-base-200 rounded-lg p-4">
+          <div class="stat-title">Valeur médiane</div>
+          <div class="stat-value">{{ formatCurrency(valueSummary.medianValue) }}</div>
+        </div>
+        <div class="stat bg-base-200 rounded-lg p-4">
+          <div class="stat-title">Taux de succès</div>
+          <div class="stat-value">{{ Math.round(valueSummary.winRate * 100) }}%</div>
+        </div>
+      </div>
+
+      <!-- Chart section -->
+      <apexchart
+        type="bar"
+        height="calc(100% - 130px)"
+        :options="chartOptions"
+        :series="series"
+      ></apexchart>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { OpportunitiesValueSummary } from '@/services/pipeline.service'
 import { PipelineService } from '@/services/pipeline.service'
 import { onMounted, ref } from 'vue'
 
 const isLoading = ref(true)
+const valueSummary = ref<OpportunitiesValueSummary | null>(null)
 
 const series = ref([
   {
@@ -78,10 +115,21 @@ const chartOptions = ref({
   },
 })
 
+// Formater les valeurs monétaires
+const formatCurrency = (value: number): string => {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
 // Récupérer les données réelles depuis l'API
 const fetchChartData = async () => {
   try {
     isLoading.value = true
+
+    // Récupérer les données des opportunités par mois
     const opportunitiesData = await PipelineService.getOpportunitiesByMonth()
 
     // Mettre à jour les séries de données
@@ -104,6 +152,9 @@ const fetchChartData = async () => {
         colors: statuses.map((status) => status.color || '#808080'),
       }
     }
+
+    // Récupérer le résumé des valeurs d'opportunités
+    valueSummary.value = await PipelineService.getOpportunitiesValueSummary()
   } catch (error) {
     console.error('Erreur lors du chargement des données du graphique:', error)
   } finally {
