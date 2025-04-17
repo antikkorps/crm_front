@@ -58,12 +58,6 @@ export interface ReminderStats {
 }
 
 export const StatsService = {
-  // Endpoint existant
-  async getStats(): Promise<DashboardStats> {
-    return await apiRequest<DashboardStats>('/v1/stats/dashboard')
-  },
-
-  // Nouveaux endpoints d'analytiques
   async getDashboardSummary(): Promise<DashboardSummary> {
     return await apiRequest<DashboardSummary>('/v1/analytics/dashboard-summary')
   },

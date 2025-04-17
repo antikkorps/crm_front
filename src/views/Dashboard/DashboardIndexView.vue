@@ -19,26 +19,28 @@
       </div>
     </div>
 
-    <!-- Graphiques et Activités récentes -->
+    <!-- Graphiques et Activités récentes - séparés en mobile -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-      <!-- Graphique des opportunités -->
-      <div class="lg:col-span-2">
+      <!-- Graphique des opportunités - pleine largeur et hauteur ajustée -->
+      <div class="lg:col-span-2 mb-6 lg:mb-0">
         <div class="card bg-base-100 shadow-sm">
           <div class="card-body">
-            <h2 class="card-title">Pipeline d'opportunités</h2>
-            <div class="h-80 w-full">
+            <h2 class="card-title mb-4">Pipeline d'opportunités</h2>
+            <div style="min-height: 420px">
               <OpportunitiesChart />
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Activités récentes -->
-      <ActivityTimeline
-        :activities="recentActivities"
-        :is-refreshing="isRefreshingActivities"
-        @refresh="refreshActivities"
-      />
+      <!-- Activités récentes - dans une grille séparée en mobile -->
+      <div class="lg:col-span-1">
+        <ActivityTimeline
+          :activities="recentActivities"
+          :is-refreshing="isRefreshingActivities"
+          @refresh="refreshActivities"
+        />
+      </div>
     </div>
 
     <!-- Tâches prioritaires et Calendrier -->
@@ -91,7 +93,7 @@ const stats = ref<Stats>({
 
 const fetchStats = async () => {
   try {
-    const data = await apiRequest<{ counts: Stats }>('/v1/analytics/dashboard')
+    const data = await apiRequest<{ counts: Stats }>('/v1/analytics/dashboard-summary')
     stats.value = data.counts
   } catch (error) {
     console.error('Erreur lors de la récupération des statistiques:', error)
@@ -133,6 +135,22 @@ const keyMetrics = ref<KpiMetric[]>([
 const recentActivities = ref<Activity[]>([])
 const isRefreshingActivities = ref(false)
 const toastStore = useToastStore()
+
+const translateTaskStatus = (status: string | undefined): string => {
+  if (!status) return ''
+
+  const translations: Record<string, string> = {
+    IN_PROGRESS: 'En cours',
+    TO_DO: 'À faire',
+    COMPLETED: 'Terminée',
+    CANCELED: 'Annulée',
+    ON_HOLD: 'En attente',
+    OVERDUE: 'En retard',
+    PENDING: 'En suspens',
+  }
+
+  return translations[status] || status
+}
 
 const refreshActivities = async () => {
   isRefreshingActivities.value = true
@@ -215,7 +233,7 @@ const refreshActivities = async () => {
         const companyName = item.Company ? `${item.Company.name || ''}`.trim() : ''
         description = `Réunion${contactName ? ` avec ${contactName}` : ''}${companyName ? ` de ${companyName}` : ''}`
       } else if (item.type === 'TASK') {
-        description = `Tâche${item.taskStatus ? ` - ${item.taskStatus}` : ''}`
+        description = `Tâche${item.taskStatus ? ` - ${translateTaskStatus(item.taskStatus)}` : ''}`
         if (item.assignedTo) {
           const assigneeName =
             `${item.assignedTo.firstName || ''} ${item.assignedTo.lastName || ''}`.trim()
@@ -290,6 +308,13 @@ onMounted(() => {
   .card-wrapper {
     width: 100%;
     max-width: none;
+  }
+}
+
+/* Assurer une hauteur minimum pour le graphique, surtout en mobile */
+@media (max-width: 768px) {
+  .card-body {
+    padding: 1rem;
   }
 }
 </style>

@@ -21,118 +21,100 @@ export interface PipelineStage {
 
 export interface OpportunitiesByMonth {
   categories: string[]
-  series: Array<{
-    name: string
-    data: number[]
-  }>
+  series: { name: string; data: number[] }[]
+  valueSeries?: { name: string; data: number[] }[]
 }
 
-export interface OpportunitiesValueSummary {
-  totalValue: number
-  averageValue: number
-  medianValue: number
-  winRate: number
-  percentChangeLastMonth: number
+export interface OpportunityStatusDistribution {
+  name: string
+  count: number
+  value: number
+  color?: string
+}
+
+export interface OpportunityValueSummary {
+  summary: {
+    totalCount: number
+    totalValue: number
+    weightedValue: number
+    averageValue: number
+  }
+  byStatus: Array<{
+    statusId: string
+    name: string
+    color: string
+    count: number
+    totalValue: number
+    weightedValue: number
+    averageValue: number
+  }>
+  byUser: Array<{
+    userId: string
+    name: string
+    count: number
+    totalValue: number
+    weightedValue: number
+  }>
 }
 
 export const PipelineService = {
   // Récupérer tous les statuts
   async getAllStatuses(): Promise<Status[]> {
-    const response = await apiRequest<{ items: Status[] }>('/statuses')
+    const response = await apiRequest<{ items: Status[] }>('/v1/statuses')
     return response.items
   },
 
   // Récupérer un statut par son ID
   async getStatusById(id: string): Promise<Status> {
-    return apiRequest<Status>(`/statuses/${id}`)
+    return apiRequest<Status>(`/v1/statuses/${id}`)
   },
 
   // Récupérer les statuts par type (ex: "OPPORTUNITY")
   async getStatusesByType(type: string): Promise<Status[]> {
-    const response = await apiRequest<{ items: Status[] }>(`/statuses/type/${type}`)
+    const response = await apiRequest<{ items: Status[] }>(`/v1/statuses/type/${type}`)
     return response.items
   },
 
   // Récupérer les données de pipeline pour le graphique (opportunités par statut)
-  async getOpportunitiesPipeline(): Promise<PipelineStage[]> {
+  async getOpportunitiesPipeline(): Promise<OpportunityStatusDistribution[]> {
     try {
-      // Route mise à jour pour correspondre au backend
-      const response = await apiRequest<{ items: PipelineStage[] }>(
+      const response = await apiRequest<{ items: OpportunityStatusDistribution[] }>(
         '/v1/analytics/opportunities-pipeline',
       )
-      console.log('Données du pipeline récupérées:', response.items)
       return response.items
     } catch (error) {
-      console.error('Erreur lors de la récupération des données du pipeline:', error)
-      // Retourner des données fictives en cas d'erreur
-      return [
-        { name: 'Prospection', count: 12, value: 25000, color: '#4fc3f7' },
-        { name: 'Qualification', count: 8, value: 35000, color: '#7bdcb5' },
-        { name: 'Proposition', count: 5, value: 42000, color: '#ffd54f' },
-        { name: 'Négociation', count: 3, value: 68000, color: '#ff9800' },
-        { name: 'Gagné', count: 2, value: 45000, color: '#4caf50' },
-      ]
+      console.error('Erreur lors de la récupération des données de pipeline:', error)
+      return []
     }
   },
 
-  // Récupérer les données d'opportunités par mois pour le graphique
+  // Récupérer les opportunités par mois
   async getOpportunitiesByMonth(): Promise<OpportunitiesByMonth> {
     try {
-      // Route mise à jour pour correspondre au backend
       return await apiRequest<OpportunitiesByMonth>('/v1/analytics/opportunities-by-month')
     } catch (error) {
-      console.error('Erreur lors de la récupération des données mensuelles:', error)
-      // Retourner des données fictives en cas d'erreur
-      return {
-        categories: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
-        series: [
-          {
-            name: 'Prospection',
-            data: [44, 55, 57, 56, 61, 58],
-          },
-          {
-            name: 'Qualification',
-            data: [76, 85, 101, 98, 87, 105],
-          },
-          {
-            name: 'Proposition',
-            data: [35, 41, 36, 26, 45, 48],
-          },
-          {
-            name: 'Négociation',
-            data: [35, 41, 36, 26, 45, 48],
-          },
-          {
-            name: 'Gagné',
-            data: [25, 31, 26, 36, 25, 28],
-          },
-        ],
-      }
+      console.error('Erreur lors de la récupération des opportunités par mois:', error)
+      return { categories: [], series: [] }
     }
   },
 
-  // Récupérer le résumé des valeurs d'opportunités
-  async getOpportunitiesValueSummary(): Promise<OpportunitiesValueSummary> {
+  // Récupérer le résumé des valeurs des opportunités
+  async getOpportunitiesValueSummary(): Promise<OpportunityValueSummary> {
     try {
-      return await apiRequest<OpportunitiesValueSummary>(
-        '/v1/analytics/opportunities-value-summary',
-      )
+      return await apiRequest<OpportunityValueSummary>('/v1/analytics/opportunities-value-summary')
     } catch (error) {
-      console.error('Erreur lors de la récupération du résumé des valeurs:', error)
-      // Retourner des données fictives en cas d'erreur
+      console.error('Erreur lors de la récupération du résumé des valeurs des opportunités:', error)
       return {
-        totalValue: 245000,
-        averageValue: 35000,
-        medianValue: 28000,
-        winRate: 0.32,
-        percentChangeLastMonth: 0.15,
+        summary: { totalCount: 0, totalValue: 0, weightedValue: 0, averageValue: 0 },
+        byStatus: [],
+        byUser: [],
       }
     }
   },
 
   // Créer un nouveau statut
   async createStatus(data: Omit<Status, 'id' | 'createdAt' | 'updatedAt'>): Promise<Status> {
-    return apiRequest<Status>('/statuses', {
+    return apiRequest<Status>('/v1/statuses', {
       method: 'POST',
       body: data,
     })
@@ -143,7 +125,7 @@ export const PipelineService = {
     id: string,
     data: Partial<Omit<Status, 'id' | 'createdAt' | 'updatedAt'>>,
   ): Promise<Status> {
-    return apiRequest<Status>(`/statuses/${id}`, {
+    return apiRequest<Status>(`/v1/statuses/${id}`, {
       method: 'PUT',
       body: data,
     })
@@ -151,7 +133,7 @@ export const PipelineService = {
 
   // Supprimer un statut
   async deleteStatus(id: string): Promise<void> {
-    await apiRequest<void>(`/statuses/${id}`, {
+    await apiRequest<void>(`/v1/statuses/${id}`, {
       method: 'DELETE',
     })
   },
