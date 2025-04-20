@@ -147,11 +147,15 @@ const statusChartOptions = computed(() => {
         return val.toString()
       },
       style: {
-        fontSize: '14px',
+        fontSize: '12px',
         fontWeight: 'bold',
-        colors: ['#333'],
+        colors: ['#ffffff'],
       },
-      offsetX: 5,
+      offsetX: -20,
+      align: 'right',
+      textAnchor: 'end',
+      position: 'inside',
+      padding: 5,
     },
     stroke: {
       width: 0,
@@ -175,7 +179,7 @@ const statusChartOptions = computed(() => {
       labels: {
         formatter: function (val: number) {
           if (pipelineStore.chartMetric === 'value') {
-            if (isNaN(val)) return '0 €'
+            if (isNaN(val)) return ''
 
             return new Intl.NumberFormat('fr-FR', {
               style: 'currency',
