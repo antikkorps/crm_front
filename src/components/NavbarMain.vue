@@ -134,7 +134,7 @@
             <summary>{{ item.label }}</summary>
             <ul v-if="item.items" class="menu">
               <li v-for="subItem in item.items" :key="subItem.label">
-                <router-link :to="subItem.command || '/'">
+                <router-link :to="subItem.command || '/'" @click="closeSidebar">
                   <Iconify :icon="subItem.iconName" class="w-4 h-4" />
                   {{ subItem.label }}
                 </router-link>
@@ -144,8 +144,8 @@
         </li>
 
         <li class="menu-title mt-4">Paramètres</li>
-        <li><router-link to="/settings">Configuration</router-link></li>
-        <li><router-link to="/profile">Profil</router-link></li>
+        <li><router-link to="/settings" @click="closeSidebar">Configuration</router-link></li>
+        <li><router-link to="/profile" @click="closeSidebar">Profil</router-link></li>
 
         <!-- Carte utilisateur en bas du drawer -->
         <div class="mt-auto pt-4 border-t border-base-300">
@@ -191,7 +191,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { AuthService } from '@/services/auth.service'
 import type { User } from '@/types/auth.types'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -356,6 +356,10 @@ const getUserInitials = (user: User | null): string => {
   const lastInitial = user.lastName ? user.lastName.charAt(0).toUpperCase() : ''
 
   return firstInitial + lastInitial || '??'
+}
+
+const closeSidebar = () => {
+  sidebarOpen.value = false
 }
 </script>
 

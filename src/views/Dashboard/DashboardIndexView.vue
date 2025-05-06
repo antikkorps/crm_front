@@ -79,6 +79,9 @@ import { apiRequest } from '@/services/api.service'
 import { useToastStore } from '@/stores/toast'
 import type { Stats } from '@/types/dashboard.types'
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 // Stats et récupération des données
 const stats = ref<Stats>({
@@ -122,6 +125,24 @@ const getDescription = (key: string, value: number | { upcoming: number; overdue
 // Event handlers pour les composants
 const handleAction = (key: string) => {
   console.log(`Action pour ${key}`)
+  switch (key) {
+    case 'contacts':
+      router.push('/contacts')
+      break
+    case 'companies':
+      router.push('/companies')
+      break
+    case 'notes':
+      router.push('/notes')
+      break
+    case 'reminders':
+    case 'upcoming':
+    case 'overdue':
+      router.push('/reminders')
+      break
+    default:
+      console.warn(`No route defined for ${key}`)
+  }
 }
 
 // KPI metrics
