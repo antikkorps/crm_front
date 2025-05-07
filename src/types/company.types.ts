@@ -108,6 +108,7 @@ export interface CompanyUpdateDto {
   statusId?: string
   size?: string
   revenue?: number
+  assignedToId?: string
 }
 
 export interface CompanyNoteCreateDto {

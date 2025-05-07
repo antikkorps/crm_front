@@ -2,15 +2,15 @@
   <div class="companies-container">
     <div class="page-header flex justify-between items-center mb-6">
       <BackToDashboard />
-      <h1 class="text-2xl font-bold">Entreprises</h1>
+      <h1 class="text-2xl font-bold">{{ t('companies.title') }}</h1>
       <button class="btn btn-primary" @click="openCreateModal">
         <Iconify icon="mdi:plus" class="w-5 h-5 mr-1" />
-        Ajouter
+        {{ t('common.add') }}
       </button>
     </div>
     <div class="mb-4">
       <SearchBar
-        placeholder="Rechercher une entreprise..."
+        :placeholder="t('companies.searchCompanyPlaceholder')"
         :filters="companyFilters"
         :initial-filters="initialFilters"
         @search="handleSearch"
@@ -27,9 +27,11 @@
     </div>
 
     <div v-else-if="!companies.length" class="text-center py-12">
-      <h3 class="text-xl mb-2">No companies found</h3>
-      <p class="text-gray-500 mb-4">Get started by adding your first company</p>
-      <button class="btn btn-primary" @click="openCreateModal">Add Company</button>
+      <h3 class="text-xl mb-2">{{ t('companies.noCompany') }}</h3>
+      <p class="text-gray-500 mb-4">{{ t('companies.startAdding') }}</p>
+      <button class="btn btn-primary" @click="openCreateModal">
+        {{ t('companies.addCompany') }}
+      </button>
     </div>
 
     <div v-else class="companies-grid">
@@ -38,12 +40,12 @@
         <table class="table w-full">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Industry</th>
-              <th class="text-right">Masse Salariale</th>
-              <th>Adresse</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{{ t('common.name') }}</th>
+              <th>{{ t('common.industry') }}</th>
+              <th class="text-right">{{ t('common.size') }}</th>
+              <th>{{ t('common.address') }}</th>
+              <th>{{ t('common.status') }}</th>
+              <th>{{ t('common.actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -62,13 +64,17 @@
                 {{ company.address || 'N/A' }} - {{ company.zipCode || 'N/A' }}
                 {{ company.city || 'N/A' }} - {{ company.country || 'N/A' }}
               </td>
-              <td v-else>Pas d'adresse renseignée</td>
+              <td v-else>{{ t('common.noAddress') }}</td>
               <td>
                 <span
                   class="px-2 py-1 rounded-full text-xs"
                   :class="getStatusClass(company.status?.name)"
                 >
-                  {{ company.status?.name || 'N/A' }}
+                  {{
+                    company.status
+                      ? t(`status.${company.status.name.toLowerCase()}`, company.status.name)
+                      : 'N/A'
+                  }}
                 </span>
               </td>
               <td>
@@ -78,7 +84,7 @@
                     @click="openEditModal(company)"
                     title="Edit"
                   >
-                    <span class="sr-only">Edit</span>
+                    <span class="sr-only">{{ t('common.edit') }}</span>
                     <Iconify icon="heroicons:pencil-square" class="h-5 w-5" />
                   </button>
                   <button
@@ -86,7 +92,7 @@
                     @click="confirmDelete(company)"
                     title="Delete"
                   >
-                    <span class="sr-only">Delete</span>
+                    <span class="sr-only">{{ t('common.delete') }}</span>
                     <Iconify icon="heroicons:trash" class="h-5 w-5" />
                   </button>
                 </div>
@@ -115,19 +121,23 @@
               class="px-2 py-1 rounded-full text-xs"
               :class="getStatusClass(company.status?.name)"
             >
-              {{ company.status?.name || 'N/A' }}
+              {{
+                company.status
+                  ? t(`status.${company.status.name.toLowerCase()}`, company.status.name)
+                  : 'N/A'
+              }}
             </span>
           </div>
 
-          <!-- Informations secondaires qui pourraient être utiles en mobile -->
+          <!-- Informations secondaires mobile -->
           <div class="text-sm text-gray-500 mb-3">
-            {{ company.industry || 'Industrie non spécifiée' }}
+            {{ company.industry || t('companies.industryNotSpecified') }}
           </div>
 
           <div class="flex justify-end space-x-3 mt-2">
             <button class="btn btn-sm btn-ghost" @click="openEditModal(company)" title="Edit">
               <Iconify icon="heroicons:pencil-square" class="h-4 w-4 mr-1" />
-              Modifier
+              {{ t('common.edit') }}
             </button>
             <button
               class="btn btn-sm btn-ghost text-red-500"
@@ -135,7 +145,7 @@
               title="Delete"
             >
               <Iconify icon="heroicons:trash" class="h-4 w-4 mr-1" />
-              Supprimer
+              {{ t('common.delete') }}
             </button>
           </div>
         </div>
@@ -145,145 +155,150 @@
     <!-- Create/Edit Company Modal -->
     <div class="modal" :class="{ 'modal-open': showModal }" id="companyModal">
       <div class="modal-box">
-        <h2 class="text-xl font-bold mb-4">{{ isEditing ? 'Edit Company' : 'Add Company' }}</h2>
+        <h2 class="text-xl font-bold mb-4">
+          {{ isEditing ? t('companies.editCompany') : t('companies.addCompany') }}
+        </h2>
 
         <form @submit.prevent="submitCompanyForm">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div class="form-group">
-              <label class="label">Company Name*</label>
+              <label class="label">{{ t('companies.name') }}*</label>
               <input
                 v-model="companyForm.name"
                 type="text"
                 class="input input-bordered w-full"
-                placeholder="Company Name"
+                :placeholder="t('companies.name')"
                 required
               />
             </div>
 
             <div class="form-group">
-              <label class="label">Industry</label>
+              <label class="label">{{ t('common.industry') }}</label>
               <input
                 v-model="companyForm.industry"
                 type="text"
                 class="input input-bordered w-full"
-                placeholder="Industry"
+                :placeholder="t('common.industry')"
               />
             </div>
 
             <div class="form-group">
-              <label class="label">Size</label>
+              <label class="label">{{ t('common.size') }}</label>
               <select v-model="companyForm.size" class="select select-bordered w-full">
-                <option value="">Select Size</option>
-                <option value="1-10">1-10 employés</option>
-                <option value="11-50">11-50 employés</option>
-                <option value="51-200">51-200 employés</option>
-                <option value="201-500">201-500 employés</option>
-                <option value="501-1000">501-1000 employés</option>
-                <option value="+1000">1000+ employés</option>
+                <option value="">{{ t('common.selectSize') }}</option>
+                <option value="1-10">{{ t('common.size1to10') }}</option>
+                <option value="11-50">{{ t('common.size11to50') }}</option>
+                <option value="51-200">{{ t('common.size51to200') }}</option>
+                <option value="201-500">{{ t('common.size201to500') }}</option>
+                <option value="501-1000">{{ t('common.size501to1000') }}</option>
+                <option value="+1000">{{ t('common.sizeMoreThan1000') }}</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label class="label">Adresse</label>
+              <label class="label">{{ t('common.address') }}</label>
               <input
                 v-model="companyForm.address"
                 type="text"
                 class="input input-bordered w-full"
-                placeholder="Adresse"
+                :placeholder="t('companies.address')"
               />
             </div>
 
             <div class="form-group">
-              <label class="label">Ville</label>
+              <label class="label">{{ t('common.city') }}</label>
               <input
                 v-model="companyForm.city"
                 type="text"
                 class="input input-bordered w-full"
-                placeholder="Ville"
+                :placeholder="t('common.city')"
               />
             </div>
 
             <div class="form-group">
-              <label class="label">Code Postal</label>
+              <label class="label">{{ t('common.zipCode') }}</label>
               <input
                 v-model="companyForm.zipCode"
                 type="text"
                 class="input input-bordered w-full"
-                placeholder="Code Postal"
+                :placeholder="t('common.zipCode')"
               />
             </div>
 
             <div class="form-group">
-              <label class="label">Pays</label>
+              <label class="label">{{ t('common.country') }}</label>
               <input
                 v-model="companyForm.country"
                 type="text"
                 class="input input-bordered w-full"
-                placeholder="Pays"
+                :placeholder="t('common.country')"
               />
             </div>
 
             <div class="form-group">
-              <label class="label">Status</label>
+              <label class="label">{{ t('common.status') }}</label>
               <select v-model="companyForm.statusId" class="select select-bordered w-full">
-                <option value="">Select Status</option>
+                <option value="">{{ t('common.selectStatus') }}</option>
                 <option v-for="status in companyStatuses" :key="status.id" :value="status.id">
-                  {{ status.name }}
+                  {{ t(`status.${status.name.toLowerCase()}`, status.name) }}
                 </option>
               </select>
             </div>
 
             <div class="form-group">
-              <label class="label">Website</label>
+              <label class="label">{{ t('common.website') }}</label>
               <input
                 v-model="companyForm.website"
                 type="url"
                 class="input input-bordered w-full"
-                placeholder="Website URL"
+                :placeholder="t('common.website')"
               />
             </div>
           </div>
 
           <div class="form-group mb-4">
-            <label class="label">Description</label>
+            <label class="label">{{ t('common.description') }}</label>
             <textarea
               v-model="companyForm.description"
               class="textarea textarea-bordered w-full"
-              placeholder="Company description"
+              :placeholder="t('common.description')"
               rows="3"
             ></textarea>
           </div>
 
           <div class="flex justify-end space-x-3 mt-6">
-            <button type="button" class="btn" @click="closeModal">Annuler</button>
+            <button type="button" class="btn" @click="closeModal">{{ t('common.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="loading">
-              {{ isEditing ? 'Mettre à jour' : 'Créer' }}
+              {{ isEditing ? t('common.update') : t('common.create') }}
             </button>
           </div>
         </form>
       </div>
       <div class="modal-backdrop" @click="closeModal">
-        <button>close</button>
+        <button>{{ t('common.close') }}</button>
       </div>
     </div>
 
     <!-- Delete Confirmation Modal -->
     <div class="modal" :class="{ 'modal-open': showDeleteModal }" id="deleteModal">
       <div class="modal-box">
-        <h2 class="text-xl font-bold mb-4">Confirm Delete</h2>
+        <h2 class="text-xl font-bold mb-4">{{ t('common.confirmDelete') }}</h2>
         <p>
-          Are you sure you want to delete {{ companyToDelete?.name }}? This action cannot be undone.
+          {{ t('common.areYouSureToDelete') }} {{ companyToDelete?.name }}?
+          {{ t('common.cannotBeUndone') }}
         </p>
 
         <div class="flex justify-end space-x-3 mt-6">
-          <button type="button" class="btn" @click="showDeleteModal = false">Cancel</button>
+          <button type="button" class="btn" @click="showDeleteModal = false">
+            {{ t('common.cancel') }}
+          </button>
           <button type="button" class="btn btn-error" @click="deleteCompany" :disabled="loading">
-            Delete
+            {{ t('common.delete') }}
           </button>
         </div>
       </div>
       <div class="modal-backdrop" @click="showDeleteModal = false">
-        <button>close</button>
+        <button>{{ t('common.close') }}</button>
       </div>
     </div>
   </div>
@@ -298,7 +313,10 @@ import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
 import type { Company, CompanyCreateDto, CompanyUpdateDto } from '@/types/company.types'
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const companyStore = useCompanyStore()
@@ -344,8 +362,8 @@ onMounted(async () => {
     error.value = companyStore.error
   } catch (err) {
     console.error(err)
-    toastStore.error('Failed to load companies')
-    error.value = 'Failed to load companies'
+    toastStore.error(t('companies.failedToLoadCompanies'))
+    error.value = t('companies.failedToLoadCompanies')
   } finally {
     loading.value = false
   }
@@ -483,17 +501,27 @@ function resetForm() {
 function getStatusClass(status: string | undefined) {
   if (!status) return 'bg-gray-100 text-gray-800'
 
-  switch (status) {
-    case 'Inactive':
-      return 'bg-gray-100 text-gray-800'
-    case 'Prospect':
-      return 'bg-blue-100 text-blue-800'
-    case 'Customer':
-      return 'bg-green-100 text-green-800'
-    case 'Partner':
-      return 'bg-purple-100 text-purple-800'
-    default:
-      return 'bg-gray-100 text-gray-800'
+  // Récupérer les traductions
+  const statusLower = status.toLowerCase()
+  const translations = {
+    inactive: t('status.inactive').toLowerCase(),
+    prospect: t('status.prospect').toLowerCase(),
+    customer: t('status.customer').toLowerCase(),
+    partner: t('status.partner').toLowerCase(),
+  }
+
+  // Vérifier si le statut correspond à l'une des traductions
+  // Utiliser une méthode différente pour la comparaison
+  if (statusLower === 'inactive' || statusLower === translations.inactive) {
+    return 'bg-gray-100 text-gray-800'
+  } else if (statusLower === 'prospect' || statusLower === translations.prospect) {
+    return 'bg-blue-100 text-blue-800'
+  } else if (statusLower === 'customer' || statusLower === translations.customer) {
+    return 'bg-green-100 text-green-800'
+  } else if (statusLower === 'partner' || statusLower === translations.partner) {
+    return 'bg-purple-100 text-purple-800'
+  } else {
+    return 'bg-gray-100 text-gray-800'
   }
 }
 
@@ -501,48 +529,48 @@ function getStatusClass(status: string | undefined) {
 const companyFilters = computed(() => [
   {
     key: 'industry',
-    label: 'Industrie',
+    label: t('common.industry'),
     type: 'text' as const,
-    placeholder: 'Filtrer par industrie',
+    placeholder: t('common.filterByIndustry'),
   },
   {
     key: 'size',
-    label: 'Taille',
+    label: t('common.size'),
     type: 'select' as const,
-    placeholder: 'Toutes tailles',
+    placeholder: t('common.allSizes'),
     options: [
-      { label: '1-10 employés', value: '1-10' },
-      { label: '11-50 employés', value: '11-50' },
-      { label: '51-200 employés', value: '51-200' },
-      { label: '201-500 employés', value: '201-500' },
-      { label: '501-1000 employés', value: '501-1000' },
-      { label: '+1000 employés', value: '+1000' },
+      { label: t('common.size1to10'), value: '1-10' },
+      { label: t('common.size11to50'), value: '11-50' },
+      { label: t('common.size51to200'), value: '51-200' },
+      { label: t('common.size201to500'), value: '201-500' },
+      { label: t('common.size501to1000'), value: '501-1000' },
+      { label: t('common.sizeMoreThan1000'), value: '+1000' },
     ],
   },
   {
     key: 'globalRevenue',
-    label: "Chiffre d'affaires",
+    label: t('common.globalRevenue'),
     type: 'range' as const,
     minKey: 'minRevenue',
     maxKey: 'maxRevenue',
   },
   {
     key: 'statusId',
-    label: 'Statut',
+    label: t('common.status'),
     type: 'select' as const,
-    placeholder: 'Tous statuts',
+    placeholder: t('common.allStatuses'),
     options: statusStore.statuses
       .filter((s) => s.type === 'COMPANY')
       .map((status) => ({
-        label: status.name,
+        label: t(`status.${status.name.toLowerCase()}`, status.name),
         value: status.id,
       })),
   },
   {
     key: 'assignedToId',
-    label: 'Assigné à',
+    label: t('common.assignedTo'),
     type: 'select' as const,
-    placeholder: 'Tous les utilisateurs',
+    placeholder: t('common.allUsers'),
     options: userStore.users.map((user: { firstName: string; lastName: string; id: string }) => ({
       label: `${user.firstName} ${user.lastName}`,
       value: user.id,
@@ -550,15 +578,15 @@ const companyFilters = computed(() => [
   },
   {
     key: 'city',
-    label: 'Ville',
+    label: t('common.city'),
     type: 'text' as const,
-    placeholder: 'Filtrer par ville',
+    placeholder: t('common.filterByCity'),
   },
   {
     key: 'country',
-    label: 'Pays',
+    label: t('common.country'),
     type: 'text' as const,
-    placeholder: 'Filtrer par pays',
+    placeholder: t('common.filterByCountry'),
   },
 ])
 

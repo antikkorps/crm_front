@@ -72,11 +72,11 @@
     <footer class="footer footer-center p-10 bg-neutral text-neutral-content">
       <div>
         <p class="font-bold">MonCRM <br />Outil interne de gestion de la relation client</p>
-        <p>© 2023 - Tous droits réservés</p>
+        <p>© 2023 - {{ t('common.allRightsReserved') }}</p>
       </div>
       <div>
         <div class="grid grid-flow-col gap-4">
-          <a class="link link-hover">{{ t('common.Documentation') }}</a>
+          <a class="link link-hover">{{ t('common.documentation') }}</a>
           <a class="link link-hover">{{ t('common.support') }}</a>
           <a class="link link-hover">{{ t('common.about') }}</a>
         </div>
@@ -110,7 +110,7 @@ const features = ref([
     icon: 'mdi:checkbox-marked-circle-outline',
   },
   {
-    title: 'Tableaux de bord',
+    title: t('common.dashboard', 2),
     description: 'Analysez vos performances avec des tableaux de bord interactifs.',
     icon: 'mdi:view-dashboard',
   },

@@ -1,12 +1,5 @@
 {
   "button": {
-    "add": "Ajouter",
-    "edit": "Modifier",
-    "delete": "Supprimer",
-    "save": "Enregistrer",
-    "cancel": "Annuler",
-    "confirm": "Confirmer",
-    "close": "Fermer",
     "contactSupport": "Contacter le support"
   },
   "auth": {
@@ -24,15 +17,32 @@
   "common": {
     "email": "Email",
     "actions": "Actions",
+    "add": "Ajouter",
     "status": "Status",
+    "selectStatus": "Sélectionner le statut",
     "address": "Adresse",
     "name": "Nom",
-    "industry": "Industrie",
+    "industry": "Secteur",
+    "filterByIndustry": "Filtrer par secteur",
     "website": "Site web",
     "city": "Ville",
     "zipCode": "Code postal",
     "country": "Pays",
+    "noAddress": "Pas d'adresse renseignée",
+    "filterByCity": "Filtrer par ville",
+    "filterByCountry": "Filtrer par pays",
     "size": "Taille",
+    "allSizes": "Toutes tailles",
+    "size1to10": "1 à 10 employés",
+    "size11to50": "11 à 50 employés",
+    "size51to200": "51 à 200 employés",
+    "size201to500": "201 à 500 employés",
+    "size501to1000": "501 à 1000 employés",
+    "sizeMoreThan1000": "+ de 1000 employés",
+    "globalRevenue": "Chiffre d'affaires",
+    "allStatuses": "Tous statuts",
+    "allUsers": "Tous les utilisateurs",
+    "selectSize": "Sélectionner la taille",
     "revenue": "Chiffre d'affaires",
     "search": "Rechercher",
     "filter": "Filtrer",
@@ -41,6 +51,10 @@
     "create": "Créer",
     "update": "Mettre à jour",
     "delete": "Supprimer",
+    "description": "Description",
+    "confirmDelete": "Confirmer la suppression",
+    "areYouSureToDelete": "Êtes-vous sûr de vouloir supprimer ",
+    "cannotBeUndone": "Cette action ne peut pas être annulée !",
     "cancel": "Annuler",
     "save": "Enregistrer",
     "edit": "Modifier",
@@ -50,18 +64,32 @@
     "documentation": "documentation",
     "support": "Support",
     "about": "À propos",
-    "dashboard": "Tableau de bord"
+    "dashboard": "Tableau de Bord | Tableaux de Bord",
+    "backToDashboard": "Retour au tableau de bord",
+    "backToList": "Retour à la liste",
+    "allRightsReserved": "Tous droits réservés",
+    "assignedTo": "Assigné à",
+    "close": "Fermer",
+    "details": "Détails"
   },
   "companies": {
     "title": "Entreprises",
-    "add": "Ajouter une entreprise",
-    "edit": "Modifier l'entreprise",
-    "delete": "Supprimer l'entreprise",
+    "address": "Adresse de l'entreprise",
+    "name": "Nom de l'entreprise",
+    "addCompany": "Ajouter une entreprise",
+    "editCompany": "Modifier l'entreprise",
+    "deleteCompany": "Supprimer l'entreprise",
     "deleteConfirm": "Êtes-vous sûr de vouloir supprimer {name} ? Cette action ne peut pas être annulée.",
-    "noCompanies": "Aucune entreprise trouvée",
-    "startAdding": "Commencez par ajouter votre première entreprise",
-    "salaryMass": "Masse Salariale",
-    "searchPlaceholder": "Rechercher une entreprise..."
+    "startAddingCompany": "Commencez par ajouter votre première entreprise",
+    "searchCompanyPlaceholder": "Rechercher une entreprise...",
+    "noCompany": "Aucune entreprise trouvée",
+    "companyNotFound": "Entreprise non trouvée",
+    "companyNotFoundMessage": "l'entreprise que vous recherchez n'a pas été trouvée",
+    "failedToLoadCompanies": "Échec du chargement des entreprises",
+    "industryNotSpecified": "Secteur non spécifié",
+    "employee": "Employé | Employés",
+    "globalRevenue": "Chiffre d'affaire global",
+    "revenue": "Chiffre d'affaire"
   },
   "contacts": {
     "title": "Contacts",
@@ -69,6 +97,52 @@
     "edit": "Modifier le contact",
     "delete": "Supprimer le contact",
     "noAddress": "Pas d'adresse renseignée"
+  },
+  "notes": {
+    "title": "Notes",
+    "add": "Ajouter une note",
+    "edit": "Modifier la note",
+    "delete": "Supprimer la note",
+    "noNotes": "Aucune note trouvée",
+    "startAdding": "Commencez par ajouter votre première note"
+  },
+  "reminders": {
+    "title": "Rappels",
+    "add": "Ajouter un rappel",
+    "edit": "Modifier le rappel",
+    "delete": "Supprimer le rappel",
+    "noReminders": "Aucun rappel trouvé",
+    "startAdding": "Commencez par ajouter votre premier rappel",
+    "upcoming": "Rappels à venir",
+    "overdue": "Rappels en retard"
+  },
+  "users": {
+    "title": "Utilisateurs",
+    "add": "Ajouter un utilisateur",
+    "edit": "Modifier l'utilisateur",
+    "delete": "Supprimer l'utilisateur",
+    "noUsers": "Aucun utilisateur trouvé",
+    "startAdding": "Commencez par ajouter votre premier utilisateur"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "general": "Général",
+    "profile": "Profil",
+    "security": "Sécurité",
+    "notifications": "Notifications",
+    "language": "Langue",
+    "currency": "Devise",
+    "timezone": "Fuseau horaire"
+  },
+  "profile": {
+    "title": "Profil",
+    "edit": "Modifier le profil",
+    "changePassword": "Changer le mot de passe",
+    "updateProfile": "Mettre à jour le profil",
+    "updatePassword": "Mettre à jour le mot de passe",
+    "currentPassword": "Mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "confirmNewPassword": "Confirmer le nouveau mot de passe"
   },
   "activities": {
     "title": "Activités",
@@ -99,5 +173,8 @@
     "filterByIndustry": "Filtrer par industrie",
     "filterByCity": "Filtrer par ville",
     "filterByCountry": "Filtrer par pays"
+  },
+  "statistics": {
+    "title": "Statistiques"
   }
 }

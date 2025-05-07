@@ -9,9 +9,11 @@
     </div>
 
     <div v-else-if="!company" class="text-center py-12">
-      <h3 class="text-xl mb-2">Company not found</h3>
-      <p class="text-gray-500 mb-4">The requested company could not be found</p>
-      <router-link to="/companies" class="btn btn-primary">Back to Companies</router-link>
+      <h3 class="text-xl mb-2">{{ t('companies.companyNotFound') }}</h3>
+      <p class="text-gray-500 mb-4">{{ t('companies.companyNotFoundMessage') }}</p>
+      <router-link to="/companies" class="btn btn-primary">{{
+        t('common.backToList')
+      }}</router-link>
     </div>
 
     <div v-else>
@@ -19,7 +21,7 @@
       <div class="flex justify-between items-center mb-4">
         <router-link to="/companies" class="btn btn-outline btn-sm mb-2 flex items-center gap-1">
           <Iconify icon="mdi:arrow-left" class="w-4 h-4" />
-          Retour à la liste
+          {{ t('common.backToList') }}
         </router-link>
       </div>
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -35,20 +37,28 @@
             <h1 class="text-2xl font-bold mt-2 sm:mt-0">{{ company.name }}</h1>
             <div class="flex flex-wrap items-center mt-1 text-sm text-gray-600 gap-2">
               <span v-if="company.industry" class="mr-3">{{ company.industry }}</span>
-              <span v-if="company.size" class="mr-3">{{ company.size }} employees</span>
+              <span v-if="company.size" class="mr-3">
+                {{ company.size }}
+                {{ t('companies.employee', company.size.includes('1-') ? 1 : 2) }}
+              </span>
               <span
                 class="px-2 py-1 rounded-full text-xs"
-                :class="getStatusClass(company.status.name)"
+                :class="getStatusClass(company.status?.name)"
               >
-                {{ formatStatusToFrench(company.status.name) || 'N/A' }}
+                {{
+                  company.status
+                    ? t(`status.${company.status.name.toLowerCase()}`, company.status.name)
+                    : 'N/A'
+                }}
               </span>
             </div>
             <div class="flex flex-wrap items-center mt-1 text-sm text-gray-600 gap-2">
               <span v-if="company.globalRevenue" class="mr-3"
-                >Chiffre d'affaire global {{ formattedRevenue(company.globalRevenue) }}</span
+                >{{ t('companies.globalRevenue') }}
+                {{ formattedRevenue(company.globalRevenue) }}</span
               >
               <span v-if="company.generatedRevenue" class="mr-3"
-                >Chiffre d'affaire généré {{ formattedRevenue(company.generatedRevenue) }}</span
+                >{{ t('companies.revenue') }} {{ formattedRevenue(company.generatedRevenue) }}</span
               >
             </div>
           </div>
@@ -86,6 +96,32 @@
                   </a>
                 </p>
                 <p v-else class="text-gray-400">Non fourni</p>
+              </div>
+
+              <div>
+                <p class="text-sm text-gray-500">{{ t('common.assignedTo') }}</p>
+                <div v-if="company.assignedTo" class="flex items-center mt-1">
+                  <div class="avatar mr-2">
+                    <div class="w-8 h-8 rounded-full" v-if="company.assignedTo">
+                      <template v-if="company.assignedTo.avatarUrl">
+                        <img
+                          :src="company.assignedTo.avatarUrl"
+                          :alt="`${company.assignedTo.firstName} ${company.assignedTo.lastName}`"
+                        />
+                      </template>
+                      <div
+                        v-else
+                        class="w-full h-full bg-primary text-primary-content flex items-center justify-center text-xs font-medium"
+                      >
+                        {{ getInitials(company.assignedTo.firstName, company.assignedTo.lastName) }}
+                      </div>
+                    </div>
+                  </div>
+                  <span class="font-medium">
+                    {{ company.assignedTo.firstName }} {{ company.assignedTo.lastName }}
+                  </span>
+                </div>
+                <p v-else class="text-gray-400">{{ t('common.notAssigned', 'Non assigné') }}</p>
               </div>
 
               <div>
@@ -221,7 +257,7 @@
                 <option value="51-200">51-200 employés</option>
                 <option value="201-500">201-500 employés</option>
                 <option value="501-1000">501-1000 employés</option>
-                <option value="1000+">1000+ employés</option>
+                <option value="+1000">+1000 employés</option>
               </select>
             </div>
 
@@ -234,15 +270,51 @@
                 placeholder="Adresse"
               />
             </div>
+            <div class="form-group">
+              <label class="label">Ville</label>
+              <input
+                v-model="companyForm.city"
+                type="text"
+                class="input input-bordered w-full"
+                placeholder="Ville"
+              />
+            </div>
+            <div class="form-group">
+              <label class="label">Code Postal</label>
+              <input
+                v-model="companyForm.zipCode"
+                type="text"
+                class="input input-bordered w-full"
+                placeholder="Code Postal"
+              />
+            </div>
+            <div class="form-group">
+              <label class="label">Pays</label>
+              <input
+                v-model="companyForm.country"
+                type="text"
+                class="input input-bordered w-full"
+                placeholder="Pays"
+              />
+            </div>
 
             <div class="form-group">
-              <label class="label">Status</label>
-              <select v-model="companyForm.status" class="select select-bordered w-full">
-                <option value="">Choisir un Status</option>
-                <option value="Inactive">Inactive</option>
-                <option value="Prospect">Prospect</option>
-                <option value="Client">Client</option>
-                <option value="Partner">Partenaire</option>
+              <label class="label">{{ t('common.status') }}</label>
+              <select v-model="companyForm.statusId" class="select select-bordered w-full">
+                <option value="">{{ t('common.selectStatus') }}</option>
+                <option v-for="status in companyStatuses" :key="status.id" :value="status.id">
+                  {{ t(`status.${status.name.toLowerCase()}`, status.name) }}
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="label">{{ t('common.assignedTo') }}</label>
+              <select v-model="companyForm.assignedToId" class="select select-bordered w-full">
+                <option value="">{{ t('common.notAssigned', 'Non assigné') }}</option>
+                <option v-for="user in users" :key="user.id" :value="user.id">
+                  {{ user.firstName }} {{ user.lastName }}
+                </option>
               </select>
             </div>
 
@@ -305,15 +377,21 @@
 
 <script setup lang="ts">
 import { useCompanyStore } from '@/stores/company'
+import { useStatusStore } from '@/stores/status'
 import { useToastStore } from '@/stores/toast'
+import { useUserStore } from '@/stores/user'
 import type { Company, CompanyUpdateDto } from '@/types/company.types'
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
 const companyStore = useCompanyStore()
+const statusStore = useStatusStore()
+const userStore = useUserStore()
 const toastStore = useToastStore()
+const { t } = useI18n()
 
 // Company data
 const company = ref<Company | null>(null)
@@ -324,15 +402,14 @@ const companyForm = reactive<CompanyUpdateDto & { id?: string }>({
   name: '',
   industry: '',
   size: '',
-  address: {
-    street: '',
-    city: '',
-    country: '',
-    zipCode: '',
-  },
-  status: '',
+  address: '',
+  city: '',
+  country: '',
+  zipCode: '',
+  statusId: '',
   website: '',
   description: '',
+  assignedToId: '',
 })
 
 // UI states
@@ -340,6 +417,10 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 const showModal = ref(false)
 const showDeleteModal = ref(false)
+
+// Computed properties
+const companyStatuses = computed(() => statusStore.getStatusesByType('COMPANY'))
+const users = computed(() => userStore.users)
 
 // Load company details on component mount
 onMounted(async () => {
@@ -350,6 +431,9 @@ onMounted(async () => {
 
   loading.value = true
   try {
+    // Chargement parallèle des statuts et des utilisateurs
+    await Promise.all([statusStore.fetchStatusesByType('COMPANY'), userStore.fetchUsers()])
+
     await companyStore.fetchCompanyById(companyId.value)
     if (companyStore.currentCompany) {
       company.value = companyStore.currentCompany
@@ -368,15 +452,20 @@ onMounted(async () => {
 // Form handling
 function openEditModal() {
   resetForm()
+  console.log('Company size from DB:', company.value?.size)
   Object.assign(companyForm, {
     id: company.value?.id,
     name: company.value?.name || '',
     industry: company.value?.industry || '',
     size: company.value?.size || '',
     address: company.value?.address || '',
-    status: company.value?.status || '',
+    city: company.value?.city || '',
+    zipCode: company.value?.zipCode || '',
+    country: company.value?.country || '',
+    statusId: company.value?.status?.id || '',
     website: company.value?.website || '',
     description: company.value?.description || '',
+    assignedToId: company.value?.assignedTo?.id || '',
   })
   showModal.value = true
 }
@@ -391,14 +480,22 @@ async function submitCompanyForm() {
       industry: companyForm.industry,
       size: companyForm.size,
       address: companyForm.address,
-      status: companyForm.status,
+      city: companyForm.city,
+      zipCode: companyForm.zipCode,
+      country: companyForm.country,
+      statusId: companyForm.statusId,
       website: companyForm.website,
       description: companyForm.description,
+      assignedToId: companyForm.assignedToId,
     }
 
     const result = await companyStore.updateCompany(companyForm.id, updateData)
     if (result) {
-      company.value = result
+      await companyStore.fetchCompanyById(companyId.value)
+      if (companyStore.currentCompany) {
+        company.value = companyStore.currentCompany
+      }
+
       toastStore.success('Company updated successfully')
       closeModal()
     } else {
@@ -448,9 +545,13 @@ function resetForm() {
     industry: '',
     size: '',
     address: '',
-    status: '',
+    city: '',
+    zipCode: '',
+    country: '',
+    statusId: '',
     website: '',
     description: '',
+    assignedToId: '',
   })
 }
 
@@ -464,17 +565,23 @@ function formatWebsiteUrl(url: string): string {
 function getStatusClass(status: string | undefined) {
   if (!status) return 'bg-gray-100 text-gray-800'
 
-  switch (status) {
-    case 'Inactive':
-      return 'bg-gray-100 text-gray-800'
-    case 'Prospect':
-      return 'bg-blue-100 text-blue-800'
-    case 'Customer':
-      return 'bg-green-100 text-green-800'
-    case 'Partner':
-      return 'bg-purple-100 text-purple-800'
-    default:
-      return 'bg-gray-100 text-gray-800'
+  // Version avec traductions i18n
+  const statusLower = status.toLowerCase()
+  const inactive = t('status.inactive').toLowerCase()
+  const prospect = t('status.prospect').toLowerCase()
+  const customer = t('status.customer').toLowerCase()
+  const partner = t('status.partner').toLowerCase()
+
+  if (statusLower === 'inactive' || statusLower === inactive) {
+    return 'bg-gray-100 text-gray-800'
+  } else if (statusLower === 'prospect' || statusLower === prospect) {
+    return 'bg-blue-100 text-blue-800'
+  } else if (statusLower === 'customer' || statusLower === customer) {
+    return 'bg-green-100 text-green-800'
+  } else if (statusLower === 'partner' || statusLower === partner) {
+    return 'bg-purple-100 text-purple-800'
+  } else {
+    return 'bg-gray-100 text-gray-800'
   }
 }
 
@@ -489,18 +596,7 @@ function formattedRevenue(value: number): string {
     .replace(/\s/g, ' ')
 }
 
-function formatStatusToFrench(value: string): string {
-  switch (value) {
-    case 'Inactive':
-      return 'Inactif'
-    case 'Prospect':
-      return 'Prospect'
-    case 'Customer':
-      return 'Client'
-    case 'Partner':
-      return 'Partenaire'
-    default:
-      return value
-  }
+function getInitials(firstName: string, lastName: string): string {
+  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
 }
 </script>
