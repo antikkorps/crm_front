@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container mx-auto px-4">
     <!-- En-tête avec KPIs optimisés pour mobile -->
-    <h1 class="text-2xl font-bold mb-4">Tableau de bord</h1>
+    <h1 class="text-2xl font-bold mb-4">{{ t('common.dashboard', 1) }}</h1>
 
     <!-- KPIs -->
     <DashboardKpis :metrics="keyMetrics" />
@@ -79,6 +79,12 @@ import { apiRequest } from '@/services/api.service'
 import { useToastStore } from '@/stores/toast'
 import type { Stats } from '@/types/dashboard.types'
 import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+
+const { t } = useI18n()
+
+const router = useRouter()
 
 // Stats et récupération des données
 const stats = ref<Stats>({
@@ -103,13 +109,13 @@ const fetchStats = async () => {
 // Helpers pour les stats
 const getTitle = (key: string) => {
   const titles: Record<string, string> = {
-    contacts: 'Contacts',
-    companies: 'Entreprises',
-    notes: 'Notes',
-    upcoming: 'Rappels à Venir',
-    overdue: 'Rappels en Retard',
+    contacts: t('contacts.title'),
+    companies: t('companies.title'),
+    notes: t('notes.title'),
+    upcoming: t('reminders.upcoming'),
+    overdue: t('reminders.overdue'),
   }
-  return titles[key] || 'Statistique'
+  return titles[key] || t('statistics.title')
 }
 
 const getDescription = (key: string, value: number | { upcoming: number; overdue: number }) => {
@@ -122,6 +128,24 @@ const getDescription = (key: string, value: number | { upcoming: number; overdue
 // Event handlers pour les composants
 const handleAction = (key: string) => {
   console.log(`Action pour ${key}`)
+  switch (key) {
+    case 'contacts':
+      router.push('/contacts')
+      break
+    case 'companies':
+      router.push('/companies')
+      break
+    case 'notes':
+      router.push('/notes')
+      break
+    case 'reminders':
+    case 'upcoming':
+    case 'overdue':
+      router.push('/reminders')
+      break
+    default:
+      console.warn(`No route defined for ${key}`)
+  }
 }
 
 // KPI metrics

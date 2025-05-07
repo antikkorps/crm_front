@@ -17,7 +17,7 @@
           </p>
           <button @click="handleLogin" class="btn btn-primary btn-lg">
             <Iconify icon="mdi:login" class="w-5 h-5 mr-2" />
-            Se connecter
+            {{ t('auth.login') }}
           </button>
         </div>
       </div>
@@ -57,11 +57,11 @@
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <button @click="handleLogin" class="btn btn-primary">
               <Iconify icon="mdi:login" class="w-5 h-5 mr-2" />
-              Se connecter
+              {{ t('auth.login') }}
             </button>
             <button @click="router.push('/contact-it')" class="btn btn-outline">
               <Iconify icon="mdi:headset" class="w-5 h-5 mr-2" />
-              Contacter le support IT
+              {{ t('button.contactSupport') }}
             </button>
           </div>
         </div>
@@ -72,13 +72,13 @@
     <footer class="footer footer-center p-10 bg-neutral text-neutral-content">
       <div>
         <p class="font-bold">MonCRM <br />Outil interne de gestion de la relation client</p>
-        <p>© 2023 - Tous droits réservés</p>
+        <p>© 2023 - {{ t('common.allRightsReserved') }}</p>
       </div>
       <div>
         <div class="grid grid-flow-col gap-4">
-          <a class="link link-hover">Documentation</a>
-          <a class="link link-hover">Support</a>
-          <a class="link link-hover">À propos</a>
+          <a class="link link-hover">{{ t('common.documentation') }}</a>
+          <a class="link link-hover">{{ t('common.support') }}</a>
+          <a class="link link-hover">{{ t('common.about') }}</a>
         </div>
       </div>
     </footer>
@@ -87,8 +87,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
+const { t } = useI18n()
 const router = useRouter()
 const features = ref([
   {
@@ -108,7 +110,7 @@ const features = ref([
     icon: 'mdi:checkbox-marked-circle-outline',
   },
   {
-    title: 'Tableaux de bord',
+    title: t('common.dashboard', 2),
     description: 'Analysez vos performances avec des tableaux de bord interactifs.',
     icon: 'mdi:view-dashboard',
   },

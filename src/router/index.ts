@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import About from '../views/AboutView.vue'
+import CompaniesListView from '../views/Companies/CompaniesListView.vue'
+import CompanyDetailsView from '../views/Companies/CompanyDetailsView.vue'
 import Dashboard from '../views/Dashboard/DashboardIndexView.vue'
 import Home from '../views/HomeView.vue'
 import Login from '../views/LoginView.vue'
@@ -19,7 +21,7 @@ const routes = [
   },
   {
     path: '/dashboard',
-    name: 'Dashboard',
+    name: 'dashboard',
     component: Dashboard,
     meta: { layout: 'dashboard' },
   },
@@ -28,6 +30,39 @@ const routes = [
     name: 'About',
     component: About,
     meta: { layout: 'default' },
+  },
+  {
+    path: '/companies',
+    name: 'companies',
+    component: CompaniesListView,
+    meta: { layout: 'dashboard' },
+  },
+  {
+    path: '/companies/:id',
+    name: 'company-detail',
+    component: CompanyDetailsView,
+    props: true,
+    meta: { layout: 'dashboard' },
+  },
+  // Pages paramètres
+  {
+    path: '/settings',
+    name: 'settings',
+    component: () => import('../views/Settings/SettingsIndexView.vue'),
+    meta: { layout: 'dashboard', requiresAuth: true },
+  },
+  {
+    path: '/settings/status',
+    name: 'status-list',
+    component: () => import('../views/Settings/StatusListView.vue'),
+    meta: { layout: 'dashboard', requiresAuth: true },
+  },
+  // Pour le futur
+  {
+    path: '/settings/segments',
+    name: 'segments',
+    component: () => import('../views/Settings/SettingsIndexView.vue'),
+    meta: { layout: 'dashboard', requiresAuth: true },
   },
 ]
 
