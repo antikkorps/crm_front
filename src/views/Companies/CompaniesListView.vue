@@ -2,8 +2,20 @@
   <div class="companies-container">
     <div class="page-header flex justify-between items-center mb-6">
       <BackToDashboard />
-      <h1 class="text-2xl font-bold">Companies</h1>
-      <button class="btn btn-primary" @click="openCreateModal">Add Company</button>
+      <h1 class="text-2xl font-bold">Entreprises</h1>
+      <button class="btn btn-primary" @click="openCreateModal">
+        <Iconify icon="mdi:plus" class="w-5 h-5 mr-1" />
+        Ajouter
+      </button>
+    </div>
+    <div class="mb-4">
+      <SearchBar
+        placeholder="Rechercher une entreprise..."
+        :filters="companyFilters"
+        :initial-filters="initialFilters"
+        @search="handleSearch"
+        @reset="resetSearch"
+      />
     </div>
 
     <div v-if="loading" class="flex justify-center py-8">
@@ -138,12 +150,12 @@
               <label class="label">Size</label>
               <select v-model="companyForm.size" class="select select-bordered w-full">
                 <option value="">Select Size</option>
-                <option value="1-10">1-10 employees</option>
-                <option value="11-50">11-50 employees</option>
-                <option value="51-200">51-200 employees</option>
-                <option value="201-500">201-500 employees</option>
-                <option value="501-1000">501-1000 employees</option>
-                <option value="1000+">1000+ employees</option>
+                <option value="1-10">1-10 employés</option>
+                <option value="11-50">11-50 employés</option>
+                <option value="51-200">51-200 employés</option>
+                <option value="201-500">201-500 employés</option>
+                <option value="501-1000">501-1000 employés</option>
+                <option value="+1000">1000+ employés</option>
               </select>
             </div>
 
@@ -154,6 +166,36 @@
                 type="text"
                 class="input input-bordered w-full"
                 placeholder="Adresse"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="label">Ville</label>
+              <input
+                v-model="companyForm.city"
+                type="text"
+                class="input input-bordered w-full"
+                placeholder="Ville"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="label">Code Postal</label>
+              <input
+                v-model="companyForm.zipCode"
+                type="text"
+                class="input input-bordered w-full"
+                placeholder="Code Postal"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="label">Pays</label>
+              <input
+                v-model="companyForm.country"
+                type="text"
+                class="input input-bordered w-full"
+                placeholder="Pays"
               />
             </div>
 
@@ -225,6 +267,7 @@
 
 <script setup lang="ts">
 import BackToDashboard from '@/components/common/BackToDashboard.vue'
+import SearchBar from '@/components/common/SearchBar.vue'
 import { useCompanyStore } from '@/stores/company'
 import { useStatusStore } from '@/stores/status'
 import { useToastStore } from '@/stores/toast'
@@ -242,12 +285,10 @@ const companyForm = reactive<CompanyCreateDto & { id?: string }>({
   name: '',
   industry: '',
   size: '',
-  address: {
-    street: '',
-    city: '',
-    zipCode: '',
-    country: '',
-  },
+  address: '',
+  city: '',
+  zipCode: '',
+  country: '',
   statusId: '',
   website: '',
   description: '',
@@ -299,6 +340,9 @@ function openEditModal(company: Company) {
     industry: company.industry || '',
     size: company.size || '',
     address: company.address || '',
+    city: company.city || '',
+    zipCode: company.zipCode || '',
+    country: company.country || '',
     statusId: company.status.id || '',
     website: company.website || '',
     description: company.description || '',
@@ -399,7 +443,10 @@ function resetForm() {
     name: '',
     industry: '',
     size: '',
-    location: '',
+    address: '',
+    city: '',
+    zipCode: '',
+    country: '',
     statusId: '',
     website: '',
     description: '',

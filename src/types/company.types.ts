@@ -85,12 +85,10 @@ export interface CompanyCreateDto {
   website?: string
   email?: string
   phone?: string
-  address?: {
-    street?: string
-    city?: string
-    zipCode?: string
-    country?: string
-  }
+  address?: string
+  city?: string
+  zipCode?: string
+  country?: string
   statusId: string
   size?: string
   revenue?: number
@@ -103,12 +101,10 @@ export interface CompanyUpdateDto {
   website?: string
   email?: string
   phone?: string
-  address?: {
-    street?: string
-    city?: string
-    zipCode?: string
-    country?: string
-  }
+  address?: string
+  city?: string
+  zipCode?: string
+  country?: string
   statusId?: string
   size?: string
   revenue?: number
