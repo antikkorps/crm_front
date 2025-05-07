@@ -33,13 +33,14 @@
     </div>
 
     <div v-else class="companies-grid">
-      <div class="overflow-x-auto">
+      <!-- Version bureau du tableau (caché sur mobile) -->
+      <div class="overflow-x-auto hidden md:block">
         <table class="table w-full">
           <thead>
             <tr>
               <th>Name</th>
               <th>Industry</th>
-              <th class="flex justify-end">Masse Salariale</th>
+              <th class="text-right">Masse Salariale</th>
               <th>Adresse</th>
               <th>Status</th>
               <th>Actions</th>
@@ -56,7 +57,7 @@
                 </router-link>
               </td>
               <td>{{ company.industry || 'N/A' }}</td>
-              <td class="flex justify-end">{{ company.size || 'N/A' }}</td>
+              <td class="text-right">{{ company.size || 'N/A' }}</td>
               <td v-if="company.address">
                 {{ company.address || 'N/A' }} - {{ company.zipCode || 'N/A' }}
                 {{ company.city || 'N/A' }} - {{ company.country || 'N/A' }}
@@ -78,17 +79,7 @@
                     title="Edit"
                   >
                     <span class="sr-only">Edit</span>
-                    <!-- Edit icon (you can replace with your own icon component) -->
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-5 w-5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
-                      />
-                    </svg>
+                    <Iconify icon="heroicons:pencil-square" class="h-5 w-5" />
                   </button>
                   <button
                     class="text-gray-500 hover:text-red-500"
@@ -96,25 +87,58 @@
                     title="Delete"
                   >
                     <span class="sr-only">Delete</span>
-                    <!-- Delete icon (you can replace with your own icon component) -->
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-5 w-5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
+                    <Iconify icon="heroicons:trash" class="h-5 w-5" />
                   </button>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Version mobile du tableau (visible uniquement sur mobile) -->
+      <div class="grid grid-cols-1 gap-4 md:hidden">
+        <div
+          v-for="company in companies"
+          :key="company.id"
+          class="bg-base-100 rounded-lg shadow p-4"
+        >
+          <div class="flex justify-between items-center mb-2">
+            <router-link
+              :to="{ name: 'company-detail', params: { id: company.id } }"
+              class="font-medium text-primary text-lg hover:underline"
+            >
+              {{ company.name }}
+            </router-link>
+
+            <span
+              class="px-2 py-1 rounded-full text-xs"
+              :class="getStatusClass(company.status?.name)"
+            >
+              {{ company.status?.name || 'N/A' }}
+            </span>
+          </div>
+
+          <!-- Informations secondaires qui pourraient être utiles en mobile -->
+          <div class="text-sm text-gray-500 mb-3">
+            {{ company.industry || 'Industrie non spécifiée' }}
+          </div>
+
+          <div class="flex justify-end space-x-3 mt-2">
+            <button class="btn btn-sm btn-ghost" @click="openEditModal(company)" title="Edit">
+              <Iconify icon="heroicons:pencil-square" class="h-4 w-4 mr-1" />
+              Modifier
+            </button>
+            <button
+              class="btn btn-sm btn-ghost text-red-500"
+              @click="confirmDelete(company)"
+              title="Delete"
+            >
+              <Iconify icon="heroicons:trash" class="h-4 w-4 mr-1" />
+              Supprimer
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -271,6 +295,7 @@ import SearchBar from '@/components/common/SearchBar.vue'
 import { useCompanyStore } from '@/stores/company'
 import { useStatusStore } from '@/stores/status'
 import { useToastStore } from '@/stores/toast'
+import { useUserStore } from '@/stores/user'
 import type { Company, CompanyCreateDto, CompanyUpdateDto } from '@/types/company.types'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -279,6 +304,7 @@ const router = useRouter()
 const companyStore = useCompanyStore()
 const statusStore = useStatusStore()
 const toastStore = useToastStore()
+const userStore = useUserStore()
 
 // Company form
 const companyForm = reactive<CompanyCreateDto & { id?: string }>({
@@ -312,6 +338,7 @@ onMounted(async () => {
   loading.value = true
   try {
     await statusStore.fetchStatusesByType('COMPANY')
+    await userStore.fetchUsers()
     await companyStore.fetchCompanies()
     companies.value = companyStore.companies
     error.value = companyStore.error
@@ -469,6 +496,179 @@ function getStatusClass(status: string | undefined) {
       return 'bg-gray-100 text-gray-800'
   }
 }
+
+//HANDLING SEARCH
+const companyFilters = computed(() => [
+  {
+    key: 'industry',
+    label: 'Industrie',
+    type: 'text' as const,
+    placeholder: 'Filtrer par industrie',
+  },
+  {
+    key: 'size',
+    label: 'Taille',
+    type: 'select' as const,
+    placeholder: 'Toutes tailles',
+    options: [
+      { label: '1-10 employés', value: '1-10' },
+      { label: '11-50 employés', value: '11-50' },
+      { label: '51-200 employés', value: '51-200' },
+      { label: '201-500 employés', value: '201-500' },
+      { label: '501-1000 employés', value: '501-1000' },
+      { label: '+1000 employés', value: '+1000' },
+    ],
+  },
+  {
+    key: 'globalRevenue',
+    label: "Chiffre d'affaires",
+    type: 'range' as const,
+    minKey: 'minRevenue',
+    maxKey: 'maxRevenue',
+  },
+  {
+    key: 'statusId',
+    label: 'Statut',
+    type: 'select' as const,
+    placeholder: 'Tous statuts',
+    options: statusStore.statuses
+      .filter((s) => s.type === 'COMPANY')
+      .map((status) => ({
+        label: status.name,
+        value: status.id,
+      })),
+  },
+  {
+    key: 'assignedToId',
+    label: 'Assigné à',
+    type: 'select' as const,
+    placeholder: 'Tous les utilisateurs',
+    options: userStore.users.map((user: { firstName: string; lastName: string; id: string }) => ({
+      label: `${user.firstName} ${user.lastName}`,
+      value: user.id,
+    })),
+  },
+  {
+    key: 'city',
+    label: 'Ville',
+    type: 'text' as const,
+    placeholder: 'Filtrer par ville',
+  },
+  {
+    key: 'country',
+    label: 'Pays',
+    type: 'text' as const,
+    placeholder: 'Filtrer par pays',
+  },
+])
+
+const initialFilters = ref({
+  industry: '',
+  size: '',
+  statusId: '',
+  assignedToId: '',
+  city: '',
+  country: '',
+  minRevenue: '',
+  maxRevenue: '',
+})
+
+// Paramètres de recherche actuels
+const searchParams = ref({
+  query: '',
+  filters: {},
+  page: 1,
+  limit: 10,
+})
+
+// Gérer la recherche
+async function handleSearch(params: { query: string; filters: Record<string, unknown> }) {
+  loading.value = true
+
+  try {
+    // Construire les paramètres de recherche pour l'API
+    const apiParams: Record<string, unknown> = {}
+
+    // Ajouter le terme de recherche comme filtre sur le nom si non vide
+    if (params.query && params.query.trim()) {
+      apiParams.name = params.query.trim()
+    }
+
+    // Ajouter tous les filtres non vides
+    Object.entries(params.filters).forEach(([key, value]) => {
+      // Vérifier si la valeur existe et n'est pas une chaîne vide
+      if (value !== undefined && value !== null && value !== '') {
+        // Pour les plages, traiter les cas spéciaux comme minRevenue/maxRevenue
+        if (key === 'minRevenue' || key === 'maxRevenue') {
+          apiParams[key] = Number(value)
+        } else {
+          apiParams[key] = value
+        }
+      }
+    })
+
+    // Ajouter pagination
+    apiParams.page = 1
+    apiParams.itemsPerPage = searchParams.value.limit || 10
+
+    console.log('Recherche avec paramètres:', apiParams)
+
+    // Appeler la fonction de recherche du store
+    const result = await companyStore.searchCompanies(apiParams)
+    companies.value = result.items || []
+
+    // Mettre à jour les paramètres de recherche actuels
+    searchParams.value = {
+      query: params.query,
+      filters: params.filters,
+      page: 1,
+      limit: searchParams.value.limit,
+    }
+  } catch (err) {
+    console.error('Erreur lors de la recherche:', err)
+    toastStore.error('Erreur lors de la recherche des entreprises')
+    error.value = 'Failed to search companies'
+  } finally {
+    loading.value = false
+  }
+}
+
+// Réinitialiser la recherche
+async function resetSearch() {
+  searchParams.value = {
+    query: '',
+    filters: {},
+    page: 1,
+    limit: 10,
+  }
+  try {
+    // Charger la liste complète
+    loading.value = true
+    await companyStore.fetchCompanies()
+    companies.value = companyStore.companies
+  } catch (err) {
+    console.error('Erreur lors du chargement des entreprises', err)
+    toastStore.error('Erreur lors du chargement des entreprises')
+  } finally {
+    loading.value = false
+  }
+}
+
+// Pagination
+// function goToPage(pageNumber) {
+//   searchParams.value.page = pageNumber
+
+//   if (searchParams.value.query || Object.values(searchParams.value.filters).some(v => v)) {
+//     // Si on a des filtres actifs, effectuer une recherche
+//     companyStore.searchCompanies(searchParams.value)
+//   } else {
+//     // Sinon, charger simplement la page demandée
+//     companyStore.fetchCompanies({
+//       page: searchParams.value.page,
+//       limit: searchParams.value.limit
+//     })
+//   }
+// }
 </script>
 
 <style scoped>

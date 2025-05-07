@@ -141,3 +141,13 @@ export interface PaginatedResponse<T> {
 export type PaginatedStatusResponse = PaginatedResponse<Status>
 
 export type CompanyStatus = Status
+
+export interface CompanySearchParams {
+  name?: string
+  industry?: string
+  statusId?: string
+  size?: string
+  revenue?: number
+  page?: number
+  itemsPerPage?: number
+}

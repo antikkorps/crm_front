@@ -5,6 +5,7 @@ import type {
   CompanyCreateDto,
   CompanyNote,
   CompanyQuote,
+  CompanySearchParams,
   CompanyTask,
   CompanyUpdateDto,
 } from '@/types/company.types'
@@ -196,6 +197,35 @@ export const useCompanyStore = defineStore('company', () => {
       loading.value = false
     }
   }
+  async function searchCompanies(params: CompanySearchParams = {}) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const searchParams: Record<string, unknown> = {}
+
+      // Ajouter chaque propriété non-undefined au searchParams
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          searchParams[key] = value
+        }
+      })
+
+      const result = (await CompanyService.searchCompanies(searchParams)) as {
+        items: Company[]
+        pagination: { totalItems: number }
+      }
+      companies.value = result.items || []
+      console.log('Companies recherchées:', companies.value)
+      return result
+    } catch (err) {
+      error.value = 'Failed to search companies'
+      console.error(err)
+      return { items: [], pagination: { totalItems: 0 } }
+    } finally {
+      loading.value = false
+    }
+  }
 
   return {
     // State
@@ -222,5 +252,6 @@ export const useCompanyStore = defineStore('company', () => {
     addCompanyNote,
     fetchCompanyTasks,
     fetchCompanyQuotes,
+    searchCompanies,
   }
 })

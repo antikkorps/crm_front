@@ -1,17 +1,17 @@
-<!-- SearchBar.vue -->
+<!-- components/common/SearchBar.vue -->
 <template>
-  <div class="search-container flex justify-center w-full">
-    <!-- Barre de recherche principale -->
-    <div class="form-control w-full">
-      <div class="input-group">
+  <div class="bg-base-200 rounded-box p-4 mb-6">
+    <!-- Barre de recherche principale avec design amélioré -->
+    <div class="form-control">
+      <div class="relative flex w-full">
         <input
           v-model="searchQuery"
           type="text"
-          class="input input-bordered flex-1"
+          class="input input-bordered w-full pr-12"
           :placeholder="placeholder"
           @input="() => handleSearch()"
         />
-        <button class="btn btn-square">
+        <button class="btn btn-primary absolute right-0 rounded-l-none">
           <Iconify icon="heroicons:magnifying-glass" class="w-5 h-5" />
         </button>
       </div>
@@ -29,10 +29,12 @@
     </div>
 
     <!-- Filtres contextuels -->
-    <div v-if="filtersVisible && showFilters" class="filters-container mt-2">
-      <div class="card bg-base-100 shadow-sm">
-        <div class="card-body p-4">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div v-if="filtersVisible && showFilters" class="mt-4">
+      <div class="collapse collapse-arrow bg-base-100 shadow-sm">
+        <input type="checkbox" checked />
+        <div class="collapse-title font-medium">Filtres avancés</div>
+        <div class="collapse-content">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <!-- Boucle sur les filtres dynamiques -->
             <div v-for="filter in availableFilters" :key="filter.key" class="form-control">
               <label class="label">
@@ -61,6 +63,28 @@
                 @change="() => handleSearch()"
               />
 
+              <!-- Range pour les filtres numériques -->
+              <div v-else-if="filter.type === 'range'" class="flex space-x-2">
+                <div class="form-control flex-1">
+                  <input
+                    v-model="selectedFilters[filter.minKey || `min${filter.key}`]"
+                    type="number"
+                    class="input input-bordered w-full"
+                    :placeholder="`Min ${filter.label}`"
+                    @input="() => handleSearch()"
+                  />
+                </div>
+                <div class="form-control flex-1">
+                  <input
+                    v-model="selectedFilters[filter.maxKey || `max${filter.key}`]"
+                    type="number"
+                    class="input input-bordered w-full"
+                    :placeholder="`Max ${filter.label}`"
+                    @input="() => handleSearch()"
+                  />
+                </div>
+              </div>
+
               <!-- Input texte pour les autres types de filtres -->
               <input
                 v-else
@@ -68,7 +92,7 @@
                 type="text"
                 class="input input-bordered w-full"
                 :placeholder="filter.placeholder"
-                @change="() => handleSearch()"
+                @input="() => handleSearch()"
               />
             </div>
           </div>
@@ -91,7 +115,7 @@
               @click="handleSearch(true)"
             >
               <Iconify icon="heroicons:funnel" class="w-4 h-4 mr-1" />
-              Appliquer les filtres
+              Appliquer
             </button>
           </div>
         </div>
@@ -112,9 +136,11 @@ export interface FilterOption {
 export interface FilterConfig {
   key: string
   label: string
-  type: 'text' | 'select' | 'date' | 'number'
+  type: 'text' | 'select' | 'date' | 'number' | 'range'
   placeholder?: string
   options?: FilterOption[]
+  minKey?: string // Pour les filtres de type range
+  maxKey?: string // Pour les filtres de type range
 }
 
 // Props du composant
@@ -174,7 +200,12 @@ const showResetButton = computed(() => {
 onMounted(() => {
   // Initialiser les filtres avec des valeurs vides
   props.filters.forEach((filter) => {
-    selectedFilters.value[filter.key] = ''
+    if (filter.type === 'range') {
+      selectedFilters.value[filter.minKey || `min${filter.key}`] = ''
+      selectedFilters.value[filter.maxKey || `max${filter.key}`] = ''
+    } else {
+      selectedFilters.value[filter.key] = ''
+    }
   })
 
   // Appliquer les filtres initiaux s'ils existent
@@ -244,3 +275,26 @@ defineExpose({
   },
 })
 </script>
+
+<style scoped>
+/* Styles pour améliorer l'apparence sur mobile */
+@media (max-width: 640px) {
+  .form-control {
+    margin-bottom: 0.5rem;
+  }
+
+  .collapse-content .grid {
+    gap: 0.75rem;
+  }
+
+  .btn {
+    height: 2.5rem;
+    min-height: 2.5rem;
+  }
+
+  .input {
+    height: 2.5rem;
+    min-height: 2.5rem;
+  }
+}
+</style>

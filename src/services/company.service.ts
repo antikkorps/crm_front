@@ -82,4 +82,22 @@ export const CompanyService = {
     )
     return response.items
   },
+
+  async searchCompanies(params: Record<string, unknown>): Promise<unknown> {
+    // Construire les paramètres de requête
+    const queryParams = new URLSearchParams()
+
+    console.log('params reçus dans le service:', params)
+
+    // Ajouter tous les paramètres à queryParams
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        queryParams.append(key, String(value))
+      }
+    })
+
+    console.log('Query parameters finaux:', queryParams.toString())
+
+    return await apiRequest(`/v1/companies/search?${queryParams.toString()}`)
+  },
 }
