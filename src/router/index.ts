@@ -44,6 +44,26 @@ const routes = [
     props: true,
     meta: { layout: 'dashboard' },
   },
+  // Pages paramètres
+  {
+    path: '/settings',
+    name: 'settings',
+    component: () => import('../views/Settings/SettingsIndexView.vue'),
+    meta: { layout: 'dashboard', requiresAuth: true },
+  },
+  {
+    path: '/settings/status',
+    name: 'status-list',
+    component: () => import('../views/Settings/StatusListView.vue'),
+    meta: { layout: 'dashboard', requiresAuth: true },
+  },
+  // Pour le futur
+  {
+    path: '/settings/segments',
+    name: 'segments',
+    component: () => import('../views/Settings/SettingsIndexView.vue'),
+    meta: { layout: 'dashboard', requiresAuth: true },
+  },
 ]
 
 const router = createRouter({

@@ -106,7 +106,7 @@
         <!-- Bouton login - seulement si non connecté -->
         <div v-else class="flex items-center gap-2">
           <ThemeToggle />
-          <button class="btn btn-primary" @click="handleLogin">Login</button>
+          <button class="btn btn-primary" @click="handleLogin">{{ t('auth.login') }}</button>
         </div>
       </div>
 
@@ -195,9 +195,11 @@
 import { AuthService } from '@/services/auth.service'
 import type { User } from '@/types/auth.types'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ThemeToggle from './ThemeToggle.vue'
 
+const { t } = useI18n()
 const router = useRouter()
 const isAuthenticated = ref(false)
 const sidebarOpen = ref(false)

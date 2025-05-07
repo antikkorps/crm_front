@@ -4,7 +4,9 @@
       <div class="card-body">
         <h1 class="text-2xl text-center font-bold text-primary py-5">Mon CRM</h1>
 
-        <h2 class="card-title text-center text-2xl font-bold mb-6 text-primary">Connexion</h2>
+        <h2 class="card-title text-center text-2xl font-bold mb-6 text-primary">
+          {{ t('auth.login') }}
+        </h2>
 
         <!-- Affichage des erreurs -->
         <div v-if="errorMessage" class="alert alert-error mb-4">
@@ -27,7 +29,7 @@
         <form @submit.prevent="handleLogin">
           <div class="form-control mb-4 flex flex-col">
             <label class="label">
-              <span class="label-text font-medium text-base-content">Email</span>
+              <span class="label-text font-medium text-base-content">{{ t('common.email') }}</span>
             </label>
             <input
               type="email"
@@ -40,7 +42,7 @@
 
           <div class="form-control mb-6">
             <label class="label">
-              <span class="label-text font-medium text-base-content">Mot de passe</span>
+              <span class="label-text font-medium text-base-content">{{ t('auth.password') }}</span>
             </label>
             <input
               type="password"
@@ -50,9 +52,9 @@
               required
             />
             <label class="label">
-              <a href="#" class="label-text-alt link link-hover text-primary"
-                >Mot de passe oublié ?</a
-              >
+              <a href="#" class="label-text-alt link link-hover text-primary">{{
+                t('auth.forgotPassword')
+              }}</a>
             </label>
           </div>
 
@@ -63,7 +65,7 @@
               :class="{ loading: isLoading }"
               :disabled="isLoading"
             >
-              {{ isLoading ? 'Connexion en cours...' : 'Se connecter' }}
+              {{ isLoading ? t('auth.connexionPending') : t('auth.login') }}
             </button>
           </div>
 
@@ -100,9 +102,9 @@
           <div class="text-center mt-6">
             <p class="text-base-content/80">
               Pas encore de compte ?
-              <router-link to="/register" class="link link-primary font-medium"
-                >S'inscrire</router-link
-              >
+              <router-link to="/register" class="link link-primary font-medium">{{
+                t('auth.register')
+              }}</router-link>
             </p>
           </div>
         </form>
@@ -114,7 +116,10 @@
 <script setup lang="ts">
 import { AuthService } from '@/services/auth.service'
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const email = ref('')

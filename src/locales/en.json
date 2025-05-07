@@ -1,0 +1,95 @@
+{
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "sendResetLink": "Send Reset Link",
+    "rememberMe": "Remember Me",
+    "title": "Register",
+    "name": "Name",
+    "registerButton": "Register",
+    "loginButton": "Already have an account? Login"
+  },
+  "common": {
+    "actions": "Actions",
+    "status": "Status",
+    "address": "Address",
+    "name": "Name",
+    "industry": "Industry",
+    "website": "Website",
+    "city": "City",
+    "zipCode": "Zip code",
+    "country": "Country",
+    "size": "Size",
+    "revenue": "Revenue",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "apply": "Apply",
+    "create": "Create",
+    "update": "Update",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "view": "View",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "Documentation": "Documentation",
+    "Support": "Support",
+    "About": "About"
+  },
+  "companies": {
+    "title": "Companies",
+    "add": "Add company",
+    "edit": "Edit company",
+    "delete": "Delete company",
+    "deleteConfirm": "Are you sure you want to delete {name}? This action cannot be undone.",
+    "noCompanies": "No companies found",
+    "startAdding": "Get started by adding your first company",
+    "salaryMass": "Salary Mass",
+    "searchPlaceholder": "Search for a company..."
+  },
+  "contacts": {
+    "title": "Contacts",
+    "add": "Add contact",
+    "edit": "Edit contact",
+    "delete": "Delete contact",
+    "noAddress": "No address provided"
+  },
+  "activities": {
+    "title": "Activities",
+    "add": "Add activity",
+    "types": {
+      "call": "Call",
+      "email": "Email",
+      "meeting": "Meeting",
+      "task": "Task",
+      "note": "Note"
+    }
+  },
+  "status": {
+    "prospect": "Prospect",
+    "customer": "Customer",
+    "partner": "Partner",
+    "inactive": "Inactive"
+  },
+  "filters": {
+    "title": "Advanced filters",
+    "hideFilters": "Hide filters",
+    "showFilters": "Show filters",
+    "allSizes": "All sizes",
+    "allStatuses": "All statuses",
+    "allUsers": "All users",
+    "minRevenue": "Min revenue",
+    "maxRevenue": "Max revenue",
+    "filterByIndustry": "Filter by industry",
+    "filterByCity": "Filter by city",
+    "filterByCountry": "Filter by country"
+  }
+}
