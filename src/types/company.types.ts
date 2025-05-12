@@ -1,3 +1,10 @@
+export interface Speciality {
+  id: string
+  name: string
+  createdAt: string
+  updatedAt: string
+}
+
 export interface Company {
   id: string
   name: string
@@ -19,6 +26,7 @@ export interface Company {
   size?: string
   globalRevenue?: number
   generatedRevenue?: number
+  operatingRooms?: number | null
   createdAt: string
   updatedAt: string
   assignedTo?: {
@@ -27,6 +35,8 @@ export interface Company {
     lastName: string
     avatarUrl?: string
   }
+  Specialities?: Speciality[]
+  specialityId?: string
 }
 
 export interface CompanyContact {
@@ -92,6 +102,8 @@ export interface CompanyCreateDto {
   statusId: string
   size?: string
   revenue?: number
+  operatingRooms?: number | null
+  specialities?: string[]
 }
 
 export interface CompanyUpdateDto {
@@ -108,6 +120,8 @@ export interface CompanyUpdateDto {
   statusId?: string
   size?: string
   revenue?: number
+  operatingRooms?: number | null
+  specialities?: string[]
   assignedToId?: string
 }
 
@@ -151,4 +165,12 @@ export interface CompanySearchParams {
   revenue?: number
   page?: number
   itemsPerPage?: number
+  specialityId?: string
+  minOperatingRooms?: number
+  maxOperatingRooms?: number
+  minRevenue?: number
+  maxRevenue?: number
+  includeSpecialities?: boolean
+  includeStatus?: boolean
+  includeAssignedTo?: boolean
 }

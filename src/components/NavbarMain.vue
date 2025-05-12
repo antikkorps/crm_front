@@ -193,17 +193,19 @@
 
 <script setup lang="ts">
 import { AuthService } from '@/services/auth.service'
+import { useUserStore } from '@/stores/user'
 import type { User } from '@/types/auth.types'
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ThemeToggle from './ThemeToggle.vue'
 
 const { t } = useI18n()
 const router = useRouter()
+const userStore = useUserStore()
 const isAuthenticated = ref(false)
 const sidebarOpen = ref(false)
-const currentUser = ref<User | null>(null)
+const currentUser = computed(() => userStore.currentUser)
 
 // Fonction pour vérifier l'état d'authentification
 const checkAuth = async () => {
@@ -213,7 +215,8 @@ const checkAuth = async () => {
   // Si l'utilisateur est authentifié, récupérer ses informations
   if (isAuthenticated.value) {
     try {
-      currentUser.value = await AuthService.getCurrentUser()
+      const user = await AuthService.getCurrentUser()
+      userStore.setCurrentUser(user)
     } catch (error) {
       console.error('Erreur lors de la récupération des informations utilisateur:', error)
     }

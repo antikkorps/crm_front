@@ -1,16 +1,16 @@
 <template>
   <div class="status-page container mx-auto p-4">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+      <BackToDashboard />
       <div>
-        <BackToDashboard />
-        <h1 class="text-2xl font-bold mt-4">Statuts d'entreprise</h1>
+        <h1 class="text-2xl font-bold mt-4">Status d'entreprise</h1>
         <p class="text-sm text-gray-500">
-          Gérez les statuts qui seront utilisés pour catégoriser vos entreprises
+          Gérez les status qui seront utilisés pour catégoriser vos entreprises
         </p>
       </div>
       <button class="btn btn-primary" @click="openCreateModal">
         <Iconify icon="mdi:plus" class="w-5 h-5 mr-2" />
-        Ajouter un statut
+        Ajouter un status
       </button>
     </div>
 
@@ -25,20 +25,20 @@
       <span>{{ statusStore.error }}</span>
     </div>
 
-    <!-- Aucun statut trouvé -->
+    <!-- Aucun status trouvé -->
     <div v-else-if="!statusStore.statuses.length" class="py-12 text-center">
       <div class="mb-4 text-gray-400">
         <Iconify icon="mdi:tag-off" class="w-16 h-16 mx-auto" />
       </div>
-      <h3 class="text-lg font-bold mb-2">Aucun statut trouvé</h3>
-      <p class="text-gray-500 mb-6">Commencez par créer un statut pour vos entreprises</p>
+      <h3 class="text-lg font-bold mb-2">Aucun status trouvé</h3>
+      <p class="text-gray-500 mb-6">Commencez par créer un status pour vos entreprises</p>
       <button class="btn btn-primary" @click="openCreateModal">
         <Iconify icon="mdi:plus" class="w-5 h-5 mr-2" />
-        Ajouter un statut
+        Ajouter un status
       </button>
     </div>
 
-    <!-- Liste des statuts -->
+    <!-- Liste des statuss -->
     <div v-else class="status-grid">
       <!-- Version bureau (masquée sur mobile) -->
       <div class="overflow-x-auto hidden md:block">
@@ -116,11 +116,11 @@
       </div>
     </div>
 
-    <!-- Modal pour créer/modifier un statut -->
+    <!-- Modal pour créer/modifier un status -->
     <div class="modal" :class="{ 'modal-open': showModal }">
       <div class="modal-box">
         <h3 class="font-bold text-lg mb-4">
-          {{ isEditing ? 'Modifier le statut' : 'Créer un statut' }}
+          {{ isEditing ? 'Modifier le status' : 'Créer un status' }}
         </h3>
 
         <form @submit.prevent="submitForm">
@@ -188,7 +188,7 @@
     <ConfirmDialog
       ref="confirmDialogRef"
       title="Confirmation de suppression"
-      message="Êtes-vous sûr de vouloir supprimer ce statut ? Cette action est irréversible et pourrait affecter les entreprises utilisant ce statut."
+      message="Êtes-vous sûr de vouloir supprimer ce status ? Cette action est irréversible et pourrait affecter les entreprises utilisant ce status."
       confirmText="Supprimer"
       confirmButtonClass="btn-error"
       icon="mdi:delete-alert"
@@ -203,12 +203,18 @@ import BackToDashboard from '@/components/common/BackToDashboard.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import { useStatusStore } from '@/stores/status'
 import { useToastStore } from '@/stores/toast'
+import { useUserStore } from '@/stores/user'
 import type { Status } from '@/types/company.types'
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 
 // Stores
 const statusStore = useStatusStore()
 const toastStore = useToastStore()
+const userStore = useUserStore()
+
+// Récupérer l'utilisateur courant et son tenantId
+const currentUser = computed(() => userStore.currentUser)
+const tenantId = computed(() => currentUser.value?.tenantId || '')
 
 // État local
 const showModal = ref(false)
@@ -225,24 +231,26 @@ const statusForm = reactive({
   order: 1,
 })
 
-// Charger les statuts au montage du composant
+// Charger les status au montage du composant
 onMounted(async () => {
   try {
+    console.log('Avant fetchStatuses: statuses.length =', statusStore.statuses.length)
     await statusStore.fetchStatuses()
+    console.log('Après fetchStatuses: statuses.length =', statusStore.statuses.length)
   } catch (error) {
-    console.error('Erreur lors du chargement des statuts:', error)
-    toastStore.error('Erreur lors du chargement des statuts')
+    console.error('Erreur lors du chargement des status:', error)
+    toastStore.error('Erreur lors du chargement des status')
   }
 })
 
-// Ouvrir le modal pour créer un nouveau statut
+// Ouvrir le modal pour créer un nouveau status
 function openCreateModal() {
   resetForm()
   isEditing.value = false
   showModal.value = true
 }
 
-// Ouvrir le modal pour modifier un statut existant
+// Ouvrir le modal pour modifier un status existant
 function editStatus(status: Status) {
   resetForm()
   statusForm.id = status.id
@@ -254,7 +262,7 @@ function editStatus(status: Status) {
   showModal.value = true
 }
 
-// Confirmer la suppression d'un statut
+// Confirmer la suppression d'un status
 function confirmDelete(status: Status) {
   statusToDelete.value = status
   if (confirmDialogRef.value) {
@@ -262,17 +270,17 @@ function confirmDelete(status: Status) {
   }
 }
 
-// Supprimer un statut
+// Supprimer un status
 async function deleteStatus() {
   if (!statusToDelete.value) return
 
   try {
     await statusStore.deleteStatus(statusToDelete.value.id)
-    toastStore.success('Statut supprimé avec succès')
+    toastStore.success('status supprimé avec succès')
     statusToDelete.value = null
   } catch (error) {
-    console.error('Erreur lors de la suppression du statut:', error)
-    toastStore.error('Erreur lors de la suppression du statut')
+    console.error('Erreur lors de la suppression du status:', error)
+    toastStore.error('Erreur lors de la suppression du status')
   }
 }
 
@@ -282,16 +290,30 @@ async function submitForm() {
     if (isEditing.value) {
       const { id, ...updateData } = statusForm
       await statusStore.updateStatus(id, updateData)
-      toastStore.success('Statut mis à jour avec succès')
+      toastStore.success('status mis à jour avec succès')
     } else {
-      const { id, ...createData } = statusForm
-      await statusStore.createStatus(createData)
-      toastStore.success('Statut créé avec succès')
+      if (!tenantId.value) {
+        toastStore.error('Impossible de créer un status : tenantId non disponible')
+        return
+      }
+
+      // Créer le status avec tous les champs nécessaires, y compris tenantId
+      const createData = {
+        name: statusForm.name,
+        type: statusForm.type,
+        color: statusForm.color,
+        order: statusForm.order,
+        tenantId: tenantId.value, // Utiliser le tenantId de l'utilisateur connecté
+      }
+
+      const result = await statusStore.createStatus(createData)
+      console.log('status créé:', result)
+      toastStore.success('status créé avec succès')
     }
     closeModal()
   } catch (error) {
-    console.error('Erreur lors de la sauvegarde du statut:', error)
-    toastStore.error('Erreur lors de la sauvegarde du statut')
+    console.error('Erreur lors de la sauvegarde du status:', error)
+    toastStore.error('Erreur lors de la sauvegarde du status')
   }
 }
 

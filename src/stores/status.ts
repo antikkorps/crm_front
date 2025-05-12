@@ -19,7 +19,10 @@ export const useStatusStore = defineStore('status', () => {
   })
 
   const getStatusesOrdered = computed(() => {
-    return [...statuses.value].sort((a, b) => a.order - b.order)
+    // Ensure statuses.value is an array before trying to sort it
+    return Array.isArray(statuses.value)
+      ? [...statuses.value].sort((a, b) => a.order - b.order)
+      : []
   })
 
   // Actions

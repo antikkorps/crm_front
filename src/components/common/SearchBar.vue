@@ -17,14 +17,18 @@
       </div>
     </div>
 
-    <!-- Bouton pour afficher/masquer les filtres -->
-    <div v-if="filters.length > 0" class="flex justify-end mt-2">
+    <!-- Boutons pour afficher/masquer les filtres et réinitialiser les filtres -->
+    <div v-if="filters.length > 0" class="flex justify-end mt-2 gap-2">
+      <button v-if="hasActiveFilters" class="btn btn-sm btn-outline" @click="resetFilters">
+        <Iconify icon="mdi:filter-variant-remove" class="w-4 h-4 mr-1" />
+        {{ t('common.reset') }}
+      </button>
       <button class="btn btn-sm btn-ghost" @click="filtersVisible = !filtersVisible">
         <Iconify
           :icon="filtersVisible ? 'heroicons:chevron-up' : 'heroicons:adjustments-horizontal'"
           class="w-4 h-4 mr-1"
         />
-        {{ filtersVisible ? 'Masquer les filtres' : 'Afficher les filtres' }}
+        {{ filtersVisible ? t('filters.hideFilters') : t('filters.showFilters') }}
       </button>
     </div>
 
@@ -106,7 +110,7 @@
               @click="resetFilters"
             >
               <Iconify icon="heroicons:trash" class="w-4 h-4 mr-1" />
-              Réinitialiser
+              {{ t('common.reset') }}
             </button>
             <button
               v-if="deferredSearch"
@@ -115,7 +119,7 @@
               @click="handleSearch(true)"
             >
               <Iconify icon="heroicons:funnel" class="w-4 h-4 mr-1" />
-              Appliquer
+              {{ t('common.apply') }}
             </button>
           </div>
         </div>
@@ -126,6 +130,9 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 // Types pour les filtres
 export interface FilterOption {
@@ -191,6 +198,13 @@ const availableFilters = computed(() => props.filters)
 
 // Bouton de réinitialisation visible si des filtres sont actifs
 const showResetButton = computed(() => {
+  return (
+    searchQuery.value !== '' || Object.values(selectedFilters.value).some((value) => value !== '')
+  )
+})
+
+// Vérifie si des filtres sont actifs (pour afficher le bouton de réinitialisation)
+const hasActiveFilters = computed(() => {
   return (
     searchQuery.value !== '' || Object.values(selectedFilters.value).some((value) => value !== '')
   )

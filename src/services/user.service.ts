@@ -5,7 +5,7 @@ import { apiRequest } from './api.service'
 export const UserService = {
   // Récupérer tous les utilisateurs
   async getAllUsers(): Promise<User[]> {
-    const response = await apiRequest<{ items: User[] }>('/users')
+    const response = await apiRequest<{ items: User[] }>('/v1/users')
     console.log('Response getAllUsers:', response.items)
     return response.items
   },

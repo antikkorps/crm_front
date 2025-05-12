@@ -29,6 +29,7 @@
     "revenue": "Revenue",
     "search": "Search",
     "filter": "Filter",
+    "filtering": "Filtering by",
     "reset": "Reset",
     "apply": "Apply",
     "create": "Create",
@@ -42,7 +43,13 @@
     "loading": "Loading...",
     "Documentation": "Documentation",
     "Support": "Support",
-    "About": "About"
+    "About": "About",
+    "specialities": "Specialities",
+    "noSpecialities": "No specialities",
+    "allSpecialities": "All specialities",
+    "noAddress": "No address provided",
+    "operatingRooms": "Operating rooms",
+    "globalRevenue": "Global revenue"
   },
   "companies": {
     "title": "Companies",

@@ -115,11 +115,13 @@
 
 <script setup lang="ts">
 import { AuthService } from '@/services/auth.service'
+import { useUserStore } from '@/stores/user'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 const { t } = useI18n()
+const userStore = useUserStore()
 
 const router = useRouter()
 const email = ref('')
@@ -136,6 +138,9 @@ const handleLogin = async () => {
       email: email.value,
       password: password.value,
     })
+
+    // Stocker l'utilisateur courant dans le store
+    userStore.setCurrentUser(response.user)
 
     console.log('Login successful:', response.user)
 

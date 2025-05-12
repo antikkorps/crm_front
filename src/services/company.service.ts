@@ -7,6 +7,7 @@ import type {
   CompanyQuote,
   CompanyTask,
   CompanyUpdateDto,
+  Speciality,
 } from '@/types/company.types'
 import { apiRequest } from './api.service'
 
@@ -83,16 +84,30 @@ export const CompanyService = {
     return response.items
   },
 
+  async fetchSpecialities(): Promise<Speciality[]> {
+    const response = await apiRequest<{ items: Speciality[] }>('/v1/specialities?limit=-1')
+    return response.items
+  },
+
   async searchCompanies(params: Record<string, unknown>): Promise<unknown> {
     // Construire les paramètres de requête
     const queryParams = new URLSearchParams()
 
     console.log('params reçus dans le service:', params)
 
+    // S'assurer que nous demandons toujours toutes les spécialités
+    if (!params.includeAllSpecialities) {
+      params.includeAllSpecialities = true
+    }
+
     // Ajouter tous les paramètres à queryParams
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        queryParams.append(key, String(value))
+        if (typeof value === 'boolean') {
+          queryParams.append(key, value ? 'true' : 'false')
+        } else {
+          queryParams.append(key, String(value))
+        }
       }
     })
 
