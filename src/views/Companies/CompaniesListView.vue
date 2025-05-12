@@ -10,6 +10,7 @@
     </div>
     <div class="mb-4">
       <SearchBar
+        ref="searchBarRef"
         :placeholder="t('companies.searchCompanyPlaceholder')"
         :filters="companyFilters"
         :initial-filters="initialFilters"
@@ -44,12 +45,13 @@
               <th>{{ t('common.industry') }}</th>
               <th class="text-right">{{ t('common.size') }}</th>
               <th>{{ t('common.address') }}</th>
+              <th>{{ t('common.specialities') }}</th>
               <th>{{ t('common.status') }}</th>
               <th>{{ t('common.actions') }}</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="company in companies" :key="company.id" class="hover:bg-gray-50">
+            <tr v-for="company in companies" :key="company.id" class="hover hover:bg-base-200">
               <td>
                 <router-link
                   :to="{ name: 'company-detail', params: { id: company.id } }"
@@ -66,8 +68,16 @@
               </td>
               <td v-else>{{ t('common.noAddress') }}</td>
               <td>
+                <SpecialityBadgeWithTooltip
+                  v-if="company.Specialities && company.Specialities.length"
+                  :specialities="company.Specialities"
+                  @speciality-click="filterBySpeciality"
+                />
+                <span v-else>{{ t('common.noSpecialities') }}</span>
+              </td>
+              <td>
                 <span
-                  class="px-2 py-1 rounded-full text-xs"
+                  class="badge px-2 py-1 rounded-full text-xs"
                   :class="getStatusClass(company.status?.name)"
                 >
                   {{
@@ -102,7 +112,7 @@
         </table>
       </div>
 
-      <!-- Version mobile du tableau (visible uniquement sur mobile) -->
+      <!-- Version mobile du tableau -->
       <div class="grid grid-cols-1 gap-4 md:hidden">
         <div
           v-for="company in companies"
@@ -118,7 +128,7 @@
             </router-link>
 
             <span
-              class="px-2 py-1 rounded-full text-xs"
+              class="badge px-2 py-1 rounded-full text-xs"
               :class="getStatusClass(company.status?.name)"
             >
               {{
@@ -133,6 +143,14 @@
           <div class="text-sm text-gray-500 mb-3">
             {{ company.industry || t('companies.industryNotSpecified') }}
           </div>
+
+          <!-- Specialities mobile -->
+          <SpecialityBadgeWithTooltip
+            v-if="company.Specialities && company.Specialities.length"
+            :specialities="company.Specialities"
+            class="mb-2"
+            @speciality-click="filterBySpeciality"
+          />
 
           <div class="flex justify-end space-x-3 mt-2">
             <button class="btn btn-sm btn-ghost" @click="openEditModal(company)" title="Edit">
@@ -254,6 +272,34 @@
                 :placeholder="t('common.website')"
               />
             </div>
+
+            <div class="form-group">
+              <label class="label">{{ t('common.operatingRooms') }}</label>
+              <input
+                v-model="companyForm.operatingRooms"
+                type="number"
+                min="0"
+                class="input input-bordered w-full"
+                :placeholder="t('common.operatingRooms')"
+              />
+            </div>
+          </div>
+
+          <div class="form-group mb-4">
+            <label class="label">{{ t('common.specialities') }}</label>
+            <select
+              v-model="companyForm.specialities"
+              class="select select-bordered w-full"
+              multiple
+            >
+              <option
+                v-for="speciality in availableSpecialities"
+                :key="speciality.id"
+                :value="speciality.id"
+              >
+                {{ speciality.name }}
+              </option>
+            </select>
           </div>
 
           <div class="form-group mb-4">
@@ -307,18 +353,17 @@
 <script setup lang="ts">
 import BackToDashboard from '@/components/common/BackToDashboard.vue'
 import SearchBar from '@/components/common/SearchBar.vue'
+import SpecialityBadgeWithTooltip from '@/components/common/SpecialityBadgeWithTooltip.vue'
 import { useCompanyStore } from '@/stores/company'
 import { useStatusStore } from '@/stores/status'
 import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
-import type { Company, CompanyCreateDto, CompanyUpdateDto } from '@/types/company.types'
-import { computed, onMounted, reactive, ref } from 'vue'
+import type { Company, CompanyCreateDto, CompanyUpdateDto, Speciality } from '@/types/company.types'
+import { computed, onMounted, reactive, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 
 const { t } = useI18n()
 
-const router = useRouter()
 const companyStore = useCompanyStore()
 const statusStore = useStatusStore()
 const toastStore = useToastStore()
@@ -336,6 +381,8 @@ const companyForm = reactive<CompanyCreateDto & { id?: string }>({
   statusId: '',
   website: '',
   description: '',
+  operatingRooms: null,
+  specialities: [] as string[],
 })
 
 // UI states
@@ -343,13 +390,28 @@ const showModal = ref(false)
 const showDeleteModal = ref(false)
 const isEditing = ref(false)
 const companyToDelete = ref<Company | null>(null)
+const filtersVisible = ref(false) // État pour contrôler la visibilité des filtres
 
 // Computed properties and reactive refs
 const companies = ref<Company[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
+const searchBarRef = ref<InstanceType<typeof SearchBar> | null>(null)
 
 const companyStatuses = computed(() => statusStore.getStatusesByType('COMPANY'))
+const availableSpecialities = ref<Speciality[]>([])
+
+// Fetch specialities list
+async function fetchSpecialities() {
+  try {
+    // Replace this with actual API call to get specialities
+    const specialitiesResponse = await companyStore.fetchSpecialities()
+    availableSpecialities.value = specialitiesResponse || []
+  } catch (err) {
+    console.error('Failed to fetch specialities', err)
+    toastStore.error(t('common.failedToFetchSpecialities'))
+  }
+}
 
 // Load companies on component mount
 onMounted(async () => {
@@ -358,6 +420,7 @@ onMounted(async () => {
     await statusStore.fetchStatusesByType('COMPANY')
     await userStore.fetchUsers()
     await companyStore.fetchCompanies()
+    await fetchSpecialities()
     companies.value = companyStore.companies
     error.value = companyStore.error
   } catch (err) {
@@ -391,6 +454,8 @@ function openEditModal(company: Company) {
     statusId: company.status.id || '',
     website: company.website || '',
     description: company.description || '',
+    operatingRooms: company.operatingRooms,
+    specialities: company.Specialities ? company.Specialities.map((spec) => spec.id) : [],
   })
   showModal.value = true
 }
@@ -409,6 +474,8 @@ async function submitCompanyForm() {
         statusId: companyForm.statusId || undefined,
         website: companyForm.website,
         description: companyForm.description,
+        operatingRooms: companyForm.operatingRooms,
+        specialities: companyForm.specialities,
       }
 
       const result = await companyStore.updateCompany(companyForm.id, updateData)
@@ -430,6 +497,8 @@ async function submitCompanyForm() {
         statusId: companyForm.statusId,
         website: companyForm.website,
         description: companyForm.description,
+        operatingRooms: companyForm.operatingRooms,
+        specialities: companyForm.specialities,
       }
 
       const result = await companyStore.createCompany(createData)
@@ -495,11 +564,13 @@ function resetForm() {
     statusId: '',
     website: '',
     description: '',
+    operatingRooms: null,
+    specialities: [] as string[],
   })
 }
 
 function getStatusClass(status: string | undefined) {
-  if (!status) return 'bg-gray-100 text-gray-800'
+  if (!status) return 'badge-neutral opacity-70'
 
   // Récupérer les traductions
   const statusLower = status.toLowerCase()
@@ -510,23 +581,23 @@ function getStatusClass(status: string | undefined) {
     partner: t('status.partner').toLowerCase(),
   }
 
-  // Vérifier si le statut correspond à l'une des traductions
-  // Utiliser une méthode différente pour la comparaison
+  // Vérifier si le statut correspond à l'une des traductions en utilisant les classes DaisyUI
   if (statusLower === 'inactive' || statusLower === translations.inactive) {
-    return 'bg-gray-100 text-gray-800'
+    return 'badge-neutral opacity-70'
   } else if (statusLower === 'prospect' || statusLower === translations.prospect) {
-    return 'bg-blue-100 text-blue-800'
+    return 'badge-info text-info-content'
   } else if (statusLower === 'customer' || statusLower === translations.customer) {
-    return 'bg-green-100 text-green-800'
+    return 'badge-success text-success-content'
   } else if (statusLower === 'partner' || statusLower === translations.partner) {
-    return 'bg-purple-100 text-purple-800'
+    return 'badge-secondary text-secondary-content'
   } else {
-    return 'bg-gray-100 text-gray-800'
+    return 'badge-neutral opacity-70'
   }
 }
 
 //HANDLING SEARCH
-const companyFilters = computed(() => [
+// On crée une référence réactive pour les filtres qui sera mise à jour quand les spécialités sont chargées
+const companyFilters = ref([
   {
     key: 'industry',
     label: t('common.industry'),
@@ -546,6 +617,23 @@ const companyFilters = computed(() => [
       { label: t('common.size501to1000'), value: '501-1000' },
       { label: t('common.sizeMoreThan1000'), value: '+1000' },
     ],
+  },
+  {
+    key: 'specialityId',
+    label: t('common.specialities'),
+    type: 'select' as const,
+    placeholder: t('common.allSpecialities'),
+    options: availableSpecialities.value.map((spec) => ({
+      label: spec.name,
+      value: spec.id,
+    })),
+  },
+  {
+    key: 'operatingRooms',
+    label: t('common.operatingRooms'),
+    type: 'range' as const,
+    minKey: 'minOperatingRooms',
+    maxKey: 'maxOperatingRooms',
   },
   {
     key: 'globalRevenue',
@@ -590,6 +678,57 @@ const companyFilters = computed(() => [
   },
 ])
 
+// Met à jour les filtres quand les données sont chargées (spécialités, statuts, utilisateurs)
+
+watchEffect(() => {
+  // Mise à jour des options de spécialités
+  if (availableSpecialities.value.length > 0) {
+    // Trouver l'index du filtre specialityId s'il existe déjà
+    const specialityFilterIndex = companyFilters.value.findIndex(
+      (filter) => filter.key === 'specialityId',
+    )
+
+    // Mettre à jour les options du filtre
+    if (specialityFilterIndex !== -1) {
+      companyFilters.value[specialityFilterIndex].options = availableSpecialities.value.map(
+        (spec) => ({
+          label: spec.name,
+          value: spec.id,
+        }),
+      )
+    }
+  }
+
+  // Mise à jour des options de statuts
+  const companyStatusesArray = statusStore.getStatusesByType('COMPANY')
+  if (companyStatusesArray.length > 0) {
+    const statusFilterIndex = companyFilters.value.findIndex((filter) => filter.key === 'statusId')
+
+    if (statusFilterIndex !== -1) {
+      companyFilters.value[statusFilterIndex].options = companyStatusesArray.map((status) => ({
+        label: t(`status.${status.name.toLowerCase()}`, status.name),
+        value: status.id,
+      }))
+    }
+  }
+
+  // Mise à jour des options d'utilisateurs assignés
+  if (userStore.users.length > 0) {
+    const userFilterIndex = companyFilters.value.findIndex(
+      (filter) => filter.key === 'assignedToId',
+    )
+
+    if (userFilterIndex !== -1) {
+      companyFilters.value[userFilterIndex].options = userStore.users.map(
+        (user: { firstName: string; lastName: string; id: string }) => ({
+          label: `${user.firstName} ${user.lastName}`,
+          value: user.id,
+        }),
+      )
+    }
+  }
+})
+
 const initialFilters = ref({
   industry: '',
   size: '',
@@ -599,6 +738,9 @@ const initialFilters = ref({
   country: '',
   minRevenue: '',
   maxRevenue: '',
+  specialityId: '',
+  minOperatingRooms: '',
+  maxOperatingRooms: '',
 })
 
 // Paramètres de recherche actuels
@@ -626,8 +768,8 @@ async function handleSearch(params: { query: string; filters: Record<string, unk
     Object.entries(params.filters).forEach(([key, value]) => {
       // Vérifier si la valeur existe et n'est pas une chaîne vide
       if (value !== undefined && value !== null && value !== '') {
-        // Pour les plages, traiter les cas spéciaux comme minRevenue/maxRevenue
-        if (key === 'minRevenue' || key === 'maxRevenue') {
+        // Pour les plages numériques, convertir en nombre
+        if (['minRevenue', 'maxRevenue', 'minOperatingRooms', 'maxOperatingRooms'].includes(key)) {
           apiParams[key] = Number(value)
         } else {
           apiParams[key] = value
@@ -643,6 +785,14 @@ async function handleSearch(params: { query: string; filters: Record<string, unk
 
     // Appeler la fonction de recherche du store
     const result = await companyStore.searchCompanies(apiParams)
+    console.log('Résultat de la recherche:', result)
+
+    // Vérifier la structure des données reçues
+    if (result.items && result.items.length > 0) {
+      console.log('Premier élément:', result.items[0])
+      console.log('Specialités du premier élément:', result.items[0].Specialities)
+    }
+
     companies.value = result.items || []
 
     // Mettre à jour les paramètres de recherche actuels
@@ -679,6 +829,41 @@ async function resetSearch() {
     toastStore.error('Erreur lors du chargement des entreprises')
   } finally {
     loading.value = false
+  }
+}
+
+// Filtrer les entreprises par spécialité lorsque l'utilisateur clique sur un badge de spécialité
+async function filterBySpeciality(speciality: Speciality) {
+  if (!speciality || !speciality.id) return
+
+  // Afficher un toast pour informer l'utilisateur
+  toastStore.info(`${t('common.filtering')}: ${speciality.name}`)
+
+  // Mettre à jour les paramètres de recherche
+  const newSearchParams = {
+    query: '',
+    filters: {
+      specialityId: speciality.id,
+    },
+  }
+
+  // Si nous avons accès à la référence du SearchBar, utiliser sa méthode exposée
+  if (searchBarRef.value) {
+    // Utiliser la méthode exposée par le SearchBar pour mettre à jour le filtre
+    searchBarRef.value.setFilter('specialityId', speciality.id)
+
+    // Assurons-nous que les filtres sont visibles
+    filtersVisible.value = true
+  } else {
+    // Sinon, effectuer la recherche directement
+    await handleSearch(newSearchParams)
+
+    // Mettre à jour l'état de recherche
+    searchParams.value = {
+      ...searchParams.value,
+      query: '',
+      filters: { specialityId: speciality.id },
+    }
   }
 }
 

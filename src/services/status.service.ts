@@ -1,13 +1,15 @@
 import type { CompanyStatus, PaginatedStatusResponse, Status } from '../types/company.types'
 import { apiRequest } from './api.service'
 
-const STATUS_API_URL = '/statuses'
+const STATUS_API_URL = '/v1/statuses'
 
 /**
  * Récupère la liste des statuts d'entreprise
  */
 export async function fetchStatuses(): Promise<CompanyStatus[]> {
-  return await apiRequest<CompanyStatus[]>(STATUS_API_URL)
+  const response = await apiRequest<PaginatedStatusResponse>(STATUS_API_URL)
+  // Return the items array from the response
+  return response.items || []
 }
 
 /**

@@ -8,6 +8,7 @@ import type {
   CompanySearchParams,
   CompanyTask,
   CompanyUpdateDto,
+  Speciality,
 } from '@/types/company.types'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
@@ -20,6 +21,7 @@ export const useCompanyStore = defineStore('company', () => {
   const companyNotes = ref<CompanyNote[]>([])
   const companyTasks = ref<CompanyTask[]>([])
   const companyQuotes = ref<CompanyQuote[]>([])
+  const specialities = ref<Speciality[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -197,6 +199,23 @@ export const useCompanyStore = defineStore('company', () => {
       loading.value = false
     }
   }
+
+  async function fetchSpecialities() {
+    loading.value = true
+    error.value = null
+
+    try {
+      specialities.value = await CompanyService.fetchSpecialities()
+      return specialities.value
+    } catch (err) {
+      error.value = 'Failed to fetch specialities'
+      console.error(err)
+      return []
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function searchCompanies(params: CompanySearchParams = {}) {
     loading.value = true
     error.value = null
@@ -211,10 +230,36 @@ export const useCompanyStore = defineStore('company', () => {
         }
       })
 
+      // Inclure les paramètres pour s'assurer que les relations sont chargées
+      searchParams.includeSpecialities = true
+      searchParams.includeAllSpecialities = true // Demande explicitement toutes les spécialités, même en filtrant
+      searchParams.includeStatus = true
+      searchParams.includeAssignedTo = true
+
       const result = (await CompanyService.searchCompanies(searchParams)) as {
         items: Company[]
         pagination: { totalItems: number }
       }
+
+      // Si on filtre par spécialité, ou si les entreprises renvoyées n'ont pas toutes les spécialités
+      if (params.specialityId && result.items && result.items.length > 0) {
+        console.log('Récupération des détails complets pour les entreprises filtrées...')
+
+        // Récupérer les détails complets pour chaque entreprise
+        const companiesWithDetails = await Promise.all(
+          result.items.map(async (company) => {
+            try {
+              return await CompanyService.getCompanyById(company.id)
+            } catch (err) {
+              console.error(`Erreur lors de la récupération des détails pour ${company.id}`, err)
+              return company
+            }
+          }),
+        )
+
+        result.items = companiesWithDetails
+      }
+
       companies.value = result.items || []
       console.log('Companies recherchées:', companies.value)
       return result
@@ -235,6 +280,7 @@ export const useCompanyStore = defineStore('company', () => {
     companyNotes,
     companyTasks,
     companyQuotes,
+    specialities,
     loading,
     error,
 
@@ -252,6 +298,7 @@ export const useCompanyStore = defineStore('company', () => {
     addCompanyNote,
     fetchCompanyTasks,
     fetchCompanyQuotes,
+    fetchSpecialities,
     searchCompanies,
   }
 })

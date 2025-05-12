@@ -264,6 +264,11 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  // Définir l'utilisateur courant
+  function setCurrentUser(user: User | null) {
+    currentUser.value = user
+  }
+
   return {
     // State
     users,
@@ -288,5 +293,6 @@ export const useUserStore = defineStore('user', () => {
     updateAvatar,
     getUserSettings,
     updateUserSettings,
+    setCurrentUser,
   }
 })

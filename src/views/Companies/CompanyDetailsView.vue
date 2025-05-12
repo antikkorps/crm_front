@@ -42,7 +42,7 @@
                 {{ t('companies.employee', company.size.includes('1-') ? 1 : 2) }}
               </span>
               <span
-                class="px-2 py-1 rounded-full text-xs"
+                class="badge px-2 py-1 rounded-full text-xs"
                 :class="getStatusClass(company.status?.name)"
               >
                 {{
@@ -122,6 +122,19 @@
                   </span>
                 </div>
                 <p v-else class="text-gray-400">{{ t('common.notAssigned', 'Non assigné') }}</p>
+              </div>
+
+              <!-- Spécialités -->
+              <div>
+                <p class="text-sm text-gray-500">{{ t('common.specialities') }}</p>
+                <div class="mt-2">
+                  <SpecialityBadgeWithTooltip
+                    v-if="company.Specialities && company.Specialities.length"
+                    :specialities="company.Specialities"
+                    :display-limit="3"
+                  />
+                  <p v-else class="text-gray-400">{{ t('common.noSpecialities') }}</p>
+                </div>
               </div>
 
               <div>
@@ -330,6 +343,23 @@
           </div>
 
           <div class="form-group mb-4">
+            <label class="label">{{ t('common.specialities') }}</label>
+            <select
+              v-model="companyForm.specialities"
+              class="select select-bordered w-full"
+              multiple
+            >
+              <option
+                v-for="speciality in availableSpecialities"
+                :key="speciality.id"
+                :value="speciality.id"
+              >
+                {{ speciality.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group mb-4">
             <label class="label">Description</label>
             <textarea
               v-model="companyForm.description"
@@ -376,6 +406,7 @@
 </template>
 
 <script setup lang="ts">
+import SpecialityBadgeWithTooltip from '@/components/common/SpecialityBadgeWithTooltip.vue'
 import { useCompanyStore } from '@/stores/company'
 import { useStatusStore } from '@/stores/status'
 import { useToastStore } from '@/stores/toast'
@@ -410,6 +441,7 @@ const companyForm = reactive<CompanyUpdateDto & { id?: string }>({
   website: '',
   description: '',
   assignedToId: '',
+  specialities: [] as string[],
 })
 
 // UI states
@@ -421,6 +453,20 @@ const showDeleteModal = ref(false)
 // Computed properties
 const companyStatuses = computed(() => statusStore.getStatusesByType('COMPANY'))
 const users = computed(() => userStore.users)
+const availableSpecialities = ref<Array<{ id: string; name: string }>>([])
+
+// Fetch specialities list
+async function fetchSpecialities() {
+  try {
+    const specialitiesResponse = await companyStore.fetchSpecialities()
+    availableSpecialities.value = specialitiesResponse || []
+  } catch (err) {
+    console.error('Failed to fetch specialities', err)
+    toastStore.error(
+      t('common.failedToFetchSpecialities', 'Erreur lors du chargement des spécialités'),
+    )
+  }
+}
 
 // Load company details on component mount
 onMounted(async () => {
@@ -431,8 +477,12 @@ onMounted(async () => {
 
   loading.value = true
   try {
-    // Chargement parallèle des statuts et des utilisateurs
-    await Promise.all([statusStore.fetchStatusesByType('COMPANY'), userStore.fetchUsers()])
+    // Chargement parallèle des statuts, des utilisateurs et des spécialités
+    await Promise.all([
+      statusStore.fetchStatusesByType('COMPANY'),
+      userStore.fetchUsers(),
+      fetchSpecialities(),
+    ])
 
     await companyStore.fetchCompanyById(companyId.value)
     if (companyStore.currentCompany) {
@@ -466,6 +516,9 @@ function openEditModal() {
     website: company.value?.website || '',
     description: company.value?.description || '',
     assignedToId: company.value?.assignedTo?.id || '',
+    specialities: company.value?.Specialities
+      ? company.value.Specialities.map((spec) => spec.id)
+      : [],
   })
   showModal.value = true
 }
@@ -487,6 +540,7 @@ async function submitCompanyForm() {
       website: companyForm.website,
       description: companyForm.description,
       assignedToId: companyForm.assignedToId,
+      specialities: companyForm.specialities,
     }
 
     const result = await companyStore.updateCompany(companyForm.id, updateData)
@@ -552,6 +606,7 @@ function resetForm() {
     website: '',
     description: '',
     assignedToId: '',
+    specialities: [],
   })
 }
 
@@ -563,7 +618,7 @@ function formatWebsiteUrl(url: string): string {
 
 // Helper function to determine CSS classes for company status
 function getStatusClass(status: string | undefined) {
-  if (!status) return 'bg-gray-100 text-gray-800'
+  if (!status) return 'badge-neutral opacity-70'
 
   // Version avec traductions i18n
   const statusLower = status.toLowerCase()
@@ -573,15 +628,15 @@ function getStatusClass(status: string | undefined) {
   const partner = t('status.partner').toLowerCase()
 
   if (statusLower === 'inactive' || statusLower === inactive) {
-    return 'bg-gray-100 text-gray-800'
+    return 'badge-neutral opacity-70'
   } else if (statusLower === 'prospect' || statusLower === prospect) {
-    return 'bg-blue-100 text-blue-800'
+    return 'badge-info text-info-content'
   } else if (statusLower === 'customer' || statusLower === customer) {
-    return 'bg-green-100 text-green-800'
+    return 'badge-success text-success-content'
   } else if (statusLower === 'partner' || statusLower === partner) {
-    return 'bg-purple-100 text-purple-800'
+    return 'badge-secondary text-secondary-content'
   } else {
-    return 'bg-gray-100 text-gray-800'
+    return 'badge-neutral opacity-70'
   }
 }
 
