@@ -14,6 +14,9 @@
     "rememberMe": "Se souvenir de moi",
     "connexionPending": "Connexion en cours..."
   },
+  "form": {
+    "title": "Titre"
+  },
   "common": {
     "email": "Email",
     "firstName": "Prénom",
@@ -25,6 +28,9 @@
     "actions": "Actions",
     "add": "Ajouter",
     "status": "Status",
+    "createdBy": "Créé par",
+    "createdAt": "Créé le",
+    "updatedAt": "Mis à jour le",
     "selectStatus": "Sélectionner le statut",
     "address": "Adresse",
     "name": "Nom",
@@ -184,9 +190,20 @@
     "startAdding": "Commencez par ajouter votre première tâche",
     "dueDate": "Date d'échéance",
     "priority": "Priorité",
-    "low": "Basse",
-    "medium": "Moyenne",
-    "high": "Haute"
+    "details": "Détails de la tâche",
+    "complete": "Marquer comme terminée",
+    "assignedTo": "Assignée à",
+    "status": {
+      "pending": "En attente",
+      "inProgress": "En cours",
+      "completed": "Terminée",
+      "cancelled": "Annulée"
+    },
+    "priorityLevel": {
+      "low": "Basse",
+      "medium": "Moyenne",
+      "high": "Élevée"
+    }
   },
   "status": {
     "prospect": "Prospect",

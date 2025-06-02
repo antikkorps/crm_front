@@ -241,6 +241,94 @@
             </div>
           </div>
 
+          <!-- Tasks Section -->
+          <div class="rounded-lg shadow-md p-6 mb-6 w-full">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-bold">{{ t('tasks.title') }}</h2>
+              <button class="btn btn-sm btn-outline">
+                <Iconify icon="mdi:plus" class="w-4 h-4" />
+                {{ t('tasks.add') }}
+              </button>
+            </div>
+
+            <div v-if="loadingTasks" class="flex justify-center py-4">
+              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            </div>
+
+            <div v-else-if="companyTasks.length">
+              <!-- Desktop Table -->
+              <div class="overflow-x-auto hidden md:block">
+                <table class="table table-zebra w-full">
+                  <thead>
+                    <tr>
+                      <th>{{ t('form.title', 'Titre') }}</th>
+                      <th>{{ t('common.status', 'Status') }}</th>
+                      <th>{{ t('tasks.dueDate') }}</th>
+                      <th>{{ t('tasks.priority') }}</th>
+                      <th class="w-10">{{ t('common.actions') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="task in companyTasks" :key="task.id" class="hover:bg-base-300">
+                      <td>{{ task.title }}</td>
+                      <td>
+                        <span
+                          :class="getTaskStatusClass(task.taskStatus || '')"
+                          class="px-2 py-1 text-xs rounded-full"
+                        >
+                          {{ getTaskStatusLabel(task.taskStatus || '') }}
+                        </span>
+                      </td>
+                      <td>{{ task.dueDate ? formatDate(task.dueDate) : '-' }}</td>
+                      <td>
+                        <span :class="getTaskPriorityClass(task.priority || '')" class="badge">
+                          {{ getTaskPriorityLabel(task.priority || '') }}
+                        </span>
+                      </td>
+                      <td>
+                        <button class="btn btn-sm btn-ghost" @click="openTaskDetails(task)">
+                          <Iconify icon="mdi:eye" class="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Mobile Cards -->
+              <div class="grid grid-cols-1 gap-4 md:hidden">
+                <div v-for="task in companyTasks" :key="task.id" class="card bg-base-100 shadow-sm">
+                  <div class="card-body p-4">
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="font-medium">{{ task.title }}</div>
+                      <button class="btn btn-sm btn-ghost" @click="openTaskDetails(task)">
+                        <Iconify icon="mdi:eye" class="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                      <span
+                        :class="getTaskStatusClass(task.taskStatus || '')"
+                        class="px-2 py-1 text-xs rounded-full"
+                      >
+                        {{ getTaskStatusLabel(task.taskStatus || '') }}
+                      </span>
+                      <span :class="getTaskPriorityClass(task.priority || '')" class="badge">
+                        {{ getTaskPriorityLabel(task.priority || '') }}
+                      </span>
+                    </div>
+                    <div v-if="task.dueDate" class="text-sm text-gray-500">
+                      {{ t('tasks.dueDate') }}: {{ formatDate(task.dueDate) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div v-else class="text-center py-8 text-gray-500">
+              <p>{{ t('tasks.noTasks') }}</p>
+            </div>
+          </div>
+
           <!-- Notes Section (Placeholder) -->
           <div class="rounded-lg shadow-md p-6 mb-6 w-full">
             <div class="flex justify-between items-center mb-4">
@@ -273,22 +361,29 @@
                 {{ t('activities.add') }}
               </button>
             </div>
-            <div class="text-center py-8 text-gray-500">
-              <p>{{ t('activities.noActivities') }}</p>
-            </div>
-          </div>
 
-          <!-- Tasks Section (Placeholder) -->
-          <div class="rounded-lg shadow-md p-6 mb-6 w-full">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-lg font-bold">{{ t('tasks.title') }}</h2>
-              <button class="btn btn-sm btn-outline">
-                <Iconify icon="mdi:plus" class="w-4 h-4" />
-                {{ t('tasks.add') }}
-              </button>
+            <div v-if="loadingActivities" class="flex justify-center py-4">
+              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
             </div>
-            <div class="text-center py-8 text-gray-500">
-              <p>{{ t('tasks.noTasks') }}</p>
+
+            <div v-else-if="companyActivities.length" class="divide-y">
+              <div v-for="activity in companyActivities" :key="activity.id" class="py-3">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <div class="font-medium">{{ activity.title }}</div>
+                    <div class="text-sm text-gray-500">{{ formatDate(activity.createdAt) }}</div>
+                    <p v-if="activity.content" class="text-sm mt-1">{{ activity.content }}</p>
+                  </div>
+                  <span class="badge badge-primary badge-outline text-xs">{{ activity.type }}</span>
+                </div>
+                <div v-if="activity.createdBy" class="text-xs text-gray-500 mt-1">
+                  Par {{ activity.createdBy.firstName }} {{ activity.createdBy.lastName }}
+                </div>
+              </div>
+            </div>
+
+            <div v-else class="text-center py-8 text-gray-500">
+              <p>{{ t('activities.noActivities') }}</p>
             </div>
           </div>
 
@@ -482,15 +577,28 @@
         <button @click="showDeleteModal = false">{{ t('common.close') }}</button>
       </form>
     </dialog>
+
+    <!-- Task Details Dialog -->
+    <TaskDetailsDialog
+      v-if="showTaskDialog"
+      :task="selectedTask"
+      :is-open="showTaskDialog"
+      @close="closeTaskDetails"
+      @complete="completeTaskHandler"
+      @edit="editTaskHandler"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import SpecialityBadgeWithTooltip from '@/components/common/SpecialityBadgeWithTooltip.vue'
+import TaskDetailsDialog from '@/components/forms/tasks/TaskDetailsDialog.vue'
+import { useActivityStore } from '@/stores/activity'
 import { useCompanyStore } from '@/stores/company'
 import { useStatusStore } from '@/stores/status'
 import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
+import type { Activity } from '@/types/activity.types'
 import type { Company, CompanyContact, CompanyNote, CompanyUpdateDto } from '@/types/company.types'
 import { formatDate } from '@/utils/date'
 import { computed, onMounted, reactive, ref } from 'vue'
@@ -500,6 +608,7 @@ import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
 const companyStore = useCompanyStore()
+const activityStore = useActivityStore()
 const statusStore = useStatusStore()
 const userStore = useUserStore()
 const toastStore = useToastStore()
@@ -527,11 +636,19 @@ const companyForm = reactive<CompanyUpdateDto & { id?: string }>({
   specialities: [] as string[],
 })
 
+// Activities
+const companyActivities = ref<Activity[]>([])
+const companyTasks = ref<Activity[]>([])
+const loadingActivities = ref(false)
+const loadingTasks = ref(false)
+
 // UI states
 const loading = ref(false)
 const error = ref<string | null>(null)
 const showModal = ref(false)
 const showDeleteModal = ref(false)
+const showTaskDialog = ref(false)
+const selectedTask = ref<Activity | null>(null)
 
 // Computed properties
 const companyStatuses = computed(() => statusStore.getStatusesByType('COMPANY'))
@@ -548,6 +665,38 @@ async function fetchSpecialities() {
     toastStore.error(
       t('common.failedToFetchSpecialities', 'Erreur lors du chargement des spécialités'),
     )
+  }
+}
+
+// Fetch Recent Activities
+async function fetchCompanyActivities() {
+  loadingActivities.value = true
+  try {
+    await activityStore.fetchRecentActivities()
+    companyActivities.value = activityStore.activities.filter(
+      (activity) => activity.companyId === companyId.value,
+    )
+  } catch (err) {
+    console.error('Failed to fetch company activities', err)
+    toastStore.error(t('activities.failedToFetch', 'Erreur lors du chargement des activités'))
+  } finally {
+    loadingActivities.value = false
+  }
+}
+
+// Fonction pour charger les tâches de l'entreprise
+async function fetchCompanyTasks() {
+  loadingTasks.value = true
+  try {
+    await activityStore.fetchTasks()
+    companyTasks.value = activityStore.activities.filter(
+      (activity) => activity.type === 'TASK' && activity.companyId === companyId.value,
+    )
+  } catch (err) {
+    console.error('Failed to fetch company tasks', err)
+    toastStore.error(t('tasks.failedToFetch', 'Erreur lors du chargement des tâches'))
+  } finally {
+    loadingTasks.value = false
   }
 }
 
@@ -590,6 +739,8 @@ onMounted(async () => {
       fetchSpecialities(),
       fetchContacts(),
       fetchNotes(),
+      fetchCompanyActivities(),
+      fetchCompanyTasks(),
     ])
 
     await companyStore.fetchCompanyById(companyId.value)
@@ -761,5 +912,92 @@ function formattedRevenue(value: number): string {
 
 function getInitials(firstName: string, lastName: string): string {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
+}
+
+// Helpers
+function getTaskStatusLabel(status: string): string {
+  switch (status) {
+    case 'PENDING':
+      return t('tasks.status.pending', 'En attente')
+    case 'IN_PROGRESS':
+      return t('tasks.status.inProgress', 'En cours')
+    case 'COMPLETED':
+      return t('tasks.status.completed', 'Terminée')
+    case 'CANCELLED':
+      return t('tasks.status.cancelled', 'Annulée')
+    default:
+      return status
+  }
+}
+
+function getTaskStatusClass(status: string): string {
+  switch (status) {
+    case 'PENDING':
+      return 'bg-gray-200 text-gray-800'
+    case 'IN_PROGRESS':
+      return 'bg-blue-100 text-blue-800'
+    case 'COMPLETED':
+      return 'bg-green-100 text-green-800'
+    case 'CANCELLED':
+      return 'bg-red-100 text-red-800'
+    default:
+      return 'bg-gray-100'
+  }
+}
+
+function getTaskPriorityLabel(priority: string): string {
+  switch (priority) {
+    case 'LOW':
+      return t('tasks.priorityLevel.low', 'Faible')
+    case 'MEDIUM':
+      return t('tasks.priorityLevel.medium', 'Moyenne')
+    case 'HIGH':
+      return t('tasks.priorityLevel.high', 'Élevée')
+    default:
+      return priority
+  }
+}
+
+function getTaskPriorityClass(priority: string): string {
+  switch (priority) {
+    case 'LOW':
+      return 'badge-info'
+    case 'MEDIUM':
+      return 'badge-warning'
+    case 'HIGH':
+      return 'badge-error'
+    default:
+      return 'badge-ghost'
+  }
+}
+
+// Fonctions pour les tâches
+function openTaskDetails(task: Activity) {
+  selectedTask.value = task
+  showTaskDialog.value = true
+}
+
+function closeTaskDetails() {
+  showTaskDialog.value = false
+  selectedTask.value = null
+}
+
+async function completeTaskHandler(taskId: string) {
+  try {
+    await activityStore.completeTask(taskId)
+    toastStore.success(t('tasks.completedSuccessfully', 'Tâche marquée comme terminée'))
+    // Rafraîchir les tâches
+    fetchCompanyTasks()
+  } catch (error) {
+    console.error('Failed to complete task:', error)
+    toastStore.error(t('tasks.failedToComplete', 'Échec de la mise à jour de la tâche'))
+  }
+  closeTaskDetails()
+}
+
+function editTaskHandler(task: Activity) {
+  console.log('Edit task:', task)
+  // À implémenter pour l'édition de tâche
+  closeTaskDetails()
 }
 </script>
