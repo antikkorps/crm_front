@@ -81,11 +81,11 @@
         <!-- Main Information -->
         <div class="col-span-1 lg:col-span-2">
           <div class="rounded-lg shadow-md p-6 mb-6 w-full">
-            <h2 class="text-xl font-bold mb-4">Détails</h2>
+            <h2 class="text-xl font-bold mb-4">{{ t('common.details') }}</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p class="text-sm text-gray-500">Site Web</p>
+                <p class="text-sm text-gray-500">{{ t('common.website') }}</p>
                 <p v-if="company.website" class="font-medium">
                   <a
                     :href="formatWebsiteUrl(company.website)"
@@ -95,7 +95,7 @@
                     {{ company.website }}
                   </a>
                 </p>
-                <p v-else class="text-gray-400">Non fourni</p>
+                <p v-else class="text-gray-400">{{ t('common.notProvided') }}</p>
               </div>
 
               <div>
@@ -138,9 +138,9 @@
               </div>
 
               <div>
-                <p class="text-sm text-gray-500">Adresse</p>
+                <p class="text-sm text-gray-500">{{ t('common.address') }}</p>
                 <p v-if="company.address" class="font-medium">{{ company.address }}</p>
-                <p v-else class="text-gray-400">Non fournie</p>
+                <p v-else class="text-gray-400">{{ t('common.notProvided') }}</p>
                 <p v-if="company.address" class="text-sm text-gray-500">
                   {{ company.zipCode }} - {{ company.city }} -
                   {{ company.country }}
@@ -149,39 +149,52 @@
             </div>
 
             <div class="mt-6">
-              <p class="text-sm text-gray-500 mb-2">Description</p>
+              <p class="text-sm text-gray-500 mb-2">{{ t('common.description') }}</p>
               <p v-if="company.description" class="text-gray-700">
                 {{ company.description }}
               </p>
-              <p v-else class="text-gray-400">Aucune description fournie</p>
+              <p v-else class="text-gray-400">{{ t('common.noDescription') }}</p>
             </div>
           </div>
 
           <!-- Contacts Section (Placeholder) -->
           <div class="rounded-lg shadow-md p-6 mb-6 w-full">
             <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-bold">Contacts</h2>
+              <h2 class="text-xl font-bold">{{ t('contacts.title') }}</h2>
               <button class="btn btn-sm btn-outline">
                 <Iconify icon="mdi:plus" class="w-4 h-4" />
-                Ajouter un contact
+                {{ t('contacts.add') }}
               </button>
             </div>
-            <div class="text-center py-8 text-gray-500">
-              <p>Pas de contacts pour le moment</p>
+            <div v-if="contacts.length" class="divide-y">
+              <div v-for="contact in contacts" :key="contact.id" class="py-2">
+                <div class="font-medium">{{ contact.firstName }} {{ contact.lastName }}</div>
+                <div class="text-sm text-gray-500">{{ contact.email }}</div>
+                <div class="text-sm text-gray-500">{{ contact.phone }}</div>
+              </div>
+            </div>
+            <div v-else class="text-center py-8 text-gray-500">
+              <p>{{ t('contacts.noContacts') }}</p>
             </div>
           </div>
 
           <!-- Notes Section (Placeholder) -->
           <div class="rounded-lg shadow-md p-6 mb-6 w-full">
             <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-bold">Notes</h2>
+              <h2 class="text-xl font-bold">{{ t('notes.title') }}</h2>
               <button class="btn btn-sm btn-outline">
                 <Iconify icon="mdi:plus" class="w-4 h-4" />
-                Ajouter une note
+                {{ t('notes.add') }}
               </button>
             </div>
-            <div class="text-center py-8 text-gray-500">
-              <p>Pas de notes pour le moment</p>
+            <div v-if="notes.length" class="divide-y">
+              <div v-for="note in notes" :key="note.id" class="py-2">
+                <div class="text-sm text-gray-500">{{ formatDate(note.createdAt) }}</div>
+                <div class="font-medium">{{ note.content }}</div>
+              </div>
+            </div>
+            <div v-else class="text-center py-8 text-gray-500">
+              <p>{{ t('notes.noNotes') }}</p>
             </div>
           </div>
         </div>
@@ -191,42 +204,42 @@
           <!-- Activities Section (Placeholder) -->
           <div class="rounded-lg shadow-md p-6 mb-6 w-full">
             <div class="flex justify-between items-center mb-4">
-              <h2 class="text-lg font-bold">Activités récentes</h2>
+              <h2 class="text-lg font-bold">{{ t('activities.recentActivities') }}</h2>
               <button class="btn btn-sm btn-outline">
                 <Iconify icon="mdi:plus" class="w-4 h-4" />
-                Ajouter
+                {{ t('activities.add') }}
               </button>
             </div>
             <div class="text-center py-8 text-gray-500">
-              <p>Pas d'activités enregistrées pour le moment</p>
+              <p>{{ t('activities.noActivities') }}</p>
             </div>
           </div>
 
           <!-- Tasks Section (Placeholder) -->
           <div class="rounded-lg shadow-md p-6 mb-6 w-full">
             <div class="flex justify-between items-center mb-4">
-              <h2 class="text-lg font-bold">Tâches</h2>
+              <h2 class="text-lg font-bold">{{ t('tasks.title') }}</h2>
               <button class="btn btn-sm btn-outline">
                 <Iconify icon="mdi:plus" class="w-4 h-4" />
-                Ajouter une tâche
+                {{ t('tasks.add') }}
               </button>
             </div>
             <div class="text-center py-8 text-gray-500">
-              <p>Pas de tâches assignées pour le moment</p>
+              <p>{{ t('tasks.noTasks') }}</p>
             </div>
           </div>
 
           <!-- Quotes Section (Placeholder) -->
           <div class="rounded-lg shadow-md p-6 w-full">
             <div class="flex justify-between items-center mb-4">
-              <h2 class="text-lg font-bold">Devis</h2>
+              <h2 class="text-lg font-bold">{{ t('quotes.title') }}</h2>
               <button class="btn btn-sm btn-outline">
                 <Iconify icon="mdi:plus" class="w-4 h-4" />
-                Ajouter un devis
+                {{ t('quotes.add') }}
               </button>
             </div>
             <div class="text-center py-8 text-gray-500">
-              <p>Pas de devis créés pour le moment</p>
+              <p>{{ t('quotes.noQuotes') }}</p>
             </div>
           </div>
         </div>
@@ -236,12 +249,12 @@
     <!-- Edit Company Modal (Reused from CompaniesListView) -->
     <dialog id="editCompanyModal" class="modal" :open="showModal">
       <div class="modal-box w-full max-w-2xl">
-        <h2 class="text-xl font-bold mb-4">Modifier l'entreprise</h2>
+        <h2 class="text-xl font-bold mb-4">{{ t('companies.editCompany') }}</h2>
 
         <form @submit.prevent="submitCompanyForm">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div class="form-group">
-              <label class="label">Nom de l'entreprise*</label>
+              <label class="label">{{ t('companies.name') }}</label>
               <input
                 v-model="companyForm.name"
                 type="text"
@@ -252,7 +265,7 @@
             </div>
 
             <div class="form-group">
-              <label class="label">Secteur d'activité</label>
+              <label class="label">{{ t('companies.industry') }}</label>
               <input
                 v-model="companyForm.industry"
                 type="text"
@@ -262,20 +275,20 @@
             </div>
 
             <div class="form-group">
-              <label class="label">Taille</label>
+              <label class="label">{{ t('common.size') }}</label>
               <select v-model="companyForm.size" class="select select-bordered w-full">
-                <option value="">Sélectionner la taille</option>
-                <option value="1-10">1-10 employés</option>
-                <option value="11-50">11-50 employés</option>
-                <option value="51-200">51-200 employés</option>
-                <option value="201-500">201-500 employés</option>
-                <option value="501-1000">501-1000 employés</option>
-                <option value="+1000">+1000 employés</option>
+                <option value="">{{ t('common.selectSize') }}</option>
+                <option value="1-10">{{ t('common.size1to10') }}</option>
+                <option value="11-50">{{ t('common.size11to50') }}</option>
+                <option value="51-200">{{ t('common.size51to200') }}</option>
+                <option value="201-500">{{ t('common.size201to500') }}</option>
+                <option value="501-1000">{{ t('common.size501to1000') }}</option>
+                <option value="+1000">{{ t('common.sizeMoreThan1000') }}</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label class="label">Adresse</label>
+              <label class="label">{{ t('common.address') }}</label>
               <input
                 v-model="companyForm.address"
                 type="text"
@@ -284,7 +297,7 @@
               />
             </div>
             <div class="form-group">
-              <label class="label">Ville</label>
+              <label class="label">{{ t('common.city') }}</label>
               <input
                 v-model="companyForm.city"
                 type="text"
@@ -293,7 +306,7 @@
               />
             </div>
             <div class="form-group">
-              <label class="label">Code Postal</label>
+              <label class="label">{{ t('common.zipCode') }}</label>
               <input
                 v-model="companyForm.zipCode"
                 type="text"
@@ -302,7 +315,7 @@
               />
             </div>
             <div class="form-group">
-              <label class="label">Pays</label>
+              <label class="label">{{ t('common.country') }}</label>
               <input
                 v-model="companyForm.country"
                 type="text"
@@ -332,7 +345,7 @@
             </div>
 
             <div class="form-group">
-              <label class="label">Site Web</label>
+              <label class="label">{{ t('common.website') }}</label>
               <input
                 v-model="companyForm.website"
                 type="url"
@@ -360,7 +373,7 @@
           </div>
 
           <div class="form-group mb-4">
-            <label class="label">Description</label>
+            <label class="label">{{ t('common.description') }}</label>
             <textarea
               v-model="companyForm.description"
               class="textarea textarea-bordered w-full"
@@ -370,36 +383,40 @@
           </div>
 
           <div class="flex justify-end space-x-3 mt-6">
-            <button type="button" class="btn btn-outline" @click="closeModal">Annuler</button>
-            <button type="submit" class="btn btn-primary" :disabled="loading">Mettre à jour</button>
+            <button type="button" class="btn btn-outline" @click="closeModal">
+              {{ t('common.cancel') }}
+            </button>
+            <button type="submit" class="btn btn-primary" :disabled="loading">
+              {{ t('common.update') }}
+            </button>
           </div>
         </form>
       </div>
       <form method="dialog" class="modal-backdrop">
-        <button @click="closeModal">fermer</button>
+        <button @click="closeModal">{{ t('common.close') }}</button>
       </form>
     </dialog>
 
     <!-- Delete Confirmation Modal -->
     <dialog id="deleteConfirmModal" class="modal" :open="showDeleteModal">
       <div class="modal-box w-full max-w-md">
-        <h2 class="text-xl font-bold mb-4">Confirmer la suppression</h2>
+        <h2 class="text-xl font-bold mb-4">{{ t('common.confirmDelete') }}</h2>
         <p>
-          Êtes-vous sûr de vouloir supprimer {{ company?.name }} ? Cette action ne peut pas être
-          annulée.
+          {{ t('common.areYouSureToDelete') }} {{ company?.name }} ?
+          {{ t('common.thisActionCannotBeUndone') }}
         </p>
 
         <div class="flex justify-end space-x-3 mt-6">
           <button type="button" class="btn btn-outline" @click="showDeleteModal = false">
-            Annuler
+            {{ t('common.cancel') }}
           </button>
           <button type="button" class="btn btn-error" :disabled="loading" @click="deleteCompany">
-            Supprimer
+            {{ t('common.delete') }}
           </button>
         </div>
       </div>
       <form method="dialog" class="modal-backdrop">
-        <button @click="showDeleteModal = false">fermer</button>
+        <button @click="showDeleteModal = false">{{ t('common.close') }}</button>
       </form>
     </dialog>
   </div>
@@ -411,7 +428,8 @@ import { useCompanyStore } from '@/stores/company'
 import { useStatusStore } from '@/stores/status'
 import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
-import type { Company, CompanyUpdateDto } from '@/types/company.types'
+import type { Company, CompanyContact, CompanyNote, CompanyUpdateDto } from '@/types/company.types'
+import { formatDate } from '@/utils/date'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -427,6 +445,8 @@ const { t } = useI18n()
 // Company data
 const company = ref<Company | null>(null)
 const companyId = ref<string>(route.params.id as string)
+const contacts = ref<CompanyContact[]>([])
+const notes = ref<CompanyNote[]>([])
 
 // Company form
 const companyForm = reactive<CompanyUpdateDto & { id?: string }>({
@@ -468,6 +488,29 @@ async function fetchSpecialities() {
   }
 }
 
+// Fetch Contacts
+async function fetchContacts() {
+  try {
+    await companyStore.fetchCompanyContacts(companyId.value)
+    contacts.value = companyStore.companyContacts
+    console.log('Contacts fetched:', contacts.value)
+  } catch (err) {
+    console.error('Failed to fetch contacts', err)
+    toastStore.error(t('common.failedToFetchContacts', 'Erreur lors du chargement des contacts'))
+  }
+}
+
+// Fetch Notes
+async function fetchNotes() {
+  try {
+    await companyStore.fetchCompanyNotes(companyId.value)
+    notes.value = companyStore.companyNotes
+  } catch (err) {
+    console.error('Failed to fetch notes', err)
+    toastStore.error(t('common.failedToFetchNotes', 'Erreur lors du chargement des notes'))
+  }
+}
+
 // Load company details on component mount
 onMounted(async () => {
   if (!companyId.value) {
@@ -482,6 +525,8 @@ onMounted(async () => {
       statusStore.fetchStatusesByType('COMPANY'),
       userStore.fetchUsers(),
       fetchSpecialities(),
+      fetchContacts(),
+      fetchNotes(),
     ])
 
     await companyStore.fetchCompanyById(companyId.value)

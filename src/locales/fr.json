@@ -57,6 +57,7 @@
     "update": "Mettre à jour",
     "delete": "Supprimer",
     "description": "Description",
+    "noDescription": "Aucune description fournie",
     "confirmDelete": "Confirmer la suppression",
     "areYouSureToDelete": "Êtes-vous sûr de vouloir supprimer ",
     "cannotBeUndone": "Cette action ne peut pas être annulée !",
@@ -75,7 +76,9 @@
     "allRightsReserved": "Tous droits réservés",
     "assignedTo": "Assigné à",
     "close": "Fermer",
-    "details": "Détails"
+    "details": "Détails",
+    "notAssigned": "Non assigné",
+    "thisActionCannotBeUndone": "Cette action ne peut pas être annulée !"
   },
   "companies": {
     "title": "Entreprises",
@@ -92,6 +95,7 @@
     "companyNotFoundMessage": "l'entreprise que vous recherchez n'a pas été trouvée",
     "failedToLoadCompanies": "Échec du chargement des entreprises",
     "industryNotSpecified": "Secteur non spécifié",
+    "industry": "Secteur d'activité",
     "employee": "Employé | Employés",
     "globalRevenue": "Chiffre d'affaire global",
     "revenue": "Chiffre d'affaire"
@@ -101,7 +105,8 @@
     "add": "Ajouter un contact",
     "edit": "Modifier le contact",
     "delete": "Supprimer le contact",
-    "noAddress": "Pas d'adresse renseignée"
+    "noAddress": "Pas d'adresse renseignée",
+    "noContacts": "Aucun contact trouvé"
   },
   "notes": {
     "title": "Notes",
@@ -158,7 +163,22 @@
       "meeting": "Réunion",
       "task": "Tâche",
       "note": "Note"
-    }
+    },
+    "noActivities": "Aucune activité trouvée",
+    "recentActivities": "Activités récentes"
+  },
+  "tasks": {
+    "title": "Tâches",
+    "add": "Ajouter une tâche",
+    "edit": "Modifier la tâche",
+    "delete": "Supprimer la tâche",
+    "noTasks": "Aucune tâche trouvée",
+    "startAdding": "Commencez par ajouter votre première tâche",
+    "dueDate": "Date d'échéance",
+    "priority": "Priorité",
+    "low": "Basse",
+    "medium": "Moyenne",
+    "high": "Haute"
   },
   "status": {
     "prospect": "Prospect",
@@ -181,5 +201,29 @@
   },
   "statistics": {
     "title": "Statistiques"
+  },
+  "quotes": {
+    "title": "Devis",
+    "add": "Ajouter un devis",
+    "edit": "Modifier le devis",
+    "delete": "Supprimer le devis",
+    "noQuotes": "Aucun devis trouvé",
+    "startAdding": "Commencez par ajouter votre premier devis",
+    "quoteNumber": "Numéro de devis",
+    "date": "Date",
+    "amount": "Montant",
+    "status": "Statut du devis"
+  },
+  "invoices": {
+    "title": "Factures",
+    "add": "Ajouter une facture",
+    "edit": "Modifier la facture",
+    "delete": "Supprimer la facture",
+    "noInvoices": "Aucune facture trouvée",
+    "startAdding": "Commencez par ajouter votre première facture",
+    "invoiceNumber": "Numéro de facture",
+    "date": "Date",
+    "amount": "Montant",
+    "status": "Statut de la facture"
   }
 }

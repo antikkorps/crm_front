@@ -49,14 +49,14 @@ export const CompanyService = {
   // Récupérer les contacts d'une entreprise
   async getCompanyContacts(companyId: string): Promise<CompanyContact[]> {
     const response = await apiRequest<{ items: CompanyContact[] }>(
-      `/v1/companies/${companyId}/contacts`,
+      `/v1/contacts/company/${companyId}`,
     )
     return response.items
   },
 
   // Récupérer les notes d'une entreprise
   async getCompanyNotes(companyId: string): Promise<CompanyNote[]> {
-    const response = await apiRequest<{ items: CompanyNote[] }>(`/v1/companies/${companyId}/notes`)
+    const response = await apiRequest<{ items: CompanyNote[] }>(`/v1/notes/company/${companyId}`)
     return response.items
   },
 
