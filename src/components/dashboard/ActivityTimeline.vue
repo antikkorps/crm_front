@@ -43,8 +43,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits } from 'vue'
-
 export interface Activity {
   title: string
   description: string
