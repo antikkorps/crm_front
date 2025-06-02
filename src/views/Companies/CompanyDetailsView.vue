@@ -157,7 +157,7 @@
             </div>
           </div>
 
-          <!-- Contacts Section (Placeholder) -->
+          <!-- Contacts Section -->
           <div class="rounded-lg shadow-md p-6 mb-6 w-full">
             <div class="flex justify-between items-center mb-4">
               <h2 class="text-xl font-bold">{{ t('contacts.title') }}</h2>
@@ -166,11 +166,74 @@
                 {{ t('contacts.add') }}
               </button>
             </div>
-            <div v-if="contacts.length" class="divide-y">
-              <div v-for="contact in contacts" :key="contact.id" class="py-2">
-                <div class="font-medium">{{ contact.firstName }} {{ contact.lastName }}</div>
-                <div class="text-sm text-gray-500">{{ contact.email }}</div>
-                <div class="text-sm text-gray-500">{{ contact.phone }}</div>
+            <div v-if="contacts.length">
+              <!-- Desktop Table -->
+              <div class="overflow-x-auto hidden md:block">
+                <table class="table table-zebra w-full">
+                  <thead>
+                    <tr>
+                      <th>{{ t('common.fullName') }}</th>
+                      <th>{{ t('common.email') }}</th>
+                      <th>{{ t('common.phone') }}</th>
+                      <th>{{ t('common.position') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="contact in contacts" :key="contact.id" class="hover:bg-base-300">
+                      <td>
+                        {{ contact.firstName }} {{ contact.lastName }}
+                        <span v-if="contact.isMainContact" class="badge badge-success badge-sm">
+                          {{ t('contacts.main') }}
+                        </span>
+                        <span v-else class="badge badge-ghost badge-sm">
+                          {{ t('contacts.secondary') }}
+                        </span>
+                      </td>
+                      <td>
+                        <a href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+                      </td>
+                      <td>{{ contact.phone }}</td>
+                      <td>{{ contact.position }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- Mobile Cards -->
+              <div class="grid grid-cols-1 gap-4 md:hidden">
+                <div
+                  v-for="contact in contacts"
+                  :key="contact.id"
+                  class="card bg-base-100 shadow-sm"
+                >
+                  <div class="card-body p-4">
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="font-bold text-lg">
+                        {{ contact.firstName }} {{ contact.lastName }}
+                      </div>
+                      <span v-if="contact.isMainContact" class="badge badge-success badge-sm">
+                        {{ t('contacts.main') }}
+                      </span>
+                      <span v-else class="badge badge-ghost badge-sm">
+                        {{ t('contacts.secondary') }}
+                      </span>
+                    </div>
+                    <div class="text-sm text-gray-500 mb-1">
+                      <span v-if="contact.position">{{ contact.position }}</span>
+                    </div>
+                    <div class="text-sm mb-1">
+                      <a
+                        v-if="contact.email"
+                        :href="`mailto:${contact.email}`"
+                        class="text-primary hover:underline"
+                      >
+                        {{ contact.email }}
+                      </a>
+                    </div>
+                    <div class="text-sm">
+                      <span v-if="contact.phone">{{ contact.phone }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div v-else class="text-center py-8 text-gray-500">

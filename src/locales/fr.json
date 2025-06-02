@@ -16,6 +16,12 @@
   },
   "common": {
     "email": "Email",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "fullName": "Nom complet",
+    "phone": "Téléphone",
+    "mobile": "Mobile",
+    "position": "Poste",
     "actions": "Actions",
     "add": "Ajouter",
     "status": "Status",
@@ -106,7 +112,9 @@
     "edit": "Modifier le contact",
     "delete": "Supprimer le contact",
     "noAddress": "Pas d'adresse renseignée",
-    "noContacts": "Aucun contact trouvé"
+    "noContacts": "Aucun contact trouvé",
+    "main": "Contact principal",
+    "secondary": "Contact secondaire"
   },
   "notes": {
     "title": "Notes",
