@@ -17,7 +17,11 @@
       <div class="navbar bg-base-100 shadow-sm w-full fixed top-0 z-30">
         <!-- Bouton sidebar - seulement pour les utilisateurs connectés -->
         <div v-if="isAuthenticated" class="flex-none">
-          <label for="my-drawer-3" aria-label="open sidebar" class="btn btn-square btn-ghost">
+          <label
+            for="my-drawer-3"
+            :aria-label="t('common.openSidebar')"
+            class="btn btn-square btn-ghost"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -36,7 +40,9 @@
 
         <!-- Titre - toujours affiché -->
         <div class="flex-1">
-          <RouterLink to="/" class="btn btn-ghost text-xl">MonCRM</RouterLink>
+          <RouterLink :to="isAuthenticated ? '/?from=navbar' : '/'" class="btn btn-ghost text-xl">
+            MonCRM
+          </RouterLink>
         </div>
 
         <!-- Section utilisateur - conditionnelle -->
@@ -65,19 +71,19 @@
               <li>
                 <router-link to="/profile" class="flex items-center gap-2">
                   <Iconify icon="mdi:account" class="w-4 h-4" />
-                  <span>Profile</span>
+                  <span>{{ t('common.profile') }}</span>
                 </router-link>
               </li>
               <li>
                 <router-link to="/settings" class="flex items-center gap-2">
                   <Iconify icon="mdi:cog" class="w-4 h-4" />
-                  <span>Settings</span>
+                  <span>{{ t('settings.title') }}</span>
                 </router-link>
               </li>
               <li>
                 <a @click="handleLogout" class="flex items-center gap-2">
                   <Iconify icon="mdi:logout" class="w-4 h-4" />
-                  <span>Logout</span>
+                  <span>{{ t('auth.logout') }}</span>
                 </a>
               </li>
             </ul>
@@ -118,12 +124,13 @@
 
     <!-- Sidebar - seulement si connecté -->
     <div v-if="isAuthenticated" class="drawer-side z-[999] h-full">
-      <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"> </label>
+      <label for="my-drawer-3" :aria-label="t('common.closeSidebar')" class="drawer-overlay">
+      </label>
 
       <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content flex flex-col">
         <!-- En-tête du menu avec bouton de fermeture à droite -->
         <div class="flex justify-between items-center mb-4 pb-2 border-b border-base-300">
-          <span class="font-bold text-lg">Menu principal</span>
+          <span class="font-bold text-lg">{{ t('common.mainMenu') }}</span>
           <label for="my-drawer-3" class="cursor-pointer">
             <Iconify icon="mdi:close" class="w-6 h-6 btn btn-sm btn-circle btn-primary" />
           </label>
@@ -143,9 +150,15 @@
           </details>
         </li>
 
-        <li class="menu-title mt-4">Paramètres</li>
-        <li><router-link to="/settings" @click="closeSidebar">Configuration</router-link></li>
-        <li><router-link to="/profile" @click="closeSidebar">Profil</router-link></li>
+        <li class="menu-title mt-4">{{ t('settings.title') }}</li>
+        <li>
+          <router-link to="/settings" @click="closeSidebar">{{
+            t('common.configuration')
+          }}</router-link>
+        </li>
+        <li>
+          <router-link to="/profile" @click="closeSidebar">{{ t('common.profile') }}</router-link>
+        </li>
 
         <!-- Carte utilisateur en bas du drawer -->
         <div class="mt-auto pt-4 border-t border-base-300">
@@ -184,7 +197,7 @@
       v-if="showScrollTop"
       @click="scrollToTop"
       class="btn btn-circle btn-primary fixed bottom-4 right-4 shadow-lg z-20"
-      aria-label="Retour en haut"
+      :aria-label="t('common.backToTop')"
     >
       <Iconify icon="mdi:chevron-up" class="w-6 h-6" />
     </button>
@@ -260,26 +273,26 @@ const toggleSidebar = () => {
   sidebarOpen.value = !sidebarOpen.value
 }
 
-const NavigationItems = ref([
+const NavigationItems = computed(() => [
   {
-    label: 'Accès rapide',
+    label: t('common.quickAccess'),
     iconName: 'mdi:home',
     command: '',
     items: [
       {
-        label: 'Accueil',
+        label: t('common.home'),
         iconName: 'mdi:home',
         shortcut: '⌘+D',
-        command: '/',
+        command: '/?from=sidebar',
       },
       {
-        label: 'Dashboard',
+        label: t('common.dashboard'),
         iconName: 'mdi:view-dashboard-outline',
         shortcut: '⌘+D',
         command: '/dashboard',
       },
       {
-        label: 'Paramètres',
+        label: t('settings.title'),
         iconName: 'mdi:cog',
         shortcut: '⌘+S',
         command: '/settings',
@@ -287,25 +300,25 @@ const NavigationItems = ref([
     ],
   },
   {
-    label: 'Gestion Commerciale',
+    label: t('common.commercialManagement'),
     icon: 'pi pi-search',
     badge: 3,
     command: '',
     items: [
       {
-        label: 'Contacts',
+        label: t('contacts.title'),
         iconName: 'mdi:account-multiple',
         shortcut: '⌘+S',
         command: '/contacts',
       },
       {
-        label: 'Entreprises',
+        label: t('companies.title'),
         iconName: 'mdi:office-building',
         shortcut: '⌘+B',
         command: '/companies',
       },
       {
-        label: 'Notes',
+        label: t('notes.title'),
         iconName: 'mdi:note-text',
         shortcut: '⌘+U',
         command: '/notes',
@@ -313,18 +326,18 @@ const NavigationItems = ref([
     ],
   },
   {
-    label: "Besoin d'aide ?",
+    label: t('common.needHelp'),
     iconName: 'mdi:information',
     command: '/about',
     items: [
       {
-        label: 'Documentation',
+        label: t('common.documentation'),
         iconName: 'mdi:book-open',
         shortcut: '⌘+D',
         command: '/documentation',
       },
       {
-        label: 'Support',
+        label: t('common.support'),
         iconName: 'mdi:headset-mic',
         shortcut: '⌘+S',
         command: '/support',
