@@ -67,7 +67,7 @@
     "specialities": "Spécialités",
     "allSpecialities": "Toutes les spécialités",
     "noSpecialities": "Aucune spécialité",
-    "operatingRooms": "Salles d'opération",
+    "operatingRooms": "Salles de chirurgie",
     "allUsers": "Tous les utilisateurs",
     "selectSize": "Sélectionner la taille",
     "revenue": "Chiffre d'affaires",
@@ -244,6 +244,10 @@
     "failedToComplete": "Échec de la mise à jour de la tâche",
     "reopenedSuccessfully": "Tâche rouverte avec succès",
     "failedToReopen": "Échec de la réouverture de la tâche",
+    "filters": {
+      "myTasks": "Mes tâches",
+      "allTasks": "Toutes les tâches"
+    },
     "status": {
       "pending": "En attente",
       "inProgress": "En cours",

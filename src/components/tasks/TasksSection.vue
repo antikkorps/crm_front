@@ -1,18 +1,22 @@
 <template>
   <div class="rounded-lg shadow-md p-6 mb-6 w-full">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold">{{ t('tasks.title') }}</h2>
+    <!-- En-tête avec titre et bouton d'ajout -->
+    <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between mb-4">
+      <h2 class="text-2xl font-bold">{{ t('tasks.title') }}</h2>
       <button class="btn btn-sm btn-outline" @click="openTaskModal(null)">
         <Iconify icon="mdi:plus" class="w-4 h-4" />
         {{ t('tasks.add') }}
       </button>
     </div>
 
+    <!-- Filtres centrés -->
+    <TaskFilter v-model="taskFilter" :task-counts="taskCounts" />
+
     <div v-if="loading" class="flex justify-center py-4">
       <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
     </div>
 
-    <div v-else-if="tasks.length">
+    <div v-else-if="filteredTasks.length">
       <!-- Desktop Table -->
       <div class="overflow-x-auto hidden md:block">
         <table class="table table-zebra w-full">
@@ -22,12 +26,13 @@
               <th>{{ t('common.status', 'Statut') }}</th>
               <th>{{ t('tasks.dueDate') }}</th>
               <th>{{ t('tasks.priority') }}</th>
+              <th>{{ t('tasks.assignedTo') }}</th>
               <th class="w-16">{{ t('common.actions') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr
-              v-for="task in tasks"
+              v-for="task in filteredTasks"
               :key="task.id"
               class="hover:bg-base-300"
               :class="{ 'cursor-pointer': clickable }"
@@ -52,13 +57,32 @@
               </td>
               <td>
                 <span :class="getDueDateClass(task.dueDate || null)">
-                  {{ task.dueDate ? formatDate(task.dueDate) : '-' }}
+                  {{ task.dueDate ? formatDateOnly(task.dueDate) : '-' }}
                 </span>
               </td>
               <td>
                 <span :class="getTaskPriorityClass(task.priority || '')" class="badge">
                   {{ getTaskPriorityLabel(task.priority || '') }}
                 </span>
+              </td>
+              <td>
+                <!-- Dropdown pour modifier l'assignation à la volée -->
+                <select
+                  :value="task.assignedToId || ''"
+                  @change="updateTaskAssignment(task, $event)"
+                  class="select select-xs select-bordered w-full max-w-xs"
+                  @click.stop
+                >
+                  <option value="">{{ t('common.notAssigned') }}</option>
+                  <option
+                    v-for="user in availableUsers"
+                    :key="user.id"
+                    :value="user.id"
+                    :selected="task.assignedToId === user.id"
+                  >
+                    {{ user.firstName }} {{ user.lastName }}
+                  </option>
+                </select>
               </td>
               <td>
                 <div class="flex space-x-1">
@@ -102,7 +126,7 @@
       <!-- Mobile Cards -->
       <div class="grid grid-cols-1 gap-4 md:hidden">
         <div
-          v-for="task in tasks"
+          v-for="task in filteredTasks"
           :key="task.id"
           class="card bg-base-100 shadow-sm"
           :class="{ 'cursor-pointer hover:shadow-md transition-shadow': clickable }"
@@ -134,6 +158,28 @@
                 </button>
               </div>
             </div>
+
+            <!-- Assignation mobile -->
+            <div class="mb-3">
+              <label class="label label-text text-xs">{{ t('tasks.assignedTo') }} :</label>
+              <select
+                :value="task.assignedToId || ''"
+                @change="updateTaskAssignment(task, $event)"
+                class="select select-xs select-bordered w-full"
+                @click.stop
+              >
+                <option value="">{{ t('common.notAssigned') }}</option>
+                <option
+                  v-for="user in availableUsers"
+                  :key="user.id"
+                  :value="user.id"
+                  :selected="task.assignedToId === user.id"
+                >
+                  {{ user.firstName }} {{ user.lastName }}
+                </option>
+              </select>
+            </div>
+
             <div class="flex flex-wrap items-center gap-2 mb-2">
               <span
                 :class="getTaskStatusClass(task.taskStatus || '')"
@@ -146,7 +192,7 @@
               </span>
             </div>
             <div v-if="task.dueDate" class="text-sm" :class="getDueDateClass(task.dueDate || null)">
-              {{ t('tasks.dueDate') }}: {{ formatDate(task.dueDate) }}
+              {{ t('tasks.dueDate') }}: {{ formatDateOnly(task.dueDate) }}
             </div>
             <div v-if="task.content && showPreview" class="text-sm text-gray-500 mt-2">
               {{ task.content }}
@@ -158,7 +204,7 @@
 
     <div v-else class="text-center py-8 text-gray-500">
       <Iconify icon="mdi:format-list-checks" class="w-12 h-12 mx-auto mb-2 opacity-50" />
-      <p>{{ t('tasks.noTasks') }}</p>
+      <p>{{ getEmptyMessage() }}</p>
       <button class="btn btn-sm btn-primary mt-2" @click="openTaskModal(null)">
         {{ t('tasks.add') }}
       </button>
@@ -193,15 +239,23 @@
 </template>
 
 <script setup lang="ts">
-import type { TaskCreateDto, TaskUpdateDto } from '@/services/activity.service'
+import {
+  ActivityService,
+  type TaskCreateDto,
+  type TaskUpdateDto,
+} from '@/services/activity.service'
+import { useUserStore } from '@/stores/user'
 import type { Activity } from '@/types/activity.types'
+import type { User } from '@/types/auth.types'
 import type { CompanyContact } from '@/types/company.types'
-import { formatDate } from '@/utils/date'
-import { ref } from 'vue'
+import { formatDateOnly } from '@/utils/date'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import TaskFilter from './TaskFilter.vue'
 import TaskForm from './TaskForm.vue'
 
 const { t } = useI18n()
+const userStore = useUserStore()
 
 // Props
 const props = defineProps<{
@@ -215,20 +269,87 @@ const props = defineProps<{
   companyContacts?: CompanyContact[]
 }>()
 
-// Emits - simplifié car on gère la création/édition en interne
+// Emits - ajout de nouvelles émissions pour la gestion des assignations
 const emit = defineEmits<{
   'view-task': [task: Activity]
   'complete-task': [taskId: string]
   'reopen-task': [taskId: string]
   'task-click': [task: Activity]
-  'task-created': [task: TaskCreateDto] // Nouveau événement pour notifier la création
-  'task-updated': [task: TaskUpdateDto & { id: string }] // Nouveau événement pour notifier la mise à jour
+  'task-created': [task: TaskCreateDto]
+  'task-updated': [task: TaskUpdateDto & { id: string }]
+  'assignment-updated': [taskId: string, userId: string | null]
 }>()
 
-// État du modal
+// État local
 const taskModalRef = ref<HTMLDialogElement | null>(null)
 const isEditMode = ref(false)
 const currentTask = ref<Activity | null>(null)
+const taskFilter = ref<'mine' | 'all'>('all')
+const availableUsers = ref<User[]>([])
+
+// Filtrage des tâches selon le filtre sélectionné
+const filteredTasks = computed(() => {
+  if (!props.tasks) return []
+
+  switch (taskFilter.value) {
+    case 'mine':
+      return props.tasks.filter((task) => task.assignedToId === userStore.currentUser?.id)
+    case 'all':
+    default:
+      return props.tasks
+  }
+})
+
+// Charger les utilisateurs au montage
+onMounted(async () => {
+  try {
+    await userStore.fetchUsers()
+    availableUsers.value = userStore.users
+  } catch (error) {
+    console.error('Erreur lors du chargement des utilisateurs:', error)
+  }
+})
+
+// Compteurs de tâches pour les filtres
+const taskCounts = computed(() => {
+  const myUserId = userStore.currentUser?.id
+
+  const mine = props.tasks.filter((task) => task.assignedToId === myUserId).length
+  const all = props.tasks.length
+
+  return { mine, all }
+})
+
+// Message d'état vide adaptatif
+function getEmptyMessage(): string {
+  switch (taskFilter.value) {
+    case 'mine':
+      return 'Aucune tâche ne vous est assignée'
+    case 'all':
+    default:
+      return t('tasks.noTasks')
+  }
+}
+
+// Modification d'assignation à la volée
+async function updateTaskAssignment(task: Activity, event: Event) {
+  const target = event.target as HTMLSelectElement
+  const newUserId = target.value || null
+
+  try {
+    // Mettre à jour via l'API
+    await ActivityService.updateTask(task.id, {
+      assignedToId: newUserId,
+    })
+
+    // Émettre l'événement pour notifier le parent
+    emit('assignment-updated', task.id, newUserId)
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour de l'assignation:", error)
+    // Restaurer la valeur précédente en cas d'erreur
+    target.value = task.assignedToId || ''
+  }
+}
 
 // Ouvrir le modal pour ajouter/modifier une tâche
 function openTaskModal(task: Activity | null) {

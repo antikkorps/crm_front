@@ -244,6 +244,10 @@
     "failedToComplete": "Failed to update task",
     "reopenedSuccessfully": "Task reopened successfully",
     "failedToReopen": "Failed to reopen task",
+    "filters": {
+      "myTasks": "My tasks",
+      "allTasks": "All tasks"
+    },
     "status": {
       "pending": "Pending",
       "inProgress": "In Progress",
