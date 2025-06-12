@@ -78,6 +78,14 @@
                     <Iconify icon="mdi:check" class="w-4 h-4" />
                   </button>
                   <button
+                    v-else
+                    class="btn btn-sm btn-ghost text-warning"
+                    @click.stop="$emit('reopen-task', task.id)"
+                    :title="t('tasks.reopen')"
+                  >
+                    <Iconify icon="mdi:undo" class="w-4 h-4" />
+                  </button>
+                  <button
                     class="btn btn-sm btn-ghost"
                     @click.stop="openTaskModal(task)"
                     :title="t('common.edit')"
@@ -113,6 +121,13 @@
                   @click.stop="$emit('complete-task', task.id)"
                 >
                   <Iconify icon="mdi:check" class="w-4 h-4" />
+                </button>
+                <button
+                  v-else
+                  class="btn btn-sm btn-ghost text-warning"
+                  @click.stop="$emit('reopen-task', task.id)"
+                >
+                  <Iconify icon="mdi:undo" class="w-4 h-4" />
                 </button>
                 <button class="btn btn-sm btn-ghost" @click.stop="openTaskModal(task)">
                   <Iconify icon="mdi:pencil" class="w-4 h-4" />
@@ -204,6 +219,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'view-task': [task: Activity]
   'complete-task': [taskId: string]
+  'reopen-task': [taskId: string]
   'task-click': [task: Activity]
   'task-created': [task: TaskCreateDto] // Nouveau événement pour notifier la création
   'task-updated': [task: TaskUpdateDto & { id: string }] // Nouveau événement pour notifier la mise à jour
@@ -322,4 +338,9 @@ function getDueDateClass(dueDate: string | null): string {
 
   return 'text-gray-600'
 }
+
+// Exposer les méthodes publiques du composant
+defineExpose({
+  openTaskModal,
+})
 </script>

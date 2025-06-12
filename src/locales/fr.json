@@ -90,7 +90,8 @@
     "close": "Fermer",
     "details": "Détails",
     "notAssigned": "Non assigné",
-    "thisActionCannotBeUndone": "Cette action ne peut pas être annulée !"
+    "thisActionCannotBeUndone": "Cette action ne peut pas être annulée !",
+    "by": "Par"
   },
   "companies": {
     "title": "Entreprises",
@@ -176,7 +177,12 @@
       "email": "Email",
       "meeting": "Réunion",
       "task": "Tâche",
-      "note": "Note"
+      "note": "Note",
+      "quote": "Devis",
+      "opportunity": "Opportunité",
+      "contact": "Contact",
+      "follow_up": "Suivi",
+      "demo": "Démonstration"
     },
     "noActivities": "Aucune activité trouvée",
     "recentActivities": "Activités récentes"
@@ -192,7 +198,12 @@
     "priority": "Priorité",
     "details": "Détails de la tâche",
     "complete": "Marquer comme terminée",
+    "reopen": "Rouvrir",
     "assignedTo": "Assignée à",
+    "completedSuccessfully": "Tâche marquée comme terminée",
+    "failedToComplete": "Échec de la mise à jour de la tâche",
+    "reopenedSuccessfully": "Tâche rouverte avec succès",
+    "failedToReopen": "Échec de la réouverture de la tâche",
     "status": {
       "pending": "En attente",
       "inProgress": "En cours",

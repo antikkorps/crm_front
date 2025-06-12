@@ -196,6 +196,25 @@ export const useActivityStore = defineStore('activity', () => {
     }
   }
 
+  const reopenTask = async (id: string) => {
+    isLoading.value = true
+    error.value = null
+    try {
+      const reopenedTask = await ActivityService.reopenTask(id)
+      const index = activities.value.findIndex((a) => a.id === id)
+      if (index !== -1) {
+        activities.value[index] = reopenedTask as Activity
+      }
+      return reopenedTask
+    } catch (e) {
+      error.value = `Failed to reopen task with id ${id}`
+      console.error(e)
+      return null
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   // Activités récentes
   const fetchRecentActivities = async () => {
     isLoading.value = true
@@ -227,6 +246,7 @@ export const useActivityStore = defineStore('activity', () => {
     updateTask,
     deleteTask,
     completeTask,
+    reopenTask,
     fetchRecentActivities,
     TaskStatus,
     TaskPriority,

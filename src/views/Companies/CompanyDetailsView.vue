@@ -171,6 +171,7 @@
 
           <!-- Tasks Section -->
           <TasksSection
+            ref="tasksSectionRef"
             :tasks="companyTasks"
             :loading="loadingTasks"
             :show-preview="true"
@@ -180,6 +181,7 @@
             :companyContacts="contacts"
             @view-task="openTaskDetails"
             @complete-task="completeTaskHandler"
+            @reopen-task="reopenTaskHandler"
             @task-click="openTaskDetails"
             @task-created="handleTaskCreated"
             @task-updated="handleTaskUpdated"
@@ -223,10 +225,13 @@
                     <div class="text-sm text-gray-500">{{ formatDate(activity.createdAt) }}</div>
                     <p v-if="activity.content" class="text-sm mt-1">{{ activity.content }}</p>
                   </div>
-                  <span class="badge badge-primary badge-outline text-xs">{{ activity.type }}</span>
+                  <span class="badge badge-primary badge-outline text-xs">
+                    {{ t(`activities.types.${activity.type.toLowerCase()}`, activity.type) }}
+                  </span>
                 </div>
                 <div v-if="activity.createdBy" class="text-xs text-gray-500 mt-1">
-                  Par {{ activity.createdBy.firstName }} {{ activity.createdBy.lastName }}
+                  {{ t('common.by') }} {{ activity.createdBy.firstName }}
+                  {{ activity.createdBy.lastName }}
                 </div>
               </div>
             </div>
@@ -471,6 +476,9 @@ const company = ref<Company | null>(null)
 const companyId = ref<string>(route.params.id as string)
 const contacts = ref<CompanyContact[]>([])
 const notes = ref<CompanyNote[]>([])
+
+// Component refs
+const tasksSectionRef = ref<InstanceType<typeof TasksSection> | null>(null)
 
 // Company form
 const companyForm = reactive<CompanyUpdateDto & { id?: string }>({
@@ -790,10 +798,27 @@ async function completeTaskHandler(taskId: string) {
   closeTaskDetails()
 }
 
-function editTaskHandler(task: Activity) {
-  console.log('Edit task:', task)
-  // À implémenter pour l'édition de tâche
+async function reopenTaskHandler(taskId: string) {
+  try {
+    await activityStore.reopenTask(taskId)
+    toastStore.success(t('tasks.reopenedSuccessfully', 'Tâche rouverte avec succès'))
+    // Rafraîchir les tâches
+    fetchCompanyTasks()
+  } catch (error) {
+    console.error('Failed to reopen task:', error)
+    toastStore.error(t('tasks.failedToReopen', 'Échec de la réouverture de la tâche'))
+  }
   closeTaskDetails()
+}
+
+function editTaskHandler(task: Activity) {
+  // Fermer le dialog des détails de la tâche
+  closeTaskDetails()
+
+  // Ouvrir le modal d'édition dans TasksSection
+  if (tasksSectionRef.value) {
+    tasksSectionRef.value.openTaskModal(task)
+  }
 }
 
 // Handlers pour les contacts

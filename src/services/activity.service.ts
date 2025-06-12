@@ -121,6 +121,11 @@ export const ActivityService = {
     return this.updateTask(id, { taskStatus: TaskStatus.COMPLETED })
   },
 
+  // Rouvrir une tâche terminée
+  async reopenTask(id: string): Promise<ApiActivity> {
+    return this.updateTask(id, { taskStatus: TaskStatus.IN_PROGRESS })
+  },
+
   // Récupérer les activités récentes
   async getRecentActivities(): Promise<ApiActivity[]> {
     const response = await apiRequest<{ items: ApiActivity[] }>('/v1/activities/recent')
