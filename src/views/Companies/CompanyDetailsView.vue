@@ -394,6 +394,17 @@
       @submit="handleContactSubmit"
       @close="handleCloseContactModal"
     />
+
+    <!-- Note Modal -->
+    <NoteModal
+      :is-open="showNoteModal"
+      :note="selectedNote"
+      :company-id="companyId"
+      :is-edit-mode="isEditingNote"
+      :is-submitting="isSubmittingNote"
+      @submit="handleNoteSubmit"
+      @close="handleCloseNoteModal"
+    />
   </div>
 </template>
 
@@ -401,7 +412,7 @@
 import { SpecialityBadgeWithTooltip } from '@/components/common'
 import { CompanyForm } from '@/components/companies'
 import { ContactModal, ContactsSection } from '@/components/contacts'
-import { NotesSection } from '@/components/notes'
+import { NoteModal, NotesSection } from '@/components/notes'
 import { TaskDetailsDialog, TasksSection } from '@/components/tasks'
 import type { TaskCreateDto, TaskUpdateDto } from '@/services/activity.service'
 import { useActivityStore } from '@/stores/activity'
@@ -414,6 +425,7 @@ import type {
   Company,
   CompanyContact,
   CompanyNote,
+  CompanyNoteCreateDto,
   CompanyUpdateDto,
   ContactCreateDto,
   ContactUpdateDto,
@@ -463,6 +475,12 @@ const showContactModal = ref(false)
 const selectedContact = ref<CompanyContact | null>(null)
 const isEditingContact = ref(false)
 const isSubmittingContact = ref(false)
+
+// Note modal states
+const showNoteModal = ref(false)
+const selectedNote = ref<CompanyNote | null>(null)
+const isEditingNote = ref(false)
+const isSubmittingNote = ref(false)
 
 // Computed properties
 const companyStatuses = computed(() => statusStore.getStatusesByType('COMPANY'))
@@ -819,6 +837,95 @@ function handleCloseContactModal() {
   isEditingContact.value = false
 }
 
+// Handlers pour les notes
+function handleAddNote() {
+  selectedNote.value = null
+  isEditingNote.value = false
+  showNoteModal.value = true
+}
+
+function handleEditNote(note: CompanyNote) {
+  selectedNote.value = note
+  isEditingNote.value = true
+  showNoteModal.value = true
+}
+
+function handleViewNote(note: CompanyNote) {
+  // Pour l'instant, on ouvre en mode édition. On peut changer ça plus tard pour un mode lecture seule
+  handleEditNote(note)
+}
+
+async function handleDeleteNote(note: CompanyNote) {
+  if (!confirm(t('notes.confirmDelete', 'Êtes-vous sûr de vouloir supprimer cette note ?'))) {
+    return
+  }
+
+  try {
+    const result = await companyStore.deleteCompanyNote(note.id)
+    if (result) {
+      toastStore.success(t('notes.deletedSuccessfully', 'Note supprimée avec succès'))
+      // Rafraîchir la liste des notes
+      await fetchNotes()
+    } else {
+      toastStore.error(t('notes.failedToDelete', 'Échec de la suppression de la note'))
+    }
+  } catch (error) {
+    console.error('Failed to delete note:', error)
+    toastStore.error(t('notes.failedToDelete', 'Échec de la suppression de la note'))
+  }
+}
+
+function handleNoteClick(note: CompanyNote) {
+  console.log('View note details:', note)
+  // À implémenter - navigation vers les détails de la note ou affichage dans un modal
+}
+
+async function handleNoteSubmit(
+  data: CompanyNoteCreateDto | (CompanyNoteCreateDto & { id: string }),
+) {
+  isSubmittingNote.value = true
+
+  try {
+    if (isEditingNote.value && 'id' in data) {
+      // Mode édition
+      const result = await companyStore.updateCompanyNote(data.id, data)
+      if (result) {
+        toastStore.success(t('notes.updatedSuccessfully', 'Note mise à jour avec succès'))
+        showNoteModal.value = false
+        // Rafraîchir la liste des notes
+        await fetchNotes()
+      } else {
+        toastStore.error(t('notes.failedToUpdate', 'Échec de la mise à jour de la note'))
+      }
+    } else {
+      // Mode création
+      const result = await companyStore.addCompanyNote(data as CompanyNoteCreateDto)
+      if (result) {
+        toastStore.success(t('notes.createdSuccessfully', 'Note créée avec succès'))
+        showNoteModal.value = false
+        // Rafraîchir la liste des notes
+        await fetchNotes()
+      } else {
+        toastStore.error(t('notes.failedToCreate', 'Échec de la création de la note'))
+      }
+    }
+  } catch (error) {
+    console.error('Failed to save note:', error)
+    const errorMessage = isEditingNote.value
+      ? t('notes.failedToUpdate', 'Échec de la mise à jour de la note')
+      : t('notes.failedToCreate', 'Échec de la création de la note')
+    toastStore.error(errorMessage)
+  } finally {
+    isSubmittingNote.value = false
+  }
+}
+
+function handleCloseNoteModal() {
+  showNoteModal.value = false
+  selectedNote.value = null
+  isEditingNote.value = false
+}
+
 // Handlers pour les tâches
 async function handleTaskCreated(taskData: TaskCreateDto) {
   try {
@@ -848,31 +955,5 @@ async function handleTaskUpdated(taskData: TaskUpdateDto & { id: string }) {
     console.error('Failed to update task:', error)
     toastStore.error(t('tasks.failedToUpdate', 'Échec de la mise à jour de la tâche'))
   }
-}
-
-// Handlers pour les notes
-function handleAddNote() {
-  console.log('Add note for company:', companyId.value)
-  // À implémenter - navigation vers le formulaire d'ajout de note
-}
-
-function handleViewNote(note: CompanyNote) {
-  console.log('View note details:', note)
-  // À implémenter - navigation vers les détails de la note
-}
-
-function handleEditNote(note: CompanyNote) {
-  console.log('Edit note:', note)
-  // À implémenter - navigation vers le formulaire d'édition de note
-}
-
-function handleDeleteNote(note: CompanyNote) {
-  console.log('Delete note:', note)
-  // À implémenter - confirmation et suppression de la note
-}
-
-function handleNoteClick(note: CompanyNote) {
-  console.log('Note clicked:', note)
-  // À implémenter - action lors du clic sur une note
 }
 </script>

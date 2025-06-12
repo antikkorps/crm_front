@@ -4,6 +4,7 @@ import type {
   CompanyContact,
   CompanyCreateDto,
   CompanyNote,
+  CompanyNoteCreateDto,
   CompanyQuote,
   CompanySearchParams,
   CompanyTask,
@@ -222,18 +223,61 @@ export const useCompanyStore = defineStore('company', () => {
     }
   }
 
-  async function addCompanyNote(content: string, companyId: string) {
+  async function addCompanyNote(data: CompanyNoteCreateDto) {
     loading.value = true
     error.value = null
 
     try {
-      const newNote = await CompanyService.addCompanyNote({ content, companyId })
+      const newNote = await CompanyService.addCompanyNote(data)
       companyNotes.value = [newNote, ...companyNotes.value]
       return newNote
     } catch (err) {
       error.value = 'Failed to add company note'
       console.error(err)
       return null
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Note management methods
+  async function updateCompanyNote(id: string, data: CompanyNoteCreateDto) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const updatedNote = await CompanyService.updateCompanyNote(id, data)
+      // Update in notes list
+      const index = companyNotes.value.findIndex((note) => note.id === id)
+      if (index !== -1) {
+        companyNotes.value[index] = updatedNote
+      }
+      return updatedNote
+    } catch (err) {
+      error.value = 'Failed to update note'
+      console.error(err)
+      return null
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function deleteCompanyNote(id: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      await CompanyService.deleteCompanyNote(id)
+      // Remove from notes list
+      const index = companyNotes.value.findIndex((note) => note.id === id)
+      if (index !== -1) {
+        companyNotes.value.splice(index, 1)
+      }
+      return true
+    } catch (err) {
+      error.value = 'Failed to delete note'
+      console.error(err)
+      return false
     } finally {
       loading.value = false
     }
@@ -366,6 +410,8 @@ export const useCompanyStore = defineStore('company', () => {
     deleteContact,
     fetchCompanyNotes,
     addCompanyNote,
+    updateCompanyNote,
+    deleteCompanyNote,
     fetchCompanyTasks,
     fetchCompanyQuotes,
     fetchSpecialities,

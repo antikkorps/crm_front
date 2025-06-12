@@ -145,7 +145,19 @@
     "edit": "Modifier la note",
     "delete": "Supprimer la note",
     "noNotes": "Aucune note trouvée",
-    "startAdding": "Commencez par ajouter votre première note"
+    "startAdding": "Commencez par ajouter votre première note",
+    "content": "Contenu de la note",
+    "contentLabel": "Contenu",
+    "noteContent": "Contenu de la note",
+    "contentPlaceholder": "Écrivez votre note ici...",
+    "editNote": "Modifier la note",
+    "createdSuccessfully": "Note créée avec succès",
+    "updatedSuccessfully": "Note mise à jour avec succès",
+    "deletedSuccessfully": "Note supprimée avec succès",
+    "failedToCreate": "Échec de la création de la note",
+    "failedToUpdate": "Échec de la mise à jour de la note",
+    "failedToDelete": "Échec de la suppression de la note",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette note ?"
   },
   "reminders": {
     "title": "Rappels",

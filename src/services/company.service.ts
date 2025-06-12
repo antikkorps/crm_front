@@ -135,6 +135,21 @@ export const CompanyService = {
     })
   },
 
+  // Mettre à jour une note
+  async updateCompanyNote(id: string, data: CompanyNoteCreateDto): Promise<CompanyNote> {
+    return apiRequest<CompanyNote>(`/v1/notes/${id}`, {
+      method: 'PUT',
+      body: data,
+    })
+  },
+
+  // Supprimer une note
+  async deleteCompanyNote(id: string): Promise<void> {
+    await apiRequest<void>(`/v1/notes/${id}`, {
+      method: 'DELETE',
+    })
+  },
+
   // Récupérer les tâches liées à une entreprise
   async getCompanyTasks(companyId: string): Promise<CompanyTask[]> {
     const response = await apiRequest<{ items: CompanyTask[] }>(
