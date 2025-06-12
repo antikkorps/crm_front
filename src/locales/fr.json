@@ -93,7 +93,11 @@
     "thisActionCannotBeUndone": "Cette action ne peut pas être annulée !",
     "by": "Par",
     "holdCtrlForMultiple": "Maintenez Ctrl pour sélectionner plusieurs éléments",
-    "selectUser": "Sélectionner un utilisateur"
+    "selectUser": "Sélectionner un utilisateur",
+    "urlMustBeValid": "L'URL doit être valide",
+    "notProvided": "Non renseigné",
+    "selectSpecialities": "Rechercher et sélectionner des spécialités...",
+    "selectMultipleSpecialities": "Tapez pour rechercher et cliquez pour sélectionner plusieurs spécialités"
   },
   "companies": {
     "title": "Entreprises",
@@ -117,7 +121,12 @@
     "industryNotSpecified": "Secteur non spécifié",
     "industry": "Secteur d'activité",
     "employee": "Employé | Employés",
-    "revenue": "Chiffre d'affaire"
+    "revenue": "Chiffre d'affaire",
+    "generalInfo": "Informations générales",
+    "clientInfo": "Informations client",
+    "contactInfo": "Informations de contact",
+    "addressInfo": "Adresse",
+    "additionalInfo": "Informations supplémentaires"
   },
   "contacts": {
     "title": "Contacts",

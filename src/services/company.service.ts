@@ -33,10 +33,25 @@ export const CompanyService = {
 
   // Mettre à jour une entreprise
   async updateCompany(id: string, data: CompanyUpdateDto): Promise<Company> {
-    return apiRequest<Company>(`/v1/companies/${id}`, {
+    console.log('🔍 Company Service - updateCompany appelé avec:', {
+      id,
+      data,
+      specialities: data.specialities,
+      specialitiesLength: data.specialities?.length,
+    })
+
+    const result = await apiRequest<Company>(`/v1/companies/${id}`, {
       method: 'PUT',
       body: data,
     })
+
+    console.log('🔍 Company Service - Réponse du backend:', {
+      result,
+      specialities: result.Specialities,
+      specialitiesCount: result.Specialities?.length,
+    })
+
+    return result
   },
 
   // Supprimer une entreprise

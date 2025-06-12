@@ -75,7 +75,6 @@ export const useCompanyStore = defineStore('company', () => {
       loading.value = false
     }
   }
-
   async function updateCompany(id: string, data: CompanyUpdateDto) {
     loading.value = true
     error.value = null

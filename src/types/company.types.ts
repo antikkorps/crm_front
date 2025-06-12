@@ -137,6 +137,52 @@ export interface CompanyUpdateDto {
   assignedToId?: string
 }
 
+// Types pour l'API backend (avec specialitiesIds)
+export interface CompanyCreateApiDto {
+  name: string
+  description?: string
+  industry?: string
+  website?: string
+  email?: string
+  phone?: string
+  address?: string
+  addressComplement?: string
+  city?: string
+  zipCode?: string
+  country?: string
+  codeRegional?: string
+  clientGroup?: string
+  clientNumber?: string
+  statusId: string
+  size?: string
+  revenue?: number
+  operatingRooms?: number | null
+  specialitiesIds?: string[]
+}
+
+export interface CompanyUpdateApiDto {
+  name?: string
+  description?: string
+  industry?: string
+  website?: string
+  email?: string
+  phone?: string
+  address?: string
+  addressComplement?: string
+  city?: string
+  zipCode?: string
+  country?: string
+  codeRegional?: string
+  clientGroup?: string
+  clientNumber?: string
+  statusId?: string
+  size?: string
+  revenue?: number
+  operatingRooms?: number | null
+  specialitiesIds?: string[]
+  assignedToId?: string
+}
+
 export interface CompanyNoteCreateDto {
   content: string
   companyId: string
