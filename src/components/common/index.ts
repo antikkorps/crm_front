@@ -1,5 +1,4 @@
 export { default as BackToDashboard } from './BackToDashboard.vue'
 export { default as ConfirmDialog } from './ConfirmDialog.vue'
-export { default as ContactsSection } from './ContactsSection.vue'
 export { default as SearchBar } from './SearchBar.vue'
 export { default as SpecialityBadgeWithTooltip } from './SpecialityBadgeWithTooltip.vue'

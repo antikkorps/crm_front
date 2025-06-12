@@ -175,32 +175,28 @@
             :loading="loadingTasks"
             :show-preview="true"
             :clickable="false"
-            @add-task="handleAddTask"
+            :companyId="companyId"
+            :companyName="company?.name"
+            :companyContacts="contacts"
             @view-task="openTaskDetails"
-            @edit-task="editTaskHandler"
             @complete-task="completeTaskHandler"
             @task-click="openTaskDetails"
+            @task-created="handleTaskCreated"
+            @task-updated="handleTaskUpdated"
           />
 
-          <!-- Notes Section (Placeholder) -->
-          <div class="rounded-lg shadow-md p-6 mb-6 w-full">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-bold">{{ t('notes.title') }}</h2>
-              <button class="btn btn-sm btn-outline">
-                <Iconify icon="mdi:plus" class="w-4 h-4" />
-                {{ t('notes.add') }}
-              </button>
-            </div>
-            <div v-if="notes.length" class="divide-y">
-              <div v-for="note in notes" :key="note.id" class="py-2">
-                <div class="text-sm text-gray-500">{{ formatDate(note.createdAt) }}</div>
-                <div class="font-medium">{{ note.content }}</div>
-              </div>
-            </div>
-            <div v-else class="text-center py-8 text-gray-500">
-              <p>{{ t('notes.noNotes') }}</p>
-            </div>
-          </div>
+          <!-- Notes Section -->
+          <NotesSection
+            :notes="notes"
+            :loading="false"
+            :show-actions="true"
+            :clickable="false"
+            @add="handleAddNote"
+            @view="handleViewNote"
+            @edit="handleEditNote"
+            @delete="handleDeleteNote"
+            @note-click="handleNoteClick"
+          />
         </div>
 
         <!-- Sidebar -->
@@ -444,8 +440,11 @@
 </template>
 
 <script setup lang="ts">
-import { ContactsSection, SpecialityBadgeWithTooltip } from '@/components/common'
+import { SpecialityBadgeWithTooltip } from '@/components/common'
+import { ContactsSection } from '@/components/contacts'
+import { NotesSection } from '@/components/notes'
 import { TaskDetailsDialog, TasksSection } from '@/components/tasks'
+import type { TaskCreateDto, TaskUpdateDto } from '@/services/activity.service'
 import { useActivityStore } from '@/stores/activity'
 import { useCompanyStore } from '@/stores/company'
 import { useStatusStore } from '@/stores/status'
@@ -819,8 +818,59 @@ function handleContactClick(contact: CompanyContact) {
 }
 
 // Handlers pour les tâches
-function handleAddTask() {
-  console.log('Add task for company:', companyId.value)
-  // À implémenter - navigation vers le formulaire d'ajout de tâche
+async function handleTaskCreated(taskData: TaskCreateDto) {
+  try {
+    // Ajouter l'ID de l'entreprise aux données de la tâche
+    const taskWithCompany = {
+      ...taskData,
+      companyId: companyId.value,
+    }
+
+    await activityStore.createTask(taskWithCompany)
+    toastStore.success(t('tasks.createdSuccessfully', 'Tâche créée avec succès'))
+    // Rafraîchir les tâches
+    fetchCompanyTasks()
+  } catch (error) {
+    console.error('Failed to create task:', error)
+    toastStore.error(t('tasks.failedToCreate', 'Échec de la création de la tâche'))
+  }
+}
+
+async function handleTaskUpdated(taskData: TaskUpdateDto & { id: string }) {
+  try {
+    await activityStore.updateTask(taskData.id, taskData)
+    toastStore.success(t('tasks.updatedSuccessfully', 'Tâche mise à jour avec succès'))
+    // Rafraîchir les tâches
+    fetchCompanyTasks()
+  } catch (error) {
+    console.error('Failed to update task:', error)
+    toastStore.error(t('tasks.failedToUpdate', 'Échec de la mise à jour de la tâche'))
+  }
+}
+
+// Handlers pour les notes
+function handleAddNote() {
+  console.log('Add note for company:', companyId.value)
+  // À implémenter - navigation vers le formulaire d'ajout de note
+}
+
+function handleViewNote(note: CompanyNote) {
+  console.log('View note details:', note)
+  // À implémenter - navigation vers les détails de la note
+}
+
+function handleEditNote(note: CompanyNote) {
+  console.log('Edit note:', note)
+  // À implémenter - navigation vers le formulaire d'édition de note
+}
+
+function handleDeleteNote(note: CompanyNote) {
+  console.log('Delete note:', note)
+  // À implémenter - confirmation et suppression de la note
+}
+
+function handleNoteClick(note: CompanyNote) {
+  console.log('Note clicked:', note)
+  // À implémenter - action lors du clic sur une note
 }
 </script>

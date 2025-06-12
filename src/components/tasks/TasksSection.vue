@@ -2,7 +2,7 @@
   <div class="rounded-lg shadow-md p-6 mb-6 w-full">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold">{{ t('tasks.title') }}</h2>
-      <button class="btn btn-sm btn-outline" @click="$emit('add-task')">
+      <button class="btn btn-sm btn-outline" @click="openTaskModal(null)">
         <Iconify icon="mdi:plus" class="w-4 h-4" />
         {{ t('tasks.add') }}
       </button>
@@ -79,7 +79,7 @@
                   </button>
                   <button
                     class="btn btn-sm btn-ghost"
-                    @click.stop="$emit('edit-task', task)"
+                    @click.stop="openTaskModal(task)"
                     :title="t('common.edit')"
                   >
                     <Iconify icon="mdi:pencil" class="w-4 h-4" />
@@ -114,7 +114,7 @@
                 >
                   <Iconify icon="mdi:check" class="w-4 h-4" />
                 </button>
-                <button class="btn btn-sm btn-ghost" @click.stop="$emit('edit-task', task)">
+                <button class="btn btn-sm btn-ghost" @click.stop="openTaskModal(task)">
                   <Iconify icon="mdi:pencil" class="w-4 h-4" />
                 </button>
               </div>
@@ -144,34 +144,104 @@
     <div v-else class="text-center py-8 text-gray-500">
       <Iconify icon="mdi:format-list-checks" class="w-12 h-12 mx-auto mb-2 opacity-50" />
       <p>{{ t('tasks.noTasks') }}</p>
-      <button class="btn btn-sm btn-primary mt-2" @click="$emit('add-task')">
+      <button class="btn btn-sm btn-primary mt-2" @click="openTaskModal(null)">
         {{ t('tasks.add') }}
       </button>
     </div>
+
+    <!-- Modal pour ajouter/modifier une tâche -->
+    <dialog ref="taskModalRef" class="modal">
+      <div class="modal-box max-w-xl">
+        <h3 class="font-bold text-lg mb-6 flex items-center gap-2">
+          <Iconify
+            :icon="isEditMode ? 'mdi:pencil' : 'mdi:plus-circle'"
+            class="w-5 h-5 text-primary"
+          />
+          {{ isEditMode ? `Modifier : ${currentTask?.title}` : 'Nouvelle tâche' }}
+        </h3>
+
+        <TaskForm
+          :task="currentTask"
+          :isEditMode="isEditMode"
+          :companyId="props.companyId"
+          :companyName="props.companyName"
+          :companyContacts="props.companyContacts"
+          @submit="saveTask"
+          @cancel="closeTaskModal"
+        />
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button @click="closeTaskModal">close</button>
+      </form>
+    </dialog>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { TaskCreateDto, TaskUpdateDto } from '@/services/activity.service'
 import type { Activity } from '@/types/activity.types'
+import type { CompanyContact } from '@/types/company.types'
 import { formatDate } from '@/utils/date'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import TaskForm from './TaskForm.vue'
 
 const { t } = useI18n()
 
-defineProps<{
+// Props
+const props = defineProps<{
   tasks: Activity[]
   loading?: boolean
   showPreview?: boolean
   clickable?: boolean
+  // Nouvelles props pour le contexte d'entreprise
+  companyId?: string
+  companyName?: string
+  companyContacts?: CompanyContact[]
 }>()
 
+// Emits - simplifié car on gère la création/édition en interne
 const emit = defineEmits<{
-  'add-task': []
   'view-task': [task: Activity]
-  'edit-task': [task: Activity]
   'complete-task': [taskId: string]
   'task-click': [task: Activity]
+  'task-created': [task: TaskCreateDto] // Nouveau événement pour notifier la création
+  'task-updated': [task: TaskUpdateDto & { id: string }] // Nouveau événement pour notifier la mise à jour
 }>()
+
+// État du modal
+const taskModalRef = ref<HTMLDialogElement | null>(null)
+const isEditMode = ref(false)
+const currentTask = ref<Activity | null>(null)
+
+// Ouvrir le modal pour ajouter/modifier une tâche
+function openTaskModal(task: Activity | null) {
+  currentTask.value = task
+  isEditMode.value = !!task
+
+  if (taskModalRef.value) {
+    taskModalRef.value.showModal()
+  }
+}
+
+// Fermer le modal
+function closeTaskModal() {
+  if (taskModalRef.value) {
+    taskModalRef.value.close()
+  }
+  currentTask.value = null
+  isEditMode.value = false
+}
+
+// Enregistrer une tâche (création ou modification)
+function saveTask(formData: TaskCreateDto | TaskUpdateDto) {
+  if (isEditMode.value && currentTask.value) {
+    emit('task-updated', { ...formData, id: currentTask.value.id })
+  } else {
+    emit('task-created', formData as TaskCreateDto)
+  }
+  closeTaskModal()
+}
 
 function handleTaskClick(task: Activity) {
   emit('task-click', task)

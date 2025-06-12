@@ -79,29 +79,38 @@
     <!-- Contact et entreprise associés (optionnels) -->
     <div
       class="grid grid-cols-1 md:grid-cols-2 gap-4"
-      v-if="contacts.length > 0 || companies.length > 0"
+      v-if="availableContacts.length > 0 || !props.companyId"
     >
-      <!-- Contact associé (si disponible) -->
-      <div class="form-control w-full" v-if="contacts.length > 0">
+      <!-- Contact associé -->
+      <div class="form-control w-full" v-if="availableContacts.length > 0">
         <label class="label">
           <span class="label-text font-medium">Contact associé</span>
         </label>
         <select v-model="formData.contactId" class="select select-bordered w-full">
           <option :value="null">Aucun</option>
-          <option v-for="contact in contacts" :key="contact.id" :value="contact.id">
+          <option v-for="contact in availableContacts" :key="contact.id" :value="contact.id">
             {{ contact.firstName }} {{ contact.lastName }}
           </option>
         </select>
       </div>
 
-      <!-- Entreprise associée (si disponible) -->
-      <div class="form-control w-full" v-if="companies.length > 0">
+      <!-- Entreprise associée -->
+      <div class="form-control w-full">
         <label class="label">
           <span class="label-text font-medium">Entreprise associée</span>
         </label>
-        <select v-model="formData.companyId" class="select select-bordered w-full">
+        <select
+          v-model="formData.companyId"
+          class="select select-bordered w-full"
+          :disabled="!!props.companyId"
+        >
           <option :value="null">Aucune</option>
-          <option v-for="company in companies" :key="company.id" :value="company.id">
+          <!-- Si on a un companyId en props, on affiche seulement cette entreprise -->
+          <option v-if="props.companyId" :value="props.companyId">
+            {{ props.companyName }}
+          </option>
+          <!-- Sinon on affiche toutes les entreprises -->
+          <option v-else v-for="company in companies" :key="company.id" :value="company.id">
             {{ company.name }}
           </option>
         </select>
@@ -130,7 +139,7 @@ import {
 import { apiRequest } from '@/services/api.service'
 import type { User } from '@/types/auth.types'
 import type { ApiActivity } from '@/types/dashboard.types'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 // Interfaces pour les données associées
 interface Contact {
@@ -153,6 +162,19 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // Nouvelles props pour le contexte d'entreprise
+  companyId: {
+    type: String,
+    default: null,
+  },
+  companyName: {
+    type: String,
+    default: null,
+  },
+  companyContacts: {
+    type: Array as () => Contact[],
+    default: () => [],
+  },
 })
 
 const emit = defineEmits(['submit', 'cancel'])
@@ -161,6 +183,16 @@ const emit = defineEmits(['submit', 'cancel'])
 const users = ref<User[]>([])
 const contacts = ref<Contact[]>([])
 const companies = ref<Company[]>([])
+
+// Computed property pour les contacts disponibles
+const availableContacts = computed(() => {
+  // Si on a des contacts d'entreprise en props, on les utilise
+  if (props.companyContacts && props.companyContacts.length > 0) {
+    return props.companyContacts
+  }
+  // Sinon on utilise tous les contacts chargés
+  return contacts.value
+})
 
 // Formulaire de tâche
 const formData = ref<TaskCreateDto | (TaskUpdateDto & { contactId?: string; companyId?: string })>({
@@ -200,7 +232,7 @@ watch(
                 : TaskStatus.PENDING,
         assignedToId: newTask.assignedToId || null,
         contactId: newTask.contactId || undefined,
-        companyId: newTask.companyId || undefined,
+        companyId: newTask.companyId || props.companyId || undefined,
       }
     } else if (!props.isEditMode) {
       // Réinitialiser le formulaire pour la création
@@ -213,7 +245,7 @@ watch(
         type: 'TASK',
         assignedToId: null,
         contactId: undefined,
-        companyId: undefined,
+        companyId: props.companyId || undefined, // Pré-remplir avec l'entreprise du contexte
       }
     }
   },
@@ -223,17 +255,21 @@ watch(
 // Récupérer les utilisateurs, contacts et entreprises
 const fetchRelatedData = async () => {
   try {
-    // Récupérer les utilisateurs
+    // Toujours récupérer les utilisateurs
     const usersData = await apiRequest<{ items: User[] }>('/v1/users')
     users.value = usersData.items
 
-    // Récupérer les contacts (limités à 10 pour ne pas surcharger la dropdown)
-    const contactsData = await apiRequest<{ items: Contact[] }>('/v1/contacts?limit=10')
-    contacts.value = contactsData.items
+    // Ne charger les contacts que si on n'a pas de contacts d'entreprise fournis
+    if (!props.companyContacts || props.companyContacts.length === 0) {
+      const contactsData = await apiRequest<{ items: Contact[] }>('/v1/contacts?limit=10')
+      contacts.value = contactsData.items
+    }
 
-    // Récupérer les entreprises (limités à 10 pour ne pas surcharger la dropdown)
-    const companiesData = await apiRequest<{ items: Company[] }>('/v1/companies?limit=10')
-    companies.value = companiesData.items
+    // Ne charger les entreprises que si on n'est pas dans le contexte d'une entreprise
+    if (!props.companyId) {
+      const companiesData = await apiRequest<{ items: Company[] }>('/v1/companies?limit=10')
+      companies.value = companiesData.items
+    }
   } catch (error) {
     console.error('Erreur lors du chargement des données associées:', error)
   }
