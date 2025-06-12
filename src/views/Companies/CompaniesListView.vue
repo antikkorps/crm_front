@@ -172,153 +172,21 @@
 
     <!-- Create/Edit Company Modal -->
     <div class="modal" :class="{ 'modal-open': showModal }" id="companyModal">
-      <div class="modal-box">
+      <div class="modal-box max-w-4xl">
         <h2 class="text-xl font-bold mb-4">
           {{ isEditing ? t('companies.editCompany') : t('companies.addCompany') }}
         </h2>
 
-        <form @submit.prevent="submitCompanyForm">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div class="form-group">
-              <label class="label">{{ t('companies.name') }}*</label>
-              <input
-                v-model="companyForm.name"
-                type="text"
-                class="input input-bordered w-full"
-                :placeholder="t('companies.name')"
-                required
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.industry') }}</label>
-              <input
-                v-model="companyForm.industry"
-                type="text"
-                class="input input-bordered w-full"
-                :placeholder="t('common.industry')"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.size') }}</label>
-              <select v-model="companyForm.size" class="select select-bordered w-full">
-                <option value="">{{ t('common.selectSize') }}</option>
-                <option value="1-10">{{ t('common.size1to10') }}</option>
-                <option value="11-50">{{ t('common.size11to50') }}</option>
-                <option value="51-200">{{ t('common.size51to200') }}</option>
-                <option value="201-500">{{ t('common.size201to500') }}</option>
-                <option value="501-1000">{{ t('common.size501to1000') }}</option>
-                <option value="+1000">{{ t('common.sizeMoreThan1000') }}</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.address') }}</label>
-              <input
-                v-model="companyForm.address"
-                type="text"
-                class="input input-bordered w-full"
-                :placeholder="t('companies.address')"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.city') }}</label>
-              <input
-                v-model="companyForm.city"
-                type="text"
-                class="input input-bordered w-full"
-                :placeholder="t('common.city')"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.zipCode') }}</label>
-              <input
-                v-model="companyForm.zipCode"
-                type="text"
-                class="input input-bordered w-full"
-                :placeholder="t('common.zipCode')"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.country') }}</label>
-              <input
-                v-model="companyForm.country"
-                type="text"
-                class="input input-bordered w-full"
-                :placeholder="t('common.country')"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.status') }}</label>
-              <select v-model="companyForm.statusId" class="select select-bordered w-full">
-                <option value="">{{ t('common.selectStatus') }}</option>
-                <option v-for="status in companyStatuses" :key="status.id" :value="status.id">
-                  {{ t(`status.${status.name.toLowerCase()}`, status.name) }}
-                </option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.website') }}</label>
-              <input
-                v-model="companyForm.website"
-                type="url"
-                class="input input-bordered w-full"
-                :placeholder="t('common.website')"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.operatingRooms') }}</label>
-              <input
-                v-model="companyForm.operatingRooms"
-                type="number"
-                min="0"
-                class="input input-bordered w-full"
-                :placeholder="t('common.operatingRooms')"
-              />
-            </div>
-          </div>
-
-          <div class="form-group mb-4">
-            <label class="label">{{ t('common.specialities') }}</label>
-            <select
-              v-model="companyForm.specialities"
-              class="select select-bordered w-full"
-              multiple
-            >
-              <option
-                v-for="speciality in availableSpecialities"
-                :key="speciality.id"
-                :value="speciality.id"
-              >
-                {{ speciality.name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-group mb-4">
-            <label class="label">{{ t('common.description') }}</label>
-            <textarea
-              v-model="companyForm.description"
-              class="textarea textarea-bordered w-full"
-              :placeholder="t('common.description')"
-              rows="3"
-            ></textarea>
-          </div>
-
-          <div class="flex justify-end space-x-3 mt-6">
-            <button type="button" class="btn" @click="closeModal">{{ t('common.cancel') }}</button>
-            <button type="submit" class="btn btn-primary" :disabled="loading">
-              {{ isEditing ? t('common.update') : t('common.create') }}
-            </button>
-          </div>
-        </form>
+        <CompanyForm
+          :company="isEditing ? companyToEdit : null"
+          :isEditMode="isEditing"
+          :statuses="companyStatuses"
+          :specialities="availableSpecialities"
+          :users="users"
+          :isSubmitting="loading"
+          @submit="submitCompanyForm"
+          @cancel="closeModal"
+        />
       </div>
       <div class="modal-backdrop" @click="closeModal">
         <button>{{ t('common.close') }}</button>
@@ -354,12 +222,13 @@
 import BackToDashboard from '@/components/common/BackToDashboard.vue'
 import SearchBar from '@/components/common/SearchBar.vue'
 import SpecialityBadgeWithTooltip from '@/components/common/SpecialityBadgeWithTooltip.vue'
+import { CompanyForm } from '@/components/companies'
 import { useCompanyStore } from '@/stores/company'
 import { useStatusStore } from '@/stores/status'
 import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
 import type { Company, CompanyCreateDto, CompanyUpdateDto, Speciality } from '@/types/company.types'
-import { computed, onMounted, reactive, ref, watchEffect } from 'vue'
+import { computed, onMounted, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -369,26 +238,11 @@ const statusStore = useStatusStore()
 const toastStore = useToastStore()
 const userStore = useUserStore()
 
-// Company form
-const companyForm = reactive<CompanyCreateDto & { id?: string }>({
-  name: '',
-  industry: '',
-  size: '',
-  address: '',
-  city: '',
-  zipCode: '',
-  country: '',
-  statusId: '',
-  website: '',
-  description: '',
-  operatingRooms: null,
-  specialities: [] as string[],
-})
-
 // UI states
 const showModal = ref(false)
 const showDeleteModal = ref(false)
 const isEditing = ref(false)
+const companyToEdit = ref<Company | null>(null)
 const companyToDelete = ref<Company | null>(null)
 const filtersVisible = ref(false) // État pour contrôler la visibilité des filtres
 
@@ -399,6 +253,7 @@ const error = ref<string | null>(null)
 const searchBarRef = ref<InstanceType<typeof SearchBar> | null>(null)
 
 const companyStatuses = computed(() => statusStore.getStatusesByType('COMPANY'))
+const users = computed(() => userStore.users)
 const availableSpecialities = ref<Speciality[]>([])
 
 // Fetch specialities list
@@ -435,50 +290,26 @@ onMounted(async () => {
 // Form handling
 function openCreateModal() {
   isEditing.value = false
-  resetForm()
+  companyToEdit.value = null
   showModal.value = true
 }
 
 function openEditModal(company: Company) {
   isEditing.value = true
-  resetForm()
-  Object.assign(companyForm, {
-    id: company.id,
-    name: company.name,
-    industry: company.industry || '',
-    size: company.size || '',
-    address: company.address || '',
-    city: company.city || '',
-    zipCode: company.zipCode || '',
-    country: company.country || '',
-    statusId: company.status.id || '',
-    website: company.website || '',
-    description: company.description || '',
-    operatingRooms: company.operatingRooms,
-    specialities: company.Specialities ? company.Specialities.map((spec) => spec.id) : [],
-  })
+  companyToEdit.value = company
   showModal.value = true
 }
 
-async function submitCompanyForm() {
+async function submitCompanyForm(formData: CompanyCreateDto | CompanyUpdateDto) {
   loading.value = true
 
   try {
-    if (isEditing.value && companyForm.id) {
+    if (isEditing.value && companyToEdit.value) {
       // Update existing company
-      const updateData: CompanyUpdateDto = {
-        name: companyForm.name,
-        industry: companyForm.industry,
-        size: companyForm.size,
-        address: companyForm.address,
-        statusId: companyForm.statusId || undefined,
-        website: companyForm.website,
-        description: companyForm.description,
-        operatingRooms: companyForm.operatingRooms,
-        specialities: companyForm.specialities,
-      }
-
-      const result = await companyStore.updateCompany(companyForm.id, updateData)
+      const result = await companyStore.updateCompany(
+        companyToEdit.value.id,
+        formData as CompanyUpdateDto,
+      )
       if (result) {
         toastStore.success('Company updated successfully')
         await companyStore.fetchCompanies()
@@ -489,19 +320,7 @@ async function submitCompanyForm() {
       }
     } else {
       // Create new company
-      const createData: CompanyCreateDto = {
-        name: companyForm.name,
-        industry: companyForm.industry,
-        size: companyForm.size,
-        address: companyForm.address,
-        statusId: companyForm.statusId,
-        website: companyForm.website,
-        description: companyForm.description,
-        operatingRooms: companyForm.operatingRooms,
-        specialities: companyForm.specialities,
-      }
-
-      const result = await companyStore.createCompany(createData)
+      const result = await companyStore.createCompany(formData as CompanyCreateDto)
       if (result) {
         toastStore.success('Company created successfully')
         await companyStore.fetchCompanies()
@@ -548,25 +367,7 @@ async function deleteCompany() {
 
 function closeModal() {
   showModal.value = false
-  resetForm()
-}
-
-function resetForm() {
-  Object.assign(companyForm, {
-    id: undefined,
-    name: '',
-    industry: '',
-    size: '',
-    address: '',
-    city: '',
-    zipCode: '',
-    country: '',
-    statusId: '',
-    website: '',
-    description: '',
-    operatingRooms: null,
-    specialities: [] as string[],
-  })
+  companyToEdit.value = null
 }
 
 function getStatusClass(status: string | undefined) {

@@ -91,12 +91,19 @@
     "details": "Détails",
     "notAssigned": "Non assigné",
     "thisActionCannotBeUndone": "Cette action ne peut pas être annulée !",
-    "by": "Par"
+    "by": "Par",
+    "holdCtrlForMultiple": "Maintenez Ctrl pour sélectionner plusieurs éléments",
+    "selectUser": "Sélectionner un utilisateur"
   },
   "companies": {
     "title": "Entreprises",
     "address": "Adresse de l'entreprise",
+    "addressComplement": "Complément d'adresse",
     "name": "Nom de l'entreprise",
+    "clientNumber": "Numéro de client",
+    "clientGroup": "Groupe de clients",
+    "codeRegional": "Code régional",
+    "globalRevenue": "Chiffre d'affaires global",
     "addCompany": "Ajouter une entreprise",
     "editCompany": "Modifier l'entreprise",
     "deleteCompany": "Supprimer l'entreprise",
@@ -110,7 +117,6 @@
     "industryNotSpecified": "Secteur non spécifié",
     "industry": "Secteur d'activité",
     "employee": "Employé | Employés",
-    "globalRevenue": "Chiffre d'affaire global",
     "revenue": "Chiffre d'affaire"
   },
   "contacts": {

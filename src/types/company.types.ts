@@ -14,9 +14,13 @@ export interface Company {
   email?: string
   phone?: string
   address?: string
+  addressComplement?: string
   city?: string
   zipCode?: string
   country?: string
+  codeRegional?: string
+  clientGroup?: string
+  clientNumber?: string
   status: {
     id: string
     name: string
@@ -96,9 +100,13 @@ export interface CompanyCreateDto {
   email?: string
   phone?: string
   address?: string
+  addressComplement?: string
   city?: string
   zipCode?: string
   country?: string
+  codeRegional?: string
+  clientGroup?: string
+  clientNumber?: string
   statusId: string
   size?: string
   revenue?: number
@@ -114,9 +122,13 @@ export interface CompanyUpdateDto {
   email?: string
   phone?: string
   address?: string
+  addressComplement?: string
   city?: string
   zipCode?: string
   country?: string
+  codeRegional?: string
+  clientGroup?: string
+  clientNumber?: string
   statusId?: string
   size?: string
   revenue?: number

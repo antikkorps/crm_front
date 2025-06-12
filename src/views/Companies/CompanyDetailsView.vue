@@ -35,12 +35,10 @@
           </div>
           <div>
             <h1 class="text-2xl font-bold mt-2 sm:mt-0">{{ company.name }}</h1>
-            <div class="flex flex-wrap items-center mt-1 text-sm text-gray-600 gap-2">
-              <span v-if="company.industry" class="mr-3">{{ company.industry }}</span>
-              <span v-if="company.size" class="mr-3">
-                {{ company.size }}
-                {{ t('companies.employee', company.size.includes('1-') ? 1 : 2) }}
-              </span>
+
+            <!-- Ligne 1: Secteur et Statut -->
+            <div class="flex flex-wrap items-center mt-1 text-sm text-gray-600 gap-3">
+              <span v-if="company.industry">{{ company.industry }}</span>
               <span
                 class="badge px-2 py-1 rounded-full text-xs"
                 :class="getStatusClass(company.status?.name)"
@@ -52,14 +50,42 @@
                 }}
               </span>
             </div>
-            <div class="flex flex-wrap items-center mt-1 text-sm text-gray-600 gap-2">
-              <span v-if="company.globalRevenue" class="mr-3"
-                >{{ t('companies.globalRevenue') }}
-                {{ formattedRevenue(company.globalRevenue) }}</span
-              >
-              <span v-if="company.generatedRevenue" class="mr-3"
-                >{{ t('companies.revenue') }} {{ formattedRevenue(company.generatedRevenue) }}</span
-              >
+
+            <!-- Ligne 2: Nombre d'employés et Salles d'opération -->
+            <div class="flex flex-wrap items-center mt-1 text-sm text-gray-600 gap-3">
+              <span v-if="company.size">
+                {{ company.size }}
+                {{ t('companies.employee', getEmployeeCount(company.size)) }}
+              </span>
+              <span v-if="company.operatingRooms !== null && company.operatingRooms !== undefined">
+                {{ company.operatingRooms }} {{ t('common.operatingRooms') }}
+              </span>
+            </div>
+
+            <!-- Ligne 3: Chiffres d'affaires -->
+            <div class="mt-1 text-sm text-gray-600">
+              <!-- Version mobile : en colonne -->
+              <div class="flex flex-col gap-1 sm:hidden">
+                <span v-if="company.globalRevenue"
+                  >{{ t('companies.globalRevenue') }}:
+                  {{ formattedRevenue(company.globalRevenue) }}</span
+                >
+                <span v-if="company.generatedRevenue"
+                  >{{ t('companies.revenue') }}:
+                  {{ formattedRevenue(company.generatedRevenue) }}</span
+                >
+              </div>
+              <!-- Version desktop : en ligne -->
+              <div class="hidden sm:flex flex-wrap items-center gap-3">
+                <span v-if="company.globalRevenue"
+                  >{{ t('companies.globalRevenue') }}:
+                  {{ formattedRevenue(company.globalRevenue) }}</span
+                >
+                <span v-if="company.generatedRevenue"
+                  >{{ t('companies.revenue') }}:
+                  {{ formattedRevenue(company.generatedRevenue) }}</span
+                >
+              </div>
             </div>
           </div>
         </div>
@@ -140,10 +166,56 @@
               <div>
                 <p class="text-sm text-gray-500">{{ t('common.address') }}</p>
                 <p v-if="company.address" class="font-medium">{{ company.address }}</p>
-                <p v-else class="text-gray-400">{{ t('common.notProvided') }}</p>
-                <p v-if="company.address" class="text-sm text-gray-500">
+                <p v-if="company.addressComplement" class="font-medium text-sm text-gray-600">
+                  {{ company.addressComplement }}
+                </p>
+                <p v-if="!company.address && !company.addressComplement" class="text-gray-400">
+                  {{ t('common.notProvided') }}
+                </p>
+                <p
+                  v-if="company.address || company.addressComplement"
+                  class="text-sm text-gray-500"
+                >
                   {{ company.zipCode }} - {{ company.city }} -
                   {{ company.country }}
+                </p>
+              </div>
+
+              <!-- Numéro de client -->
+              <div v-if="company.clientNumber">
+                <p class="text-sm text-gray-500">{{ t('companies.clientNumber') }}</p>
+                <p class="font-medium">{{ company.clientNumber }}</p>
+              </div>
+
+              <!-- Groupe de clients -->
+              <div v-if="company.clientGroup">
+                <p class="text-sm text-gray-500">{{ t('companies.clientGroup') }}</p>
+                <p class="font-medium">{{ company.clientGroup }}</p>
+              </div>
+
+              <!-- Code régional -->
+              <div v-if="company.codeRegional">
+                <p class="text-sm text-gray-500">{{ t('companies.codeRegional') }}</p>
+                <p class="font-medium">{{ company.codeRegional }}</p>
+              </div>
+
+              <!-- Email -->
+              <div v-if="company.email">
+                <p class="text-sm text-gray-500">{{ t('common.email') }}</p>
+                <p class="font-medium">
+                  <a :href="`mailto:${company.email}`" class="text-primary hover:underline">
+                    {{ company.email }}
+                  </a>
+                </p>
+              </div>
+
+              <!-- Téléphone -->
+              <div v-if="company.phone">
+                <p class="text-sm text-gray-500">{{ t('common.phone') }}</p>
+                <p class="font-medium">
+                  <a :href="`tel:${company.phone}`" class="text-primary hover:underline">
+                    {{ company.phone }}
+                  </a>
                 </p>
               </div>
             </div>
@@ -258,151 +330,21 @@
       </div>
     </div>
 
-    <!-- Edit Company Modal (Reused from CompaniesListView) -->
+    <!-- Edit Company Modal -->
     <dialog id="editCompanyModal" class="modal" :open="showModal">
-      <div class="modal-box w-full max-w-2xl">
+      <div class="modal-box w-full max-w-4xl">
         <h2 class="text-xl font-bold mb-4">{{ t('companies.editCompany') }}</h2>
 
-        <form @submit.prevent="submitCompanyForm">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div class="form-group">
-              <label class="label">{{ t('companies.name') }}</label>
-              <input
-                v-model="companyForm.name"
-                type="text"
-                class="input input-bordered w-full"
-                placeholder="Company Name"
-                required
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('companies.industry') }}</label>
-              <input
-                v-model="companyForm.industry"
-                type="text"
-                class="input input-bordered w-full"
-                placeholder="Industry"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.size') }}</label>
-              <select v-model="companyForm.size" class="select select-bordered w-full">
-                <option value="">{{ t('common.selectSize') }}</option>
-                <option value="1-10">{{ t('common.size1to10') }}</option>
-                <option value="11-50">{{ t('common.size11to50') }}</option>
-                <option value="51-200">{{ t('common.size51to200') }}</option>
-                <option value="201-500">{{ t('common.size201to500') }}</option>
-                <option value="501-1000">{{ t('common.size501to1000') }}</option>
-                <option value="+1000">{{ t('common.sizeMoreThan1000') }}</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.address') }}</label>
-              <input
-                v-model="companyForm.address"
-                type="text"
-                class="input input-bordered w-full"
-                placeholder="Adresse"
-              />
-            </div>
-            <div class="form-group">
-              <label class="label">{{ t('common.city') }}</label>
-              <input
-                v-model="companyForm.city"
-                type="text"
-                class="input input-bordered w-full"
-                placeholder="Ville"
-              />
-            </div>
-            <div class="form-group">
-              <label class="label">{{ t('common.zipCode') }}</label>
-              <input
-                v-model="companyForm.zipCode"
-                type="text"
-                class="input input-bordered w-full"
-                placeholder="Code Postal"
-              />
-            </div>
-            <div class="form-group">
-              <label class="label">{{ t('common.country') }}</label>
-              <input
-                v-model="companyForm.country"
-                type="text"
-                class="input input-bordered w-full"
-                placeholder="Pays"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.status') }}</label>
-              <select v-model="companyForm.statusId" class="select select-bordered w-full">
-                <option value="">{{ t('common.selectStatus') }}</option>
-                <option v-for="status in companyStatuses" :key="status.id" :value="status.id">
-                  {{ t(`status.${status.name.toLowerCase()}`, status.name) }}
-                </option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.assignedTo') }}</label>
-              <select v-model="companyForm.assignedToId" class="select select-bordered w-full">
-                <option value="">{{ t('common.notAssigned', 'Non assigné') }}</option>
-                <option v-for="user in users" :key="user.id" :value="user.id">
-                  {{ user.firstName }} {{ user.lastName }}
-                </option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.website') }}</label>
-              <input
-                v-model="companyForm.website"
-                type="url"
-                class="input input-bordered w-full"
-                placeholder="Website URL"
-              />
-            </div>
-          </div>
-
-          <div class="form-group mb-4">
-            <label class="label">{{ t('common.specialities') }}</label>
-            <select
-              v-model="companyForm.specialities"
-              class="select select-bordered w-full"
-              multiple
-            >
-              <option
-                v-for="speciality in availableSpecialities"
-                :key="speciality.id"
-                :value="speciality.id"
-              >
-                {{ speciality.name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-group mb-4">
-            <label class="label">{{ t('common.description') }}</label>
-            <textarea
-              v-model="companyForm.description"
-              class="textarea textarea-bordered w-full"
-              placeholder="Company description"
-              rows="3"
-            ></textarea>
-          </div>
-
-          <div class="flex justify-end space-x-3 mt-6">
-            <button type="button" class="btn btn-outline" @click="closeModal">
-              {{ t('common.cancel') }}
-            </button>
-            <button type="submit" class="btn btn-primary" :disabled="loading">
-              {{ t('common.update') }}
-            </button>
-          </div>
-        </form>
+        <CompanyForm
+          :company="company"
+          :isEditMode="true"
+          :statuses="companyStatuses"
+          :specialities="availableSpecialities"
+          :users="users"
+          :isSubmitting="loading"
+          @submit="submitCompanyForm"
+          @cancel="closeModal"
+        />
       </div>
       <form method="dialog" class="modal-backdrop">
         <button @click="closeModal">{{ t('common.close') }}</button>
@@ -446,6 +388,7 @@
 
 <script setup lang="ts">
 import { SpecialityBadgeWithTooltip } from '@/components/common'
+import { CompanyForm } from '@/components/companies'
 import { ContactsSection } from '@/components/contacts'
 import { NotesSection } from '@/components/notes'
 import { TaskDetailsDialog, TasksSection } from '@/components/tasks'
@@ -456,9 +399,15 @@ import { useStatusStore } from '@/stores/status'
 import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
 import type { Activity } from '@/types/activity.types'
-import type { Company, CompanyContact, CompanyNote, CompanyUpdateDto } from '@/types/company.types'
+import type {
+  Company,
+  CompanyContact,
+  CompanyNote,
+  CompanyUpdateDto,
+  Speciality,
+} from '@/types/company.types'
 import { formatDate } from '@/utils/date'
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -480,22 +429,6 @@ const notes = ref<CompanyNote[]>([])
 // Component refs
 const tasksSectionRef = ref<InstanceType<typeof TasksSection> | null>(null)
 
-// Company form
-const companyForm = reactive<CompanyUpdateDto & { id?: string }>({
-  name: '',
-  industry: '',
-  size: '',
-  address: '',
-  city: '',
-  country: '',
-  zipCode: '',
-  statusId: '',
-  website: '',
-  description: '',
-  assignedToId: '',
-  specialities: [] as string[],
-})
-
 // Activities
 const companyActivities = ref<Activity[]>([])
 const companyTasks = ref<Activity[]>([])
@@ -513,7 +446,7 @@ const selectedTask = ref<Activity | null>(null)
 // Computed properties
 const companyStatuses = computed(() => statusStore.getStatusesByType('COMPANY'))
 const users = computed(() => userStore.users)
-const availableSpecialities = ref<Array<{ id: string; name: string }>>([])
+const availableSpecialities = ref<Speciality[]>([])
 
 // Fetch specialities list
 async function fetchSpecialities() {
@@ -620,49 +553,15 @@ onMounted(async () => {
 
 // Form handling
 function openEditModal() {
-  resetForm()
-  console.log('Company size from DB:', company.value?.size)
-  Object.assign(companyForm, {
-    id: company.value?.id,
-    name: company.value?.name || '',
-    industry: company.value?.industry || '',
-    size: company.value?.size || '',
-    address: company.value?.address || '',
-    city: company.value?.city || '',
-    zipCode: company.value?.zipCode || '',
-    country: company.value?.country || '',
-    statusId: company.value?.status?.id || '',
-    website: company.value?.website || '',
-    description: company.value?.description || '',
-    assignedToId: company.value?.assignedTo?.id || '',
-    specialities: company.value?.Specialities
-      ? company.value.Specialities.map((spec) => spec.id)
-      : [],
-  })
   showModal.value = true
 }
 
-async function submitCompanyForm() {
-  if (!company.value || !companyForm.id) return
+async function submitCompanyForm(formData: CompanyUpdateDto) {
+  if (!company.value) return
 
   loading.value = true
   try {
-    const updateData: CompanyUpdateDto = {
-      name: companyForm.name,
-      industry: companyForm.industry,
-      size: companyForm.size,
-      address: companyForm.address,
-      city: companyForm.city,
-      zipCode: companyForm.zipCode,
-      country: companyForm.country,
-      statusId: companyForm.statusId,
-      website: companyForm.website,
-      description: companyForm.description,
-      assignedToId: companyForm.assignedToId,
-      specialities: companyForm.specialities,
-    }
-
-    const result = await companyStore.updateCompany(companyForm.id, updateData)
+    const result = await companyStore.updateCompany(company.value.id, formData)
     if (result) {
       await companyStore.fetchCompanyById(companyId.value)
       if (companyStore.currentCompany) {
@@ -709,24 +608,6 @@ async function deleteCompany() {
 
 function closeModal() {
   showModal.value = false
-  resetForm()
-}
-
-function resetForm() {
-  Object.assign(companyForm, {
-    name: '',
-    industry: '',
-    size: '',
-    address: '',
-    city: '',
-    zipCode: '',
-    country: '',
-    statusId: '',
-    website: '',
-    description: '',
-    assignedToId: '',
-    specialities: [],
-  })
 }
 
 // Format website URL to ensure it starts with http:// or https://
@@ -772,6 +653,20 @@ function formattedRevenue(value: number): string {
 
 function getInitials(firstName: string, lastName: string): string {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
+}
+
+// Fonction pour déterminer le nombre d'employés pour le pluriel
+function getEmployeeCount(size: string): number {
+  if (!size) return 1
+
+  // Extraire le premier nombre de la chaîne de taille
+  const match = size.match(/(\d+)/)
+  if (match) {
+    return parseInt(match[1]) === 1 ? 1 : 2
+  }
+
+  // Par défaut, utiliser le pluriel
+  return 2
 }
 
 // Fonctions pour les tâches
