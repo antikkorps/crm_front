@@ -232,7 +232,7 @@
           <!-- Contacts Section -->
           <ContactsSection
             :contacts="contacts"
-            :loading="false"
+            :loading="loadingContacts"
             :show-actions="true"
             :clickable="false"
             @add-contact="handleAddContact"
@@ -262,7 +262,7 @@
           <!-- Notes Section -->
           <NotesSection
             :notes="notes"
-            :loading="false"
+            :loading="loadingNotes"
             :show-actions="true"
             :clickable="false"
             @add="handleAddNote"
@@ -383,13 +383,24 @@
       @complete="completeTaskHandler"
       @edit="editTaskHandler"
     />
+
+    <!-- Contact Modal -->
+    <ContactModal
+      :is-open="showContactModal"
+      :contact="selectedContact"
+      :company-id="companyId"
+      :is-edit-mode="isEditingContact"
+      :is-submitting="isSubmittingContact"
+      @submit="handleContactSubmit"
+      @close="handleCloseContactModal"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { SpecialityBadgeWithTooltip } from '@/components/common'
 import { CompanyForm } from '@/components/companies'
-import { ContactsSection } from '@/components/contacts'
+import { ContactModal, ContactsSection } from '@/components/contacts'
 import { NotesSection } from '@/components/notes'
 import { TaskDetailsDialog, TasksSection } from '@/components/tasks'
 import type { TaskCreateDto, TaskUpdateDto } from '@/services/activity.service'
@@ -404,6 +415,8 @@ import type {
   CompanyContact,
   CompanyNote,
   CompanyUpdateDto,
+  ContactCreateDto,
+  ContactUpdateDto,
   Speciality,
 } from '@/types/company.types'
 import { formatDate } from '@/utils/date'
@@ -434,6 +447,8 @@ const companyActivities = ref<Activity[]>([])
 const companyTasks = ref<Activity[]>([])
 const loadingActivities = ref(false)
 const loadingTasks = ref(false)
+const loadingContacts = ref(false)
+const loadingNotes = ref(false)
 
 // UI states
 const loading = ref(false)
@@ -442,6 +457,12 @@ const showModal = ref(false)
 const showDeleteModal = ref(false)
 const showTaskDialog = ref(false)
 const selectedTask = ref<Activity | null>(null)
+
+// Contact modal states
+const showContactModal = ref(false)
+const selectedContact = ref<CompanyContact | null>(null)
+const isEditingContact = ref(false)
+const isSubmittingContact = ref(false)
 
 // Computed properties
 const companyStatuses = computed(() => statusStore.getStatusesByType('COMPANY'))
@@ -495,6 +516,7 @@ async function fetchCompanyTasks() {
 
 // Fetch Contacts
 async function fetchContacts() {
+  loadingContacts.value = true
   try {
     await companyStore.fetchCompanyContacts(companyId.value)
     contacts.value = companyStore.companyContacts
@@ -502,17 +524,22 @@ async function fetchContacts() {
   } catch (err) {
     console.error('Failed to fetch contacts', err)
     toastStore.error(t('common.failedToFetchContacts', 'Erreur lors du chargement des contacts'))
+  } finally {
+    loadingContacts.value = false
   }
 }
 
 // Fetch Notes
 async function fetchNotes() {
+  loadingNotes.value = true
   try {
     await companyStore.fetchCompanyNotes(companyId.value)
     notes.value = companyStore.companyNotes
   } catch (err) {
     console.error('Failed to fetch notes', err)
     toastStore.error(t('common.failedToFetchNotes', 'Erreur lors du chargement des notes'))
+  } finally {
+    loadingNotes.value = false
   }
 }
 
@@ -718,23 +745,78 @@ function editTaskHandler(task: Activity) {
 
 // Handlers pour les contacts
 function handleAddContact() {
-  console.log('Add contact for company:', companyId.value)
-  // À implémenter - navigation vers le formulaire d'ajout de contact
+  selectedContact.value = null
+  isEditingContact.value = false
+  showContactModal.value = true
 }
 
 function handleEditContact(contact: CompanyContact) {
-  console.log('Edit contact:', contact)
-  // À implémenter - navigation vers le formulaire d'édition de contact
+  selectedContact.value = contact
+  isEditingContact.value = true
+  showContactModal.value = true
 }
 
-function handleDeleteContact(contact: CompanyContact) {
-  console.log('Delete contact:', contact)
-  // À implémenter - confirmation et suppression du contact
+async function handleDeleteContact(contact: CompanyContact) {
+  if (!confirm(t('contacts.confirmDelete', 'Êtes-vous sûr de vouloir supprimer ce contact ?'))) {
+    return
+  }
+
+  try {
+    const success = await companyStore.deleteContact(contact.id)
+    if (success) {
+      toastStore.success(t('contacts.deletedSuccessfully', 'Contact supprimé avec succès'))
+    } else {
+      toastStore.error(t('contacts.failedToDelete', 'Échec de la suppression du contact'))
+    }
+  } catch (error) {
+    console.error('Failed to delete contact:', error)
+    toastStore.error(t('contacts.failedToDelete', 'Échec de la suppression du contact'))
+  }
 }
 
 function handleContactClick(contact: CompanyContact) {
   console.log('View contact details:', contact)
   // À implémenter - navigation vers les détails du contact
+}
+
+async function handleContactSubmit(data: ContactCreateDto | (ContactUpdateDto & { id: string })) {
+  isSubmittingContact.value = true
+
+  try {
+    if (isEditingContact.value && 'id' in data) {
+      // Mode édition
+      const result = await companyStore.updateContact(data.id, data)
+      if (result) {
+        toastStore.success(t('contacts.updatedSuccessfully', 'Contact mis à jour avec succès'))
+        showContactModal.value = false
+      } else {
+        toastStore.error(t('contacts.failedToUpdate', 'Échec de la mise à jour du contact'))
+      }
+    } else {
+      // Mode création
+      const result = await companyStore.createContact(data as ContactCreateDto)
+      if (result) {
+        toastStore.success(t('contacts.createdSuccessfully', 'Contact créé avec succès'))
+        showContactModal.value = false
+      } else {
+        toastStore.error(t('contacts.failedToCreate', 'Échec de la création du contact'))
+      }
+    }
+  } catch (error) {
+    console.error('Failed to save contact:', error)
+    const errorMessage = isEditingContact.value
+      ? t('contacts.failedToUpdate', 'Échec de la mise à jour du contact')
+      : t('contacts.failedToCreate', 'Échec de la création du contact')
+    toastStore.error(errorMessage)
+  } finally {
+    isSubmittingContact.value = false
+  }
+}
+
+function handleCloseContactModal() {
+  showContactModal.value = false
+  selectedContact.value = null
+  isEditingContact.value = false
 }
 
 // Handlers pour les tâches

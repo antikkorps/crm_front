@@ -188,6 +188,25 @@ export interface CompanyNoteCreateDto {
   companyId: string
 }
 
+export interface ContactCreateDto {
+  firstName: string
+  lastName: string
+  email?: string
+  phone?: string
+  position?: string
+  isMainContact: boolean
+  companyId: string
+}
+
+export interface ContactUpdateDto {
+  firstName?: string
+  lastName?: string
+  email?: string
+  phone?: string
+  position?: string
+  isMainContact?: boolean
+}
+
 export interface Status {
   id: string
   name: string

@@ -1,6 +1,6 @@
 <template>
-  <dialog ref="dialogRef" :open="isOpen" class="modal">
-    <div ref="modalBox" class="modal-box w-full max-w-2xl">
+  <dialog :open="isOpen" class="modal">
+    <div class="modal-box w-full max-w-2xl">
       <h2 class="text-xl font-bold mb-4">{{ task?.title || t('tasks.details') }}</h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -111,8 +111,6 @@
 <script setup lang="ts">
 import type { Activity } from '@/types/activity.types'
 import { formatDate } from '@/utils/date'
-import gsap from 'gsap'
-import { ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -122,8 +120,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['close', 'complete', 'edit'])
-const dialogRef = ref<HTMLDialogElement | null>(null)
-const modalBox = ref<HTMLElement | null>(null)
 
 // Helper functions for tasks
 function getTaskStatusLabel(status: string): string {
@@ -182,47 +178,6 @@ function getTaskPriorityClass(priority: string): string {
   }
 }
 
-// Animation d'ouverture (simplifiée)
-function animateOpen() {
-  if (!modalBox.value) return
-
-  // Animation d'entrée simple et fluide
-  gsap.fromTo(
-    modalBox.value,
-    {
-      opacity: 0,
-      y: -30,
-      scale: 0.95,
-    },
-    {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      duration: 0.3,
-      ease: 'back.out',
-    },
-  )
-}
-
-// Animation de fermeture
-function closeDialogWithAnimation() {
-  if (!modalBox.value) {
-    emit('close')
-    return
-  }
-
-  gsap.to(modalBox.value, {
-    opacity: 0,
-    y: 20,
-    scale: 0.95,
-    duration: 0.25,
-    ease: 'power2.in',
-    onComplete: () => {
-      emit('close')
-    },
-  })
-}
-
 function completeTask() {
   if (props.task) {
     emit('complete', props.task.id)
@@ -236,13 +191,6 @@ function editTask() {
 }
 
 function closeDialog() {
-  closeDialogWithAnimation()
+  emit('close')
 }
-
-// Utiliser seulement watchEffect pour éviter les doubles déclenchements
-watchEffect(() => {
-  if (props.isOpen && modalBox.value) {
-    setTimeout(() => animateOpen(), 50)
-  }
-})
 </script>

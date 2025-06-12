@@ -7,6 +7,8 @@ import type {
   CompanyQuote,
   CompanyTask,
   CompanyUpdateDto,
+  ContactCreateDto,
+  ContactUpdateDto,
   Speciality,
 } from '@/types/company.types'
 import { apiRequest } from './api.service'
@@ -67,6 +69,29 @@ export const CompanyService = {
       `/v1/contacts/company/${companyId}`,
     )
     return response.items
+  },
+
+  // Créer un nouveau contact pour une entreprise
+  async createContact(data: ContactCreateDto): Promise<CompanyContact> {
+    return apiRequest<CompanyContact>('/v1/contacts', {
+      method: 'POST',
+      body: data,
+    })
+  },
+
+  // Mettre à jour un contact
+  async updateContact(id: string, data: ContactUpdateDto): Promise<CompanyContact> {
+    return apiRequest<CompanyContact>(`/v1/contacts/${id}`, {
+      method: 'PUT',
+      body: data,
+    })
+  },
+
+  // Supprimer un contact
+  async deleteContact(id: string): Promise<void> {
+    await apiRequest<void>(`/v1/contacts/${id}`, {
+      method: 'DELETE',
+    })
   },
 
   // Récupérer les notes d'une entreprise

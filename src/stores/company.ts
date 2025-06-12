@@ -8,6 +8,8 @@ import type {
   CompanySearchParams,
   CompanyTask,
   CompanyUpdateDto,
+  ContactCreateDto,
+  ContactUpdateDto,
   Speciality,
 } from '@/types/company.types'
 import { defineStore } from 'pinia'
@@ -135,6 +137,72 @@ export const useCompanyStore = defineStore('company', () => {
     } catch (err) {
       error.value = 'Failed to fetch company contacts'
       console.error(err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Contact management methods
+  async function createContact(data: ContactCreateDto) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const newContact = await CompanyService.createContact(data)
+      // Add to contacts list if we're viewing the same company
+      if (
+        companyContacts.value.length > 0 &&
+        companyContacts.value[0]?.companyId === data.companyId
+      ) {
+        companyContacts.value.push(newContact)
+      }
+      return newContact
+    } catch (err) {
+      error.value = 'Failed to create contact'
+      console.error(err)
+      return null
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function updateContact(id: string, data: ContactUpdateDto) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const updatedContact = await CompanyService.updateContact(id, data)
+      // Update in contacts list
+      const index = companyContacts.value.findIndex((contact) => contact.id === id)
+      if (index !== -1) {
+        companyContacts.value[index] = updatedContact
+      }
+      return updatedContact
+    } catch (err) {
+      error.value = 'Failed to update contact'
+      console.error(err)
+      return null
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function deleteContact(id: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      await CompanyService.deleteContact(id)
+      // Remove from contacts list
+      const index = companyContacts.value.findIndex((contact) => contact.id === id)
+      if (index !== -1) {
+        companyContacts.value.splice(index, 1)
+      }
+      return true
+    } catch (err) {
+      error.value = 'Failed to delete contact'
+      console.error(err)
+      return false
     } finally {
       loading.value = false
     }
@@ -293,6 +361,9 @@ export const useCompanyStore = defineStore('company', () => {
     updateCompany,
     deleteCompany,
     fetchCompanyContacts,
+    createContact,
+    updateContact,
+    deleteContact,
     fetchCompanyNotes,
     addCompanyNote,
     fetchCompanyTasks,

@@ -136,7 +136,8 @@
     "noAddress": "Pas d'adresse renseignée",
     "noContacts": "Aucun contact trouvé",
     "main": "Contact principal",
-    "secondary": "Contact secondaire"
+    "secondary": "Contact secondaire",
+    "defineAsMain": "Définir comme contact principal"
   },
   "notes": {
     "title": "Notes",
