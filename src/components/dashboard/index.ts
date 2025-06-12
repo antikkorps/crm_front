@@ -1,0 +1,7 @@
+export { default as DashboardActivityTimeline } from './DashboardActivityTimeline.vue'
+export { default as DashboardCardSingle } from './DashboardCardSingle.vue'
+export { default as DashboardKpis } from './DashboardKpis.vue'
+export { default as DashboardMiniCalendar } from './DashboardMiniCalendar.vue'
+export { default as DashboardOpportunitiesChart } from './DashboardOpportunitiesChart.vue'
+export { default as DashboardOpportunitySummaryCards } from './DashboardOpportunitySummaryCards.vue'
+export { default as DashboardTasksList } from './DashboardTasksList.vue'

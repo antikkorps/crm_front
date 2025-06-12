@@ -48,7 +48,7 @@ vi.mock('@/services/activity.service', () => {
 })
 
 // Mock du composant TaskForm pour éviter qu'il soit réellement monté
-vi.mock('@/components/forms/tasks/TaskForm.vue', () => ({
+vi.mock('@/components/tasks/TaskForm.vue', () => ({
   default: {
     name: 'TaskForm',
     template: '<div data-testid="task-form-mock"></div>',

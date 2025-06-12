@@ -65,15 +65,17 @@
 </template>
 
 <script setup lang="ts">
-import type { Activity } from '@/components/dashboard/ActivityTimeline.vue'
-import ActivityTimeline from '@/components/dashboard/ActivityTimeline.vue'
-import CardComponent from '@/components/dashboard/cardSingle.vue'
+import {
+  DashboardActivityTimeline as ActivityTimeline,
+  DashboardCardSingle as CardComponent,
+  DashboardKpis,
+  DashboardMiniCalendar as MiniCalendar,
+  DashboardOpportunitiesChart as OpportunitiesChart,
+  DashboardTasksList as TasksList,
+} from '@/components/dashboard'
+import type { Activity } from '@/components/dashboard/DashboardActivityTimeline.vue'
 import type { KpiMetric } from '@/components/dashboard/DashboardKpis.vue'
-import DashboardKpis from '@/components/dashboard/DashboardKpis.vue'
-import type { CalendarEvent } from '@/components/dashboard/MiniCalendar.vue'
-import MiniCalendar from '@/components/dashboard/MiniCalendar.vue'
-import OpportunitiesChart from '@/components/dashboard/OpportunitiesChart.vue'
-import TasksList from '@/components/dashboard/TasksList.vue'
+import type { CalendarEvent } from '@/components/dashboard/DashboardMiniCalendar.vue'
 import { ActivityService } from '@/services/activity.service'
 import { apiRequest } from '@/services/api.service'
 import { useToastStore } from '@/stores/toast'

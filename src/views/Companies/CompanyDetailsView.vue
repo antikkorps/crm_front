@@ -158,176 +158,29 @@
           </div>
 
           <!-- Contacts Section -->
-          <div class="rounded-lg shadow-md p-6 mb-6 w-full">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-bold">{{ t('contacts.title') }}</h2>
-              <button class="btn btn-sm btn-outline">
-                <Iconify icon="mdi:plus" class="w-4 h-4" />
-                {{ t('contacts.add') }}
-              </button>
-            </div>
-            <div v-if="contacts.length">
-              <!-- Desktop Table -->
-              <div class="overflow-x-auto hidden md:block">
-                <table class="table table-zebra w-full">
-                  <thead>
-                    <tr>
-                      <th>{{ t('common.fullName') }}</th>
-                      <th>{{ t('common.email') }}</th>
-                      <th>{{ t('common.phone') }}</th>
-                      <th>{{ t('common.position') }}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="contact in contacts" :key="contact.id" class="hover:bg-base-300">
-                      <td>
-                        {{ contact.firstName }} {{ contact.lastName }}
-                        <span v-if="contact.isMainContact" class="badge badge-success badge-sm">
-                          {{ t('contacts.main') }}
-                        </span>
-                        <span v-else class="badge badge-ghost badge-sm">
-                          {{ t('contacts.secondary') }}
-                        </span>
-                      </td>
-                      <td>
-                        <a href="mailto:{{ contact.email }}">{{ contact.email }}</a>
-                      </td>
-                      <td>{{ contact.phone }}</td>
-                      <td>{{ contact.position }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <!-- Mobile Cards -->
-              <div class="grid grid-cols-1 gap-4 md:hidden">
-                <div
-                  v-for="contact in contacts"
-                  :key="contact.id"
-                  class="card bg-base-100 shadow-sm"
-                >
-                  <div class="card-body p-4">
-                    <div class="flex items-center justify-between mb-2">
-                      <div class="font-bold text-lg">
-                        {{ contact.firstName }} {{ contact.lastName }}
-                      </div>
-                      <span v-if="contact.isMainContact" class="badge badge-success badge-sm">
-                        {{ t('contacts.main') }}
-                      </span>
-                      <span v-else class="badge badge-ghost badge-sm">
-                        {{ t('contacts.secondary') }}
-                      </span>
-                    </div>
-                    <div class="text-sm text-gray-500 mb-1">
-                      <span v-if="contact.position">{{ contact.position }}</span>
-                    </div>
-                    <div class="text-sm mb-1">
-                      <a
-                        v-if="contact.email"
-                        :href="`mailto:${contact.email}`"
-                        class="text-primary hover:underline"
-                      >
-                        {{ contact.email }}
-                      </a>
-                    </div>
-                    <div class="text-sm">
-                      <span v-if="contact.phone">{{ contact.phone }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div v-else class="text-center py-8 text-gray-500">
-              <p>{{ t('contacts.noContacts') }}</p>
-            </div>
-          </div>
+          <ContactsSection
+            :contacts="contacts"
+            :loading="false"
+            :show-actions="true"
+            :clickable="false"
+            @add-contact="handleAddContact"
+            @edit-contact="handleEditContact"
+            @delete-contact="handleDeleteContact"
+            @contact-click="handleContactClick"
+          />
 
           <!-- Tasks Section -->
-          <div class="rounded-lg shadow-md p-6 mb-6 w-full">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-bold">{{ t('tasks.title') }}</h2>
-              <button class="btn btn-sm btn-outline">
-                <Iconify icon="mdi:plus" class="w-4 h-4" />
-                {{ t('tasks.add') }}
-              </button>
-            </div>
-
-            <div v-if="loadingTasks" class="flex justify-center py-4">
-              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-            </div>
-
-            <div v-else-if="companyTasks.length">
-              <!-- Desktop Table -->
-              <div class="overflow-x-auto hidden md:block">
-                <table class="table table-zebra w-full">
-                  <thead>
-                    <tr>
-                      <th>{{ t('form.title', 'Titre') }}</th>
-                      <th>{{ t('common.status', 'Status') }}</th>
-                      <th>{{ t('tasks.dueDate') }}</th>
-                      <th>{{ t('tasks.priority') }}</th>
-                      <th class="w-10">{{ t('common.actions') }}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="task in companyTasks" :key="task.id" class="hover:bg-base-300">
-                      <td>{{ task.title }}</td>
-                      <td>
-                        <span
-                          :class="getTaskStatusClass(task.taskStatus || '')"
-                          class="px-2 py-1 text-xs rounded-full"
-                        >
-                          {{ getTaskStatusLabel(task.taskStatus || '') }}
-                        </span>
-                      </td>
-                      <td>{{ task.dueDate ? formatDate(task.dueDate) : '-' }}</td>
-                      <td>
-                        <span :class="getTaskPriorityClass(task.priority || '')" class="badge">
-                          {{ getTaskPriorityLabel(task.priority || '') }}
-                        </span>
-                      </td>
-                      <td>
-                        <button class="btn btn-sm btn-ghost" @click="openTaskDetails(task)">
-                          <Iconify icon="mdi:eye" class="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <!-- Mobile Cards -->
-              <div class="grid grid-cols-1 gap-4 md:hidden">
-                <div v-for="task in companyTasks" :key="task.id" class="card bg-base-100 shadow-sm">
-                  <div class="card-body p-4">
-                    <div class="flex items-center justify-between mb-2">
-                      <div class="font-medium">{{ task.title }}</div>
-                      <button class="btn btn-sm btn-ghost" @click="openTaskDetails(task)">
-                        <Iconify icon="mdi:eye" class="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2 mb-2">
-                      <span
-                        :class="getTaskStatusClass(task.taskStatus || '')"
-                        class="px-2 py-1 text-xs rounded-full"
-                      >
-                        {{ getTaskStatusLabel(task.taskStatus || '') }}
-                      </span>
-                      <span :class="getTaskPriorityClass(task.priority || '')" class="badge">
-                        {{ getTaskPriorityLabel(task.priority || '') }}
-                      </span>
-                    </div>
-                    <div v-if="task.dueDate" class="text-sm text-gray-500">
-                      {{ t('tasks.dueDate') }}: {{ formatDate(task.dueDate) }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div v-else class="text-center py-8 text-gray-500">
-              <p>{{ t('tasks.noTasks') }}</p>
-            </div>
-          </div>
+          <TasksSection
+            :tasks="companyTasks"
+            :loading="loadingTasks"
+            :show-preview="true"
+            :clickable="false"
+            @add-task="handleAddTask"
+            @view-task="openTaskDetails"
+            @edit-task="editTaskHandler"
+            @complete-task="completeTaskHandler"
+            @task-click="openTaskDetails"
+          />
 
           <!-- Notes Section (Placeholder) -->
           <div class="rounded-lg shadow-md p-6 mb-6 w-full">
@@ -591,8 +444,8 @@
 </template>
 
 <script setup lang="ts">
-import SpecialityBadgeWithTooltip from '@/components/common/SpecialityBadgeWithTooltip.vue'
-import TaskDetailsDialog from '@/components/forms/tasks/TaskDetailsDialog.vue'
+import { ContactsSection, SpecialityBadgeWithTooltip } from '@/components/common'
+import { TaskDetailsDialog, TasksSection } from '@/components/tasks'
 import { useActivityStore } from '@/stores/activity'
 import { useCompanyStore } from '@/stores/company'
 import { useStatusStore } from '@/stores/status'
@@ -914,63 +767,6 @@ function getInitials(firstName: string, lastName: string): string {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
 }
 
-// Helpers
-function getTaskStatusLabel(status: string): string {
-  switch (status) {
-    case 'PENDING':
-      return t('tasks.status.pending', 'En attente')
-    case 'IN_PROGRESS':
-      return t('tasks.status.inProgress', 'En cours')
-    case 'COMPLETED':
-      return t('tasks.status.completed', 'Terminée')
-    case 'CANCELLED':
-      return t('tasks.status.cancelled', 'Annulée')
-    default:
-      return status
-  }
-}
-
-function getTaskStatusClass(status: string): string {
-  switch (status) {
-    case 'PENDING':
-      return 'bg-gray-200 text-gray-800'
-    case 'IN_PROGRESS':
-      return 'bg-blue-100 text-blue-800'
-    case 'COMPLETED':
-      return 'bg-green-100 text-green-800'
-    case 'CANCELLED':
-      return 'bg-red-100 text-red-800'
-    default:
-      return 'bg-gray-100'
-  }
-}
-
-function getTaskPriorityLabel(priority: string): string {
-  switch (priority) {
-    case 'LOW':
-      return t('tasks.priorityLevel.low', 'Faible')
-    case 'MEDIUM':
-      return t('tasks.priorityLevel.medium', 'Moyenne')
-    case 'HIGH':
-      return t('tasks.priorityLevel.high', 'Élevée')
-    default:
-      return priority
-  }
-}
-
-function getTaskPriorityClass(priority: string): string {
-  switch (priority) {
-    case 'LOW':
-      return 'badge-info'
-    case 'MEDIUM':
-      return 'badge-warning'
-    case 'HIGH':
-      return 'badge-error'
-    default:
-      return 'badge-ghost'
-  }
-}
-
 // Fonctions pour les tâches
 function openTaskDetails(task: Activity) {
   selectedTask.value = task
@@ -999,5 +795,32 @@ function editTaskHandler(task: Activity) {
   console.log('Edit task:', task)
   // À implémenter pour l'édition de tâche
   closeTaskDetails()
+}
+
+// Handlers pour les contacts
+function handleAddContact() {
+  console.log('Add contact for company:', companyId.value)
+  // À implémenter - navigation vers le formulaire d'ajout de contact
+}
+
+function handleEditContact(contact: CompanyContact) {
+  console.log('Edit contact:', contact)
+  // À implémenter - navigation vers le formulaire d'édition de contact
+}
+
+function handleDeleteContact(contact: CompanyContact) {
+  console.log('Delete contact:', contact)
+  // À implémenter - confirmation et suppression du contact
+}
+
+function handleContactClick(contact: CompanyContact) {
+  console.log('View contact details:', contact)
+  // À implémenter - navigation vers les détails du contact
+}
+
+// Handlers pour les tâches
+function handleAddTask() {
+  console.log('Add task for company:', companyId.value)
+  // À implémenter - navigation vers le formulaire d'ajout de tâche
 }
 </script>
