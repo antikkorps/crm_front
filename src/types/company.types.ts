@@ -50,7 +50,6 @@ export interface CompanyContact {
   email?: string
   phone?: string
   position?: string
-  isMainContact: boolean
   companyId: string
 }
 
@@ -194,7 +193,6 @@ export interface ContactCreateDto {
   email?: string
   phone?: string
   position?: string
-  isMainContact: boolean
   companyId: string
 }
 
@@ -204,7 +202,6 @@ export interface ContactUpdateDto {
   email?: string
   phone?: string
   position?: string
-  isMainContact?: boolean
 }
 
 export interface Status {

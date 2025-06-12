@@ -10,8 +10,10 @@ import type {
   ContactCreateDto,
   ContactUpdateDto,
   Speciality,
+  Status,
 } from '@/types/company.types'
 import { apiRequest } from './api.service'
+import { AuthService } from './auth.service'
 
 export const CompanyService = {
   // Récupérer toutes les entreprises
@@ -73,10 +75,35 @@ export const CompanyService = {
 
   // Créer un nouveau contact pour une entreprise
   async createContact(data: ContactCreateDto): Promise<CompanyContact> {
-    return apiRequest<CompanyContact>('/v1/contacts', {
-      method: 'POST',
-      body: data,
-    })
+    try {
+      // Récupérer l'utilisateur connecté pour obtenir tenantId
+      const currentUser = await AuthService.getCurrentUser()
+
+      // Récupérer les statuts de type CONTACT pour obtenir le premier comme défaut
+      const contactStatuses = await apiRequest<{ items: Status[] }>('/v1/statuses/type/CONTACT')
+      const defaultStatus = contactStatuses.items?.[0]
+
+      if (!defaultStatus) {
+        throw new Error(
+          'Aucun statut de contact disponible. Veuillez créer un statut de type CONTACT.',
+        )
+      }
+
+      // Préparer les données avec tenantId et statusId
+      const contactData = {
+        ...data,
+        tenantId: currentUser.tenantId,
+        statusId: defaultStatus.id,
+      }
+
+      return apiRequest<CompanyContact>('/v1/contacts', {
+        method: 'POST',
+        body: contactData,
+      })
+    } catch (error) {
+      console.error('Error creating contact:', error)
+      throw error
+    }
   },
 
   // Mettre à jour un contact

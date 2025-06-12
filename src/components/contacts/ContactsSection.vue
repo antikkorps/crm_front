@@ -33,15 +33,7 @@
               :class="{ 'cursor-pointer': clickable }"
               @click="handleContactClick(contact)"
             >
-              <td>
-                {{ contact.firstName }} {{ contact.lastName }}
-                <span v-if="contact.isMainContact" class="badge badge-success badge-sm ml-2">
-                  {{ t('contacts.main') }}
-                </span>
-                <span v-else class="badge badge-ghost badge-sm ml-2">
-                  {{ t('contacts.secondary') }}
-                </span>
-              </td>
+              <td>{{ contact.firstName }} {{ contact.lastName }}</td>
               <td>
                 <a
                   v-if="contact.email"
@@ -86,12 +78,6 @@
             <div class="flex items-center justify-between mb-2">
               <div class="font-bold text-lg">{{ contact.firstName }} {{ contact.lastName }}</div>
               <div class="flex items-center space-x-2">
-                <span v-if="contact.isMainContact" class="badge badge-success badge-sm">
-                  {{ t('contacts.main') }}
-                </span>
-                <span v-else class="badge badge-ghost badge-sm">
-                  {{ t('contacts.secondary') }}
-                </span>
                 <div v-if="showActions" class="flex space-x-1">
                   <button class="btn btn-sm btn-ghost" @click.stop="$emit('edit-contact', contact)">
                     <Iconify icon="mdi:pencil" class="w-4 h-4" />

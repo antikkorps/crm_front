@@ -127,35 +127,6 @@
       </div>
     </div>
 
-    <!-- Section: Paramètres -->
-    <div class="card bg-base-100 border border-base-300">
-      <div class="card-body p-6">
-        <h3 class="card-title text-lg mb-4">
-          <Iconify icon="mdi:cog" class="w-5 h-5" />
-          {{ t('contacts.settings', 'Paramètres') }}
-        </h3>
-
-        <!-- Contact principal -->
-        <div class="form-control">
-          <label class="label cursor-pointer justify-start gap-3">
-            <input
-              v-model="formData.isMainContact"
-              type="checkbox"
-              class="checkbox checkbox-primary"
-            />
-            <div class="flex flex-col">
-              <span class="label-text font-medium">{{
-                t('contacts.main', 'Contact principal')
-              }}</span>
-              <span class="label-text-alt text-gray-500">
-                {{ t('contacts.defineAsMain', "Définir comme contact principal de l'entreprise") }}
-              </span>
-            </div>
-          </label>
-        </div>
-      </div>
-    </div>
-
     <!-- Actions -->
     <div class="flex justify-end space-x-3 pt-4 border-t border-base-300">
       <button
@@ -207,7 +178,6 @@ const formData = reactive<ContactCreateDto>({
   email: '',
   phone: '',
   position: '',
-  isMainContact: false,
   companyId: props.companyId,
 })
 
@@ -230,7 +200,6 @@ watch(
       formData.email = newContact.email || ''
       formData.phone = newContact.phone || ''
       formData.position = newContact.position || ''
-      formData.isMainContact = newContact.isMainContact
       formData.companyId = newContact.companyId
     }
   },
@@ -345,7 +314,6 @@ function handleSubmit() {
       id: props.contact.id,
       firstName: formData.firstName.trim(),
       lastName: formData.lastName.trim(),
-      isMainContact: formData.isMainContact,
     }
 
     // Add optional fields only if they have values
@@ -365,7 +333,6 @@ function handleSubmit() {
     const createData: ContactCreateDto = {
       firstName: formData.firstName.trim(),
       lastName: formData.lastName.trim(),
-      isMainContact: formData.isMainContact,
       companyId: props.companyId,
     }
 
@@ -391,7 +358,6 @@ function resetForm() {
   formData.email = ''
   formData.phone = ''
   formData.position = ''
-  formData.isMainContact = false
   formData.companyId = props.companyId
 
   // Clear errors
