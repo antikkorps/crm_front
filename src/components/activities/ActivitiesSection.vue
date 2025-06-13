@@ -112,7 +112,12 @@
             <ActivityIcon type="CALL" size="lg" />
           </div>
           <div class="stat-title text-xs">{{ t('activities.types.call') }}</div>
-          <div class="stat-value text-2xl">{{ activityCounts.calls || 0 }}</div>
+          <div
+            class="stat-value text-lg font-medium"
+            :title="`${activityCounts.calls || 0} ${t('activities.types.call').toLowerCase()}`"
+          >
+            {{ formatNumber(activityCounts.calls || 0) }}
+          </div>
         </div>
 
         <div
@@ -127,7 +132,12 @@
             <ActivityIcon type="MEETING" size="lg" />
           </div>
           <div class="stat-title text-xs">{{ t('activities.types.meeting') }}</div>
-          <div class="stat-value text-2xl">{{ activityCounts.meetings || 0 }}</div>
+          <div
+            class="stat-value text-lg font-medium"
+            :title="`${activityCounts.meetings || 0} ${t('activities.types.meeting').toLowerCase()}`"
+          >
+            {{ formatNumber(activityCounts.meetings || 0) }}
+          </div>
         </div>
 
         <div
@@ -142,7 +152,12 @@
             <ActivityIcon type="EMAIL" size="lg" />
           </div>
           <div class="stat-title text-xs">{{ t('activities.types.email') }}</div>
-          <div class="stat-value text-2xl">{{ activityCounts.emails || 0 }}</div>
+          <div
+            class="stat-value text-lg font-medium"
+            :title="`${activityCounts.emails || 0} ${t('activities.types.email').toLowerCase()}`"
+          >
+            {{ formatNumber(activityCounts.emails || 0) }}
+          </div>
         </div>
 
         <div
@@ -157,7 +172,12 @@
             <ActivityIcon type="TASK" size="lg" />
           </div>
           <div class="stat-title text-xs">{{ t('activities.types.task') }}</div>
-          <div class="stat-value text-2xl">{{ activityCounts.tasks || 0 }}</div>
+          <div
+            class="stat-value text-lg font-medium"
+            :title="`${activityCounts.tasks || 0} ${t('activities.types.task').toLowerCase()}`"
+          >
+            {{ formatNumber(activityCounts.tasks || 0) }}
+          </div>
         </div>
 
         <div
@@ -172,7 +192,12 @@
             <ActivityIcon type="NOTE" size="lg" />
           </div>
           <div class="stat-title text-xs">{{ t('activities.types.note') }}</div>
-          <div class="stat-value text-2xl">{{ activityCounts.notes || 0 }}</div>
+          <div
+            class="stat-value text-lg font-medium"
+            :title="`${activityCounts.notes || 0} ${t('activities.types.note').toLowerCase()}`"
+          >
+            {{ formatNumber(activityCounts.notes || 0) }}
+          </div>
         </div>
       </div>
     </div>
@@ -745,5 +770,15 @@ function clearTypeFilters() {
   selectedActivityTypes.value.clear()
   selectedActivityTypes.value = new Set()
   currentPage.value = 1
+}
+
+// Fonction pour formater les grands nombres
+function formatNumber(num: number): string {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M'
+  } else if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'k'
+  }
+  return num.toString()
 }
 </script>
