@@ -271,50 +271,17 @@
             @delete="handleDeleteNote"
             @note-click="handleNoteClick"
           />
-        </div>
 
+          <!-- Activities Section -->
+          <div class="rounded-lg shadow-md p-6 mb-6 w-full">
+            <h2 class="text-xl font-bold mb-4">{{ t('activities.title') }}</h2>
+            <ActivitiesSection :company-id="companyId" />
+          </div>
+        </div>
         <!-- Sidebar -->
         <div class="col-span-1 w-full">
-          <!-- Activities Section (Placeholder) -->
-          <div class="rounded-lg shadow-md p-6 mb-6 w-full">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-lg font-bold">{{ t('activities.recentActivities') }}</h2>
-              <button class="btn btn-sm btn-outline">
-                <Iconify icon="mdi:plus" class="w-4 h-4" />
-                {{ t('activities.add') }}
-              </button>
-            </div>
-
-            <div v-if="loadingActivities" class="flex justify-center py-4">
-              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-            </div>
-
-            <div v-else-if="companyActivities.length" class="divide-y">
-              <div v-for="activity in companyActivities" :key="activity.id" class="py-3">
-                <div class="flex justify-between items-start">
-                  <div>
-                    <div class="font-medium">{{ activity.title }}</div>
-                    <div class="text-sm text-gray-500">{{ formatDate(activity.createdAt) }}</div>
-                    <p v-if="activity.content" class="text-sm mt-1">{{ activity.content }}</p>
-                  </div>
-                  <span class="badge badge-primary badge-outline text-xs">
-                    {{ t(`activities.types.${activity.type.toLowerCase()}`, activity.type) }}
-                  </span>
-                </div>
-                <div v-if="activity.createdBy" class="text-xs text-gray-500 mt-1">
-                  {{ t('common.by') }} {{ activity.createdBy.firstName }}
-                  {{ activity.createdBy.lastName }}
-                </div>
-              </div>
-            </div>
-
-            <div v-else class="text-center py-8 text-gray-500">
-              <p>{{ t('activities.noActivities') }}</p>
-            </div>
-          </div>
-
           <!-- Quotes Section (Placeholder) -->
-          <div class="rounded-lg shadow-md p-6 w-full">
+          <div class="rounded-lg shadow-md p-6 mb-6 w-full">
             <div class="flex justify-between items-center mb-4">
               <h2 class="text-lg font-bold">{{ t('quotes.title') }}</h2>
               <button class="btn btn-sm btn-outline">
@@ -324,6 +291,25 @@
             </div>
             <div class="text-center py-8 text-gray-500">
               <p>{{ t('quotes.noQuotes') }}</p>
+            </div>
+          </div>
+
+          <!-- Quick Stats ou autre contenu sidebar -->
+          <div class="rounded-lg shadow-md p-6 w-full">
+            <h2 class="text-lg font-bold mb-4">{{ t('companies.quickStats') }}</h2>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">{{ t('contacts.title') }}</span>
+                <span class="font-medium">{{ contacts.length }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">{{ t('tasks.title') }}</span>
+                <span class="font-medium">{{ companyTasks.length }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">{{ t('notes.title') }}</span>
+                <span class="font-medium">{{ notes.length }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -409,6 +395,7 @@
 </template>
 
 <script setup lang="ts">
+import { ActivitiesSection } from '@/components/activities'
 import { SpecialityBadgeWithTooltip } from '@/components/common'
 import { CompanyForm } from '@/components/companies'
 import { ContactModal, ContactsSection } from '@/components/contacts'
@@ -431,7 +418,6 @@ import type {
   ContactUpdateDto,
   Speciality,
 } from '@/types/company.types'
-import { formatDate } from '@/utils/date'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -455,9 +441,7 @@ const notes = ref<CompanyNote[]>([])
 const tasksSectionRef = ref<InstanceType<typeof TasksSection> | null>(null)
 
 // Activities
-const companyActivities = ref<Activity[]>([])
 const companyTasks = ref<Activity[]>([])
-const loadingActivities = ref(false)
 const loadingTasks = ref(false)
 const loadingContacts = ref(false)
 const loadingNotes = ref(false)
@@ -497,22 +481,6 @@ async function fetchSpecialities() {
     toastStore.error(
       t('common.failedToFetchSpecialities', 'Erreur lors du chargement des spécialités'),
     )
-  }
-}
-
-// Fetch Recent Activities
-async function fetchCompanyActivities() {
-  loadingActivities.value = true
-  try {
-    await activityStore.fetchRecentActivities()
-    companyActivities.value = activityStore.activities.filter(
-      (activity) => activity.companyId === companyId.value,
-    )
-  } catch (err) {
-    console.error('Failed to fetch company activities', err)
-    toastStore.error(t('activities.failedToFetch', 'Erreur lors du chargement des activités'))
-  } finally {
-    loadingActivities.value = false
   }
 }
 
@@ -577,7 +545,6 @@ onMounted(async () => {
       fetchSpecialities(),
       fetchContacts(),
       fetchNotes(),
-      fetchCompanyActivities(),
       fetchCompanyTasks(),
     ])
 

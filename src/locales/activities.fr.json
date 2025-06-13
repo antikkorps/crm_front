@@ -1,0 +1,159 @@
+{
+  "activities": {
+    "title": "Activités",
+    "subtitle": "Gérez toutes vos activités commerciales",
+    "total": "activités",
+    "new": "Nouvelle activité",
+    "create": "Créer une activité",
+    "edit": "Modifier l'activité",
+    "filters": "Filtres",
+    "noActivities": "Aucune activité",
+    "noActivitiesDesc": "Commencez par créer votre première activité",
+    "createFirst": "Créer la première activité",
+    "type": "Type d'activité",
+    "assignedTo": "Assigné à",
+    "priority": "Priorité",
+    "period": "Période",
+    "titlePlaceholder": "Titre de l'activité",
+    "descriptionPlaceholder": "Description de l'activité",
+    "noDescription": "Aucune description",
+    "activeFilters": "Filtres actifs",
+    "savePreset": "Sauvegarder le préréglage",
+    "loadPreset": "Charger un préréglage",
+    "deleteConfirmTitle": "Confirmer la suppression",
+    "deleteConfirmMessage": "Êtes-vous sûr de vouloir supprimer l'activité \"{title}\" ?",
+    "createSuccess": "Activité créée avec succès",
+    "updateSuccess": "Activité mise à jour avec succès",
+    "deleteSuccess": "Activité supprimée avec succès",
+    "duplicateSuccess": "Activité dupliquée avec succès",
+    "createError": "Erreur lors de la création",
+    "updateError": "Erreur lors de la mise à jour",
+    "deleteError": "Erreur lors de la suppression",
+    "duplicateError": "Erreur lors de la duplication",
+    "loadError": "Erreur lors du chargement",
+    "featureComingSoon": "Fonctionnalité bientôt disponible",
+    "types": {
+      "call": "Appel",
+      "meeting": "Réunion",
+      "email": "Email",
+      "task": "Tâche",
+      "note": "Note"
+    },
+    "priority": {
+      "low": "Faible",
+      "medium": "Moyenne",
+      "high": "Élevée"
+    },
+    "periods": {
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "thisWeek": "Cette semaine",
+      "lastWeek": "Semaine dernière",
+      "thisMonth": "Ce mois",
+      "lastMonth": "Mois dernier",
+      "custom": "Personnalisé"
+    },
+    "status": {
+      "unknown": "Inconnu"
+    }
+  },
+  "calls": {
+    "direction": "Direction",
+    "duration": "Durée",
+    "durationPlaceholder": "Durée en minutes",
+    "minutes": "minutes",
+    "outcome": "Résultat",
+    "callback": "Rappeler",
+    "followUp": "Suivi",
+    "scheduleFollowUp": "Planifier un suivi",
+    "direction": {
+      "incoming": "Entrant",
+      "outgoing": "Sortant"
+    },
+    "outcome": {
+      "answered": "Répondu",
+      "noAnswer": "Pas de réponse",
+      "busy": "Occupé",
+      "voicemail": "Messagerie",
+      "failed": "Échec",
+      "unknown": "Inconnu"
+    }
+  },
+  "meetings": {
+    "type": "Type de réunion",
+    "location": "Lieu",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "minutes": "minutes",
+    "joinMeeting": "Rejoindre la réunion",
+    "addNotes": "Ajouter des notes",
+    "reschedule": "Reprogrammer",
+    "type": {
+      "inPerson": "En personne",
+      "videoCall": "Visioconférence",
+      "phoneCall": "Appel téléphonique",
+      "webinar": "Webinaire"
+    },
+    "locationPlaceholder": {
+      "inPerson": "Adresse du lieu de réunion",
+      "videoCall": "Lien de la visioconférence",
+      "phoneCall": "Numéro de téléphone",
+      "webinar": "Lien du webinaire",
+      "default": "Lieu de la réunion"
+    },
+    "status": {
+      "planned": "Planifiée",
+      "upcoming": "À venir",
+      "ongoing": "En cours",
+      "completed": "Terminée"
+    }
+  },
+  "emails": {
+    "to": "À",
+    "cc": "Copie",
+    "status": "Statut",
+    "sentDate": "Date d'envoi",
+    "recipients": "destinataires",
+    "recipientsList": "Liste des destinataires",
+    "send": "Envoyer",
+    "reply": "Répondre",
+    "forward": "Transférer",
+    "resend": "Renvoyer",
+    "toPlaceholder": "email1@example.com, email2@example.com",
+    "ccPlaceholder": "Copie cachée (optionnel)",
+    "toHint": "Séparez les emails par des virgules",
+    "ccHint": "Copie cachée (optionnel)",
+    "status": {
+      "draft": "Brouillon",
+      "sent": "Envoyé",
+      "delivered": "Livré",
+      "opened": "Ouvert",
+      "replied": "Répondu",
+      "bounced": "Rejeté",
+      "failed": "Échec",
+      "unknown": "Inconnu"
+    },
+    "metrics": {
+      "opened": "Ouvert",
+      "replied": "Répondu",
+      "instant": "Instantané"
+    }
+  },
+  "tasks": {
+    "dueDate": "Date d'échéance",
+    "markComplete": "Marquer comme terminé",
+    "changeDueDate": "Modifier l'échéance",
+    "status": {
+      "noDue": "Pas d'échéance",
+      "overdue": "En retard",
+      "dueToday": "À faire aujourd'hui",
+      "dueSoon": "À faire bientôt",
+      "upcoming": "À venir"
+    }
+  },
+  "notes": {
+    "status": {
+      "saved": "Sauvegardée"
+    }
+  }
+}
