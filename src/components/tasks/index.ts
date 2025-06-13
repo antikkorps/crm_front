@@ -1,0 +1,5 @@
+export { default as TaskCard } from './TaskCard.vue'
+export { default as TaskDetailsDialog } from './TaskDetailsDialog.vue'
+export { default as TaskFilter } from './TaskFilter.vue'
+export { default as TaskForm } from './TaskForm.vue'
+export { default as TasksSection } from './TasksSection.vue'

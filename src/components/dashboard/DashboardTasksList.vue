@@ -185,7 +185,7 @@
 
 <script setup lang="ts">
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
-import TaskForm from '@/components/forms/tasks/TaskForm.vue'
+import TaskForm from '@/components/tasks/TaskForm.vue'
 import {
   ActivityService,
   TaskStatus,

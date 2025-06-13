@@ -15,10 +15,31 @@
     "connexionPending": "Connexion en cours..."
   },
   "common": {
+    "title": "Titre",
+    "home": "Accueil",
+    "mainMenu": "Menu principal",
+    "quickAccess": "Accès rapide",
+    "commercialManagement": "Gestion Commerciale",
+    "needHelp": "Besoin d'aide ?",
+    "configuration": "Configuration",
+    "profile": "Profil",
+    "openSidebar": "Ouvrir le menu",
+    "closeSidebar": "Fermer le menu",
+    "backToTop": "Retour en haut",
+    "userMenu": "Menu utilisateur",
     "email": "Email",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "fullName": "Nom complet",
+    "phone": "Téléphone",
+    "mobile": "Mobile",
+    "position": "Poste",
     "actions": "Actions",
     "add": "Ajouter",
     "status": "Status",
+    "createdBy": "Créé par",
+    "createdAt": "Créé le",
+    "updatedAt": "Mis à jour le",
     "selectStatus": "Sélectionner le statut",
     "address": "Adresse",
     "name": "Nom",
@@ -44,7 +65,7 @@
     "specialities": "Spécialités",
     "allSpecialities": "Toutes les spécialités",
     "noSpecialities": "Aucune spécialité",
-    "operatingRooms": "Salles d'opération",
+    "operatingRooms": "Salles de chirurgie",
     "allUsers": "Tous les utilisateurs",
     "selectSize": "Sélectionner la taille",
     "revenue": "Chiffre d'affaires",
@@ -57,6 +78,7 @@
     "update": "Mettre à jour",
     "delete": "Supprimer",
     "description": "Description",
+    "noDescription": "Aucune description fournie",
     "confirmDelete": "Confirmer la suppression",
     "areYouSureToDelete": "Êtes-vous sûr de vouloir supprimer ",
     "cannotBeUndone": "Cette action ne peut pas être annulée !",
@@ -70,17 +92,32 @@
     "support": "Support",
     "about": "À propos",
     "dashboard": "Tableau de Bord | Tableaux de Bord",
+    "accessDashboard": "Accéder à votre Dashboard",
     "backToDashboard": "Retour au tableau de bord",
     "backToList": "Retour à la liste",
     "allRightsReserved": "Tous droits réservés",
     "assignedTo": "Assigné à",
     "close": "Fermer",
-    "details": "Détails"
+    "details": "Détails",
+    "notAssigned": "Non assigné",
+    "thisActionCannotBeUndone": "Cette action ne peut pas être annulée !",
+    "by": "Par",
+    "holdCtrlForMultiple": "Maintenez Ctrl pour sélectionner plusieurs éléments",
+    "selectUser": "Sélectionner un utilisateur",
+    "urlMustBeValid": "L'URL doit être valide",
+    "notProvided": "Non renseigné",
+    "selectSpecialities": "Rechercher et sélectionner des spécialités...",
+    "selectMultipleSpecialities": "Tapez pour rechercher et cliquez pour sélectionner plusieurs spécialités"
   },
   "companies": {
     "title": "Entreprises",
     "address": "Adresse de l'entreprise",
+    "addressComplement": "Complément d'adresse",
     "name": "Nom de l'entreprise",
+    "clientNumber": "Numéro de client",
+    "clientGroup": "Groupe de clients",
+    "codeRegional": "Code régional",
+    "globalRevenue": "Chiffre d'affaires global",
     "addCompany": "Ajouter une entreprise",
     "editCompany": "Modifier l'entreprise",
     "deleteCompany": "Supprimer l'entreprise",
@@ -92,16 +129,25 @@
     "companyNotFoundMessage": "l'entreprise que vous recherchez n'a pas été trouvée",
     "failedToLoadCompanies": "Échec du chargement des entreprises",
     "industryNotSpecified": "Secteur non spécifié",
+    "industry": "Secteur d'activité",
     "employee": "Employé | Employés",
-    "globalRevenue": "Chiffre d'affaire global",
-    "revenue": "Chiffre d'affaire"
+    "revenue": "Chiffre d'affaire",
+    "generalInfo": "Informations générales",
+    "clientInfo": "Informations client",
+    "contactInfo": "Informations de contact",
+    "addressInfo": "Adresse",
+    "additionalInfo": "Informations supplémentaires"
   },
   "contacts": {
     "title": "Contacts",
     "add": "Ajouter un contact",
     "edit": "Modifier le contact",
     "delete": "Supprimer le contact",
-    "noAddress": "Pas d'adresse renseignée"
+    "noAddress": "Pas d'adresse renseignée",
+    "noContacts": "Aucun contact trouvé",
+    "main": "Contact principal",
+    "secondary": "Contact secondaire",
+    "defineAsMain": "Définir comme contact principal"
   },
   "notes": {
     "title": "Notes",
@@ -109,7 +155,19 @@
     "edit": "Modifier la note",
     "delete": "Supprimer la note",
     "noNotes": "Aucune note trouvée",
-    "startAdding": "Commencez par ajouter votre première note"
+    "startAdding": "Commencez par ajouter votre première note",
+    "content": "Contenu de la note",
+    "contentLabel": "Contenu",
+    "noteContent": "Contenu de la note",
+    "contentPlaceholder": "Écrivez votre note ici...",
+    "editNote": "Modifier la note",
+    "createdSuccessfully": "Note créée avec succès",
+    "updatedSuccessfully": "Note mise à jour avec succès",
+    "deletedSuccessfully": "Note supprimée avec succès",
+    "failedToCreate": "Échec de la création de la note",
+    "failedToUpdate": "Échec de la mise à jour de la note",
+    "failedToDelete": "Échec de la suppression de la note",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette note ?"
   },
   "reminders": {
     "title": "Rappels",
@@ -157,7 +215,48 @@
       "email": "Email",
       "meeting": "Réunion",
       "task": "Tâche",
-      "note": "Note"
+      "note": "Note",
+      "quote": "Devis",
+      "opportunity": "Opportunité",
+      "contact": "Contact",
+      "follow_up": "Suivi",
+      "demo": "Démonstration"
+    },
+    "noActivities": "Aucune activité trouvée",
+    "recentActivities": "Activités récentes"
+  },
+  "tasks": {
+    "title": "Tâches",
+    "add": "Ajouter une tâche",
+    "edit": "Modifier la tâche",
+    "delete": "Supprimer la tâche",
+    "noTasks": "Aucune tâche trouvée",
+    "startAdding": "Commencez par ajouter votre première tâche",
+    "dueDate": "Date d'échéance",
+    "priority": "Priorité",
+    "details": "Détails de la tâche",
+    "complete": "Marquer comme terminée",
+    "reopen": "Rouvrir",
+    "assignedTo": "Assignée à",
+    "completedSuccessfully": "Tâche marquée comme terminée",
+    "failedToComplete": "Échec de la mise à jour de la tâche",
+    "reopenedSuccessfully": "Tâche rouverte avec succès",
+    "failedToReopen": "Échec de la réouverture de la tâche",
+    "filters": {
+      "myTasks": "Mes tâches",
+      "allTasks": "Toutes les tâches"
+    },
+    "status": {
+      "title": "Status",
+      "pending": "En attente",
+      "inProgress": "En cours",
+      "completed": "Terminée",
+      "cancelled": "Annulée"
+    },
+    "priorityLevel": {
+      "low": "Basse",
+      "medium": "Moyenne",
+      "high": "Élevée"
     }
   },
   "status": {
@@ -181,5 +280,29 @@
   },
   "statistics": {
     "title": "Statistiques"
+  },
+  "quotes": {
+    "title": "Devis",
+    "add": "Ajouter un devis",
+    "edit": "Modifier le devis",
+    "delete": "Supprimer le devis",
+    "noQuotes": "Aucun devis trouvé",
+    "startAdding": "Commencez par ajouter votre premier devis",
+    "quoteNumber": "Numéro de devis",
+    "date": "Date",
+    "amount": "Montant",
+    "status": "Statut du devis"
+  },
+  "invoices": {
+    "title": "Factures",
+    "add": "Ajouter une facture",
+    "edit": "Modifier la facture",
+    "delete": "Supprimer la facture",
+    "noInvoices": "Aucune facture trouvée",
+    "startAdding": "Commencez par ajouter votre première facture",
+    "invoiceNumber": "Numéro de facture",
+    "date": "Date",
+    "amount": "Montant",
+    "status": "Statut de la facture"
   }
 }

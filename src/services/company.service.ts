@@ -7,9 +7,13 @@ import type {
   CompanyQuote,
   CompanyTask,
   CompanyUpdateDto,
+  ContactCreateDto,
+  ContactUpdateDto,
   Speciality,
+  Status,
 } from '@/types/company.types'
 import { apiRequest } from './api.service'
+import { AuthService } from './auth.service'
 
 export const CompanyService = {
   // Récupérer toutes les entreprises
@@ -33,10 +37,25 @@ export const CompanyService = {
 
   // Mettre à jour une entreprise
   async updateCompany(id: string, data: CompanyUpdateDto): Promise<Company> {
-    return apiRequest<Company>(`/v1/companies/${id}`, {
+    console.log('🔍 Company Service - updateCompany appelé avec:', {
+      id,
+      data,
+      specialities: data.specialities,
+      specialitiesLength: data.specialities?.length,
+    })
+
+    const result = await apiRequest<Company>(`/v1/companies/${id}`, {
       method: 'PUT',
       body: data,
     })
+
+    console.log('🔍 Company Service - Réponse du backend:', {
+      result,
+      specialities: result.Specialities,
+      specialitiesCount: result.Specialities?.length,
+    })
+
+    return result
   },
 
   // Supprimer une entreprise
@@ -49,14 +68,62 @@ export const CompanyService = {
   // Récupérer les contacts d'une entreprise
   async getCompanyContacts(companyId: string): Promise<CompanyContact[]> {
     const response = await apiRequest<{ items: CompanyContact[] }>(
-      `/v1/companies/${companyId}/contacts`,
+      `/v1/contacts/company/${companyId}`,
     )
     return response.items
   },
 
+  // Créer un nouveau contact pour une entreprise
+  async createContact(data: ContactCreateDto): Promise<CompanyContact> {
+    try {
+      // Récupérer l'utilisateur connecté pour obtenir tenantId
+      const currentUser = await AuthService.getCurrentUser()
+
+      // Récupérer les statuts de type CONTACT pour obtenir le premier comme défaut
+      const contactStatuses = await apiRequest<{ items: Status[] }>('/v1/statuses/type/CONTACT')
+      const defaultStatus = contactStatuses.items?.[0]
+
+      if (!defaultStatus) {
+        throw new Error(
+          'Aucun statut de contact disponible. Veuillez créer un statut de type CONTACT.',
+        )
+      }
+
+      // Préparer les données avec tenantId et statusId
+      const contactData = {
+        ...data,
+        tenantId: currentUser.tenantId,
+        statusId: defaultStatus.id,
+      }
+
+      return apiRequest<CompanyContact>('/v1/contacts', {
+        method: 'POST',
+        body: contactData,
+      })
+    } catch (error) {
+      console.error('Error creating contact:', error)
+      throw error
+    }
+  },
+
+  // Mettre à jour un contact
+  async updateContact(id: string, data: ContactUpdateDto): Promise<CompanyContact> {
+    return apiRequest<CompanyContact>(`/v1/contacts/${id}`, {
+      method: 'PUT',
+      body: data,
+    })
+  },
+
+  // Supprimer un contact
+  async deleteContact(id: string): Promise<void> {
+    await apiRequest<void>(`/v1/contacts/${id}`, {
+      method: 'DELETE',
+    })
+  },
+
   // Récupérer les notes d'une entreprise
   async getCompanyNotes(companyId: string): Promise<CompanyNote[]> {
-    const response = await apiRequest<{ items: CompanyNote[] }>(`/v1/companies/${companyId}/notes`)
+    const response = await apiRequest<{ items: CompanyNote[] }>(`/v1/notes/company/${companyId}`)
     return response.items
   },
 
@@ -65,6 +132,21 @@ export const CompanyService = {
     return apiRequest<CompanyNote>('/v1/notes', {
       method: 'POST',
       body: data,
+    })
+  },
+
+  // Mettre à jour une note
+  async updateCompanyNote(id: string, data: CompanyNoteCreateDto): Promise<CompanyNote> {
+    return apiRequest<CompanyNote>(`/v1/notes/${id}`, {
+      method: 'PUT',
+      body: data,
+    })
+  },
+
+  // Supprimer une note
+  async deleteCompanyNote(id: string): Promise<void> {
+    await apiRequest<void>(`/v1/notes/${id}`, {
+      method: 'DELETE',
     })
   },
 

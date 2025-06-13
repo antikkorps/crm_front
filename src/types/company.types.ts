@@ -14,9 +14,13 @@ export interface Company {
   email?: string
   phone?: string
   address?: string
+  addressComplement?: string
   city?: string
   zipCode?: string
   country?: string
+  codeRegional?: string
+  clientGroup?: string
+  clientNumber?: string
   status: {
     id: string
     name: string
@@ -46,7 +50,6 @@ export interface CompanyContact {
   email?: string
   phone?: string
   position?: string
-  isMainContact: boolean
   companyId: string
 }
 
@@ -96,9 +99,13 @@ export interface CompanyCreateDto {
   email?: string
   phone?: string
   address?: string
+  addressComplement?: string
   city?: string
   zipCode?: string
   country?: string
+  codeRegional?: string
+  clientGroup?: string
+  clientNumber?: string
   statusId: string
   size?: string
   revenue?: number
@@ -114,9 +121,13 @@ export interface CompanyUpdateDto {
   email?: string
   phone?: string
   address?: string
+  addressComplement?: string
   city?: string
   zipCode?: string
   country?: string
+  codeRegional?: string
+  clientGroup?: string
+  clientNumber?: string
   statusId?: string
   size?: string
   revenue?: number
@@ -125,9 +136,72 @@ export interface CompanyUpdateDto {
   assignedToId?: string
 }
 
+// Types pour l'API backend (avec specialitiesIds)
+export interface CompanyCreateApiDto {
+  name: string
+  description?: string
+  industry?: string
+  website?: string
+  email?: string
+  phone?: string
+  address?: string
+  addressComplement?: string
+  city?: string
+  zipCode?: string
+  country?: string
+  codeRegional?: string
+  clientGroup?: string
+  clientNumber?: string
+  statusId: string
+  size?: string
+  revenue?: number
+  operatingRooms?: number | null
+  specialitiesIds?: string[]
+}
+
+export interface CompanyUpdateApiDto {
+  name?: string
+  description?: string
+  industry?: string
+  website?: string
+  email?: string
+  phone?: string
+  address?: string
+  addressComplement?: string
+  city?: string
+  zipCode?: string
+  country?: string
+  codeRegional?: string
+  clientGroup?: string
+  clientNumber?: string
+  statusId?: string
+  size?: string
+  revenue?: number
+  operatingRooms?: number | null
+  specialitiesIds?: string[]
+  assignedToId?: string
+}
+
 export interface CompanyNoteCreateDto {
   content: string
   companyId: string
+}
+
+export interface ContactCreateDto {
+  firstName: string
+  lastName: string
+  email?: string
+  phone?: string
+  position?: string
+  companyId: string
+}
+
+export interface ContactUpdateDto {
+  firstName?: string
+  lastName?: string
+  email?: string
+  phone?: string
+  position?: string
 }
 
 export interface Status {

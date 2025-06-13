@@ -35,12 +35,10 @@
           </div>
           <div>
             <h1 class="text-2xl font-bold mt-2 sm:mt-0">{{ company.name }}</h1>
-            <div class="flex flex-wrap items-center mt-1 text-sm text-gray-600 gap-2">
-              <span v-if="company.industry" class="mr-3">{{ company.industry }}</span>
-              <span v-if="company.size" class="mr-3">
-                {{ company.size }}
-                {{ t('companies.employee', company.size.includes('1-') ? 1 : 2) }}
-              </span>
+
+            <!-- Ligne 1: Secteur et Statut -->
+            <div class="flex flex-wrap items-center mt-1 text-sm text-gray-600 gap-3">
+              <span v-if="company.industry">{{ company.industry }}</span>
               <span
                 class="badge px-2 py-1 rounded-full text-xs"
                 :class="getStatusClass(company.status?.name)"
@@ -52,14 +50,42 @@
                 }}
               </span>
             </div>
-            <div class="flex flex-wrap items-center mt-1 text-sm text-gray-600 gap-2">
-              <span v-if="company.globalRevenue" class="mr-3"
-                >{{ t('companies.globalRevenue') }}
-                {{ formattedRevenue(company.globalRevenue) }}</span
-              >
-              <span v-if="company.generatedRevenue" class="mr-3"
-                >{{ t('companies.revenue') }} {{ formattedRevenue(company.generatedRevenue) }}</span
-              >
+
+            <!-- Ligne 2: Nombre d'employés et Salles d'opération -->
+            <div class="flex flex-wrap items-center mt-1 text-sm text-gray-600 gap-3">
+              <span v-if="company.size">
+                {{ company.size }}
+                {{ t('companies.employee', getEmployeeCount(company.size)) }}
+              </span>
+              <span v-if="company.operatingRooms !== null && company.operatingRooms !== undefined">
+                {{ company.operatingRooms }} {{ t('common.operatingRooms') }}
+              </span>
+            </div>
+
+            <!-- Ligne 3: Chiffres d'affaires -->
+            <div class="mt-1 text-sm text-gray-600">
+              <!-- Version mobile : en colonne -->
+              <div class="flex flex-col gap-1 sm:hidden">
+                <span v-if="company.globalRevenue"
+                  >{{ t('companies.globalRevenue') }}:
+                  {{ formattedRevenue(company.globalRevenue) }}</span
+                >
+                <span v-if="company.generatedRevenue"
+                  >{{ t('companies.revenue') }}:
+                  {{ formattedRevenue(company.generatedRevenue) }}</span
+                >
+              </div>
+              <!-- Version desktop : en ligne -->
+              <div class="hidden sm:flex flex-wrap items-center gap-3">
+                <span v-if="company.globalRevenue"
+                  >{{ t('companies.globalRevenue') }}:
+                  {{ formattedRevenue(company.globalRevenue) }}</span
+                >
+                <span v-if="company.generatedRevenue"
+                  >{{ t('companies.revenue') }}:
+                  {{ formattedRevenue(company.generatedRevenue) }}</span
+                >
+              </div>
             </div>
           </div>
         </div>
@@ -81,11 +107,11 @@
         <!-- Main Information -->
         <div class="col-span-1 lg:col-span-2">
           <div class="rounded-lg shadow-md p-6 mb-6 w-full">
-            <h2 class="text-xl font-bold mb-4">Détails</h2>
+            <h2 class="text-xl font-bold mb-4">{{ t('common.details') }}</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p class="text-sm text-gray-500">Site Web</p>
+                <p class="text-sm text-gray-500">{{ t('common.website') }}</p>
                 <p v-if="company.website" class="font-medium">
                   <a
                     :href="formatWebsiteUrl(company.website)"
@@ -95,7 +121,7 @@
                     {{ company.website }}
                   </a>
                 </p>
-                <p v-else class="text-gray-400">Non fourni</p>
+                <p v-else class="text-gray-400">{{ t('common.notProvided') }}</p>
               </div>
 
               <div>
@@ -138,52 +164,113 @@
               </div>
 
               <div>
-                <p class="text-sm text-gray-500">Adresse</p>
+                <p class="text-sm text-gray-500">{{ t('common.address') }}</p>
                 <p v-if="company.address" class="font-medium">{{ company.address }}</p>
-                <p v-else class="text-gray-400">Non fournie</p>
-                <p v-if="company.address" class="text-sm text-gray-500">
+                <p v-if="company.addressComplement" class="font-medium text-sm text-gray-600">
+                  {{ company.addressComplement }}
+                </p>
+                <p v-if="!company.address && !company.addressComplement" class="text-gray-400">
+                  {{ t('common.notProvided') }}
+                </p>
+                <p
+                  v-if="company.address || company.addressComplement"
+                  class="text-sm text-gray-500"
+                >
                   {{ company.zipCode }} - {{ company.city }} -
                   {{ company.country }}
+                </p>
+              </div>
+
+              <!-- Numéro de client -->
+              <div v-if="company.clientNumber">
+                <p class="text-sm text-gray-500">{{ t('companies.clientNumber') }}</p>
+                <p class="font-medium">{{ company.clientNumber }}</p>
+              </div>
+
+              <!-- Groupe de clients -->
+              <div v-if="company.clientGroup">
+                <p class="text-sm text-gray-500">{{ t('companies.clientGroup') }}</p>
+                <p class="font-medium">{{ company.clientGroup }}</p>
+              </div>
+
+              <!-- Code régional -->
+              <div v-if="company.codeRegional">
+                <p class="text-sm text-gray-500">{{ t('companies.codeRegional') }}</p>
+                <p class="font-medium">{{ company.codeRegional }}</p>
+              </div>
+
+              <!-- Email -->
+              <div v-if="company.email">
+                <p class="text-sm text-gray-500">{{ t('common.email') }}</p>
+                <p class="font-medium">
+                  <a :href="`mailto:${company.email}`" class="text-primary hover:underline">
+                    {{ company.email }}
+                  </a>
+                </p>
+              </div>
+
+              <!-- Téléphone -->
+              <div v-if="company.phone">
+                <p class="text-sm text-gray-500">{{ t('common.phone') }}</p>
+                <p class="font-medium">
+                  <a :href="`tel:${company.phone}`" class="text-primary hover:underline">
+                    {{ company.phone }}
+                  </a>
                 </p>
               </div>
             </div>
 
             <div class="mt-6">
-              <p class="text-sm text-gray-500 mb-2">Description</p>
+              <p class="text-sm text-gray-500 mb-2">{{ t('common.description') }}</p>
               <p v-if="company.description" class="text-gray-700">
                 {{ company.description }}
               </p>
-              <p v-else class="text-gray-400">Aucune description fournie</p>
+              <p v-else class="text-gray-400">{{ t('common.noDescription') }}</p>
             </div>
           </div>
 
-          <!-- Contacts Section (Placeholder) -->
-          <div class="rounded-lg shadow-md p-6 mb-6 w-full">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-bold">Contacts</h2>
-              <button class="btn btn-sm btn-outline">
-                <Iconify icon="mdi:plus" class="w-4 h-4" />
-                Ajouter un contact
-              </button>
-            </div>
-            <div class="text-center py-8 text-gray-500">
-              <p>Pas de contacts pour le moment</p>
-            </div>
-          </div>
+          <!-- Contacts Section -->
+          <ContactsSection
+            :contacts="contacts"
+            :loading="loadingContacts"
+            :show-actions="true"
+            :clickable="false"
+            @add-contact="handleAddContact"
+            @edit-contact="handleEditContact"
+            @delete-contact="handleDeleteContact"
+            @contact-click="handleContactClick"
+          />
 
-          <!-- Notes Section (Placeholder) -->
-          <div class="rounded-lg shadow-md p-6 mb-6 w-full">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-bold">Notes</h2>
-              <button class="btn btn-sm btn-outline">
-                <Iconify icon="mdi:plus" class="w-4 h-4" />
-                Ajouter une note
-              </button>
-            </div>
-            <div class="text-center py-8 text-gray-500">
-              <p>Pas de notes pour le moment</p>
-            </div>
-          </div>
+          <!-- Tasks Section -->
+          <TasksSection
+            ref="tasksSectionRef"
+            :tasks="companyTasks"
+            :loading="loadingTasks"
+            :show-preview="true"
+            :clickable="false"
+            :companyId="companyId"
+            :companyName="company?.name"
+            :companyContacts="contacts"
+            @view-task="openTaskDetails"
+            @complete-task="completeTaskHandler"
+            @reopen-task="reopenTaskHandler"
+            @task-click="openTaskDetails"
+            @task-created="handleTaskCreated"
+            @task-updated="handleTaskUpdated"
+          />
+
+          <!-- Notes Section -->
+          <NotesSection
+            :notes="notes"
+            :loading="loadingNotes"
+            :show-actions="true"
+            :clickable="false"
+            @add="handleAddNote"
+            @view="handleViewNote"
+            @edit="handleEditNote"
+            @delete="handleDeleteNote"
+            @note-click="handleNoteClick"
+          />
         </div>
 
         <!-- Sidebar -->
@@ -191,234 +278,168 @@
           <!-- Activities Section (Placeholder) -->
           <div class="rounded-lg shadow-md p-6 mb-6 w-full">
             <div class="flex justify-between items-center mb-4">
-              <h2 class="text-lg font-bold">Activités récentes</h2>
+              <h2 class="text-lg font-bold">{{ t('activities.recentActivities') }}</h2>
               <button class="btn btn-sm btn-outline">
                 <Iconify icon="mdi:plus" class="w-4 h-4" />
-                Ajouter
+                {{ t('activities.add') }}
               </button>
             </div>
-            <div class="text-center py-8 text-gray-500">
-              <p>Pas d'activités enregistrées pour le moment</p>
-            </div>
-          </div>
 
-          <!-- Tasks Section (Placeholder) -->
-          <div class="rounded-lg shadow-md p-6 mb-6 w-full">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-lg font-bold">Tâches</h2>
-              <button class="btn btn-sm btn-outline">
-                <Iconify icon="mdi:plus" class="w-4 h-4" />
-                Ajouter une tâche
-              </button>
+            <div v-if="loadingActivities" class="flex justify-center py-4">
+              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
             </div>
-            <div class="text-center py-8 text-gray-500">
-              <p>Pas de tâches assignées pour le moment</p>
+
+            <div v-else-if="companyActivities.length" class="divide-y">
+              <div v-for="activity in companyActivities" :key="activity.id" class="py-3">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <div class="font-medium">{{ activity.title }}</div>
+                    <div class="text-sm text-gray-500">{{ formatDate(activity.createdAt) }}</div>
+                    <p v-if="activity.content" class="text-sm mt-1">{{ activity.content }}</p>
+                  </div>
+                  <span class="badge badge-primary badge-outline text-xs">
+                    {{ t(`activities.types.${activity.type.toLowerCase()}`, activity.type) }}
+                  </span>
+                </div>
+                <div v-if="activity.createdBy" class="text-xs text-gray-500 mt-1">
+                  {{ t('common.by') }} {{ activity.createdBy.firstName }}
+                  {{ activity.createdBy.lastName }}
+                </div>
+              </div>
+            </div>
+
+            <div v-else class="text-center py-8 text-gray-500">
+              <p>{{ t('activities.noActivities') }}</p>
             </div>
           </div>
 
           <!-- Quotes Section (Placeholder) -->
           <div class="rounded-lg shadow-md p-6 w-full">
             <div class="flex justify-between items-center mb-4">
-              <h2 class="text-lg font-bold">Devis</h2>
+              <h2 class="text-lg font-bold">{{ t('quotes.title') }}</h2>
               <button class="btn btn-sm btn-outline">
                 <Iconify icon="mdi:plus" class="w-4 h-4" />
-                Ajouter un devis
+                {{ t('quotes.add') }}
               </button>
             </div>
             <div class="text-center py-8 text-gray-500">
-              <p>Pas de devis créés pour le moment</p>
+              <p>{{ t('quotes.noQuotes') }}</p>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Edit Company Modal (Reused from CompaniesListView) -->
+    <!-- Edit Company Modal -->
     <dialog id="editCompanyModal" class="modal" :open="showModal">
-      <div class="modal-box w-full max-w-2xl">
-        <h2 class="text-xl font-bold mb-4">Modifier l'entreprise</h2>
+      <div class="modal-box w-full max-w-4xl">
+        <h2 class="text-xl font-bold mb-4">{{ t('companies.editCompany') }}</h2>
 
-        <form @submit.prevent="submitCompanyForm">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div class="form-group">
-              <label class="label">Nom de l'entreprise*</label>
-              <input
-                v-model="companyForm.name"
-                type="text"
-                class="input input-bordered w-full"
-                placeholder="Company Name"
-                required
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="label">Secteur d'activité</label>
-              <input
-                v-model="companyForm.industry"
-                type="text"
-                class="input input-bordered w-full"
-                placeholder="Industry"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="label">Taille</label>
-              <select v-model="companyForm.size" class="select select-bordered w-full">
-                <option value="">Sélectionner la taille</option>
-                <option value="1-10">1-10 employés</option>
-                <option value="11-50">11-50 employés</option>
-                <option value="51-200">51-200 employés</option>
-                <option value="201-500">201-500 employés</option>
-                <option value="501-1000">501-1000 employés</option>
-                <option value="+1000">+1000 employés</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="label">Adresse</label>
-              <input
-                v-model="companyForm.address"
-                type="text"
-                class="input input-bordered w-full"
-                placeholder="Adresse"
-              />
-            </div>
-            <div class="form-group">
-              <label class="label">Ville</label>
-              <input
-                v-model="companyForm.city"
-                type="text"
-                class="input input-bordered w-full"
-                placeholder="Ville"
-              />
-            </div>
-            <div class="form-group">
-              <label class="label">Code Postal</label>
-              <input
-                v-model="companyForm.zipCode"
-                type="text"
-                class="input input-bordered w-full"
-                placeholder="Code Postal"
-              />
-            </div>
-            <div class="form-group">
-              <label class="label">Pays</label>
-              <input
-                v-model="companyForm.country"
-                type="text"
-                class="input input-bordered w-full"
-                placeholder="Pays"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.status') }}</label>
-              <select v-model="companyForm.statusId" class="select select-bordered w-full">
-                <option value="">{{ t('common.selectStatus') }}</option>
-                <option v-for="status in companyStatuses" :key="status.id" :value="status.id">
-                  {{ t(`status.${status.name.toLowerCase()}`, status.name) }}
-                </option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="label">{{ t('common.assignedTo') }}</label>
-              <select v-model="companyForm.assignedToId" class="select select-bordered w-full">
-                <option value="">{{ t('common.notAssigned', 'Non assigné') }}</option>
-                <option v-for="user in users" :key="user.id" :value="user.id">
-                  {{ user.firstName }} {{ user.lastName }}
-                </option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="label">Site Web</label>
-              <input
-                v-model="companyForm.website"
-                type="url"
-                class="input input-bordered w-full"
-                placeholder="Website URL"
-              />
-            </div>
-          </div>
-
-          <div class="form-group mb-4">
-            <label class="label">{{ t('common.specialities') }}</label>
-            <select
-              v-model="companyForm.specialities"
-              class="select select-bordered w-full"
-              multiple
-            >
-              <option
-                v-for="speciality in availableSpecialities"
-                :key="speciality.id"
-                :value="speciality.id"
-              >
-                {{ speciality.name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-group mb-4">
-            <label class="label">Description</label>
-            <textarea
-              v-model="companyForm.description"
-              class="textarea textarea-bordered w-full"
-              placeholder="Company description"
-              rows="3"
-            ></textarea>
-          </div>
-
-          <div class="flex justify-end space-x-3 mt-6">
-            <button type="button" class="btn btn-outline" @click="closeModal">Annuler</button>
-            <button type="submit" class="btn btn-primary" :disabled="loading">Mettre à jour</button>
-          </div>
-        </form>
+        <CompanyForm
+          :company="company"
+          :isEditMode="true"
+          :statuses="companyStatuses"
+          :specialities="availableSpecialities"
+          :users="users"
+          :isSubmitting="loading"
+          @submit="submitCompanyForm"
+          @cancel="closeModal"
+        />
       </div>
       <form method="dialog" class="modal-backdrop">
-        <button @click="closeModal">fermer</button>
+        <button @click="closeModal">{{ t('common.close') }}</button>
       </form>
     </dialog>
 
     <!-- Delete Confirmation Modal -->
     <dialog id="deleteConfirmModal" class="modal" :open="showDeleteModal">
       <div class="modal-box w-full max-w-md">
-        <h2 class="text-xl font-bold mb-4">Confirmer la suppression</h2>
+        <h2 class="text-xl font-bold mb-4">{{ t('common.confirmDelete') }}</h2>
         <p>
-          Êtes-vous sûr de vouloir supprimer {{ company?.name }} ? Cette action ne peut pas être
-          annulée.
+          {{ t('common.areYouSureToDelete') }} {{ company?.name }} ?
+          {{ t('common.thisActionCannotBeUndone') }}
         </p>
 
         <div class="flex justify-end space-x-3 mt-6">
           <button type="button" class="btn btn-outline" @click="showDeleteModal = false">
-            Annuler
+            {{ t('common.cancel') }}
           </button>
           <button type="button" class="btn btn-error" :disabled="loading" @click="deleteCompany">
-            Supprimer
+            {{ t('common.delete') }}
           </button>
         </div>
       </div>
       <form method="dialog" class="modal-backdrop">
-        <button @click="showDeleteModal = false">fermer</button>
+        <button @click="showDeleteModal = false">{{ t('common.close') }}</button>
       </form>
     </dialog>
+
+    <!-- Task Details Dialog -->
+    <TaskDetailsDialog
+      v-if="showTaskDialog"
+      :task="selectedTask"
+      :is-open="showTaskDialog"
+      @close="closeTaskDetails"
+      @complete="completeTaskHandler"
+      @edit="editTaskHandler"
+    />
+
+    <!-- Contact Modal -->
+    <ContactModal
+      :is-open="showContactModal"
+      :contact="selectedContact"
+      :company-id="companyId"
+      :is-edit-mode="isEditingContact"
+      :is-submitting="isSubmittingContact"
+      @submit="handleContactSubmit"
+      @close="handleCloseContactModal"
+    />
+
+    <!-- Note Modal -->
+    <NoteModal
+      :is-open="showNoteModal"
+      :note="selectedNote"
+      :company-id="companyId"
+      :is-edit-mode="isEditingNote"
+      :is-submitting="isSubmittingNote"
+      @submit="handleNoteSubmit"
+      @close="handleCloseNoteModal"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import SpecialityBadgeWithTooltip from '@/components/common/SpecialityBadgeWithTooltip.vue'
+import { SpecialityBadgeWithTooltip } from '@/components/common'
+import { CompanyForm } from '@/components/companies'
+import { ContactModal, ContactsSection } from '@/components/contacts'
+import { NoteModal, NotesSection } from '@/components/notes'
+import { TaskDetailsDialog, TasksSection } from '@/components/tasks'
+import type { TaskCreateDto, TaskUpdateDto } from '@/services/activity.service'
+import { useActivityStore } from '@/stores/activity'
 import { useCompanyStore } from '@/stores/company'
 import { useStatusStore } from '@/stores/status'
 import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
-import type { Company, CompanyUpdateDto } from '@/types/company.types'
-import { computed, onMounted, reactive, ref } from 'vue'
+import type { Activity } from '@/types/activity.types'
+import type {
+  Company,
+  CompanyContact,
+  CompanyNote,
+  CompanyNoteCreateDto,
+  CompanyUpdateDto,
+  ContactCreateDto,
+  ContactUpdateDto,
+  Speciality,
+} from '@/types/company.types'
+import { formatDate } from '@/utils/date'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
 const companyStore = useCompanyStore()
+const activityStore = useActivityStore()
 const statusStore = useStatusStore()
 const userStore = useUserStore()
 const toastStore = useToastStore()
@@ -427,33 +448,44 @@ const { t } = useI18n()
 // Company data
 const company = ref<Company | null>(null)
 const companyId = ref<string>(route.params.id as string)
+const contacts = ref<CompanyContact[]>([])
+const notes = ref<CompanyNote[]>([])
 
-// Company form
-const companyForm = reactive<CompanyUpdateDto & { id?: string }>({
-  name: '',
-  industry: '',
-  size: '',
-  address: '',
-  city: '',
-  country: '',
-  zipCode: '',
-  statusId: '',
-  website: '',
-  description: '',
-  assignedToId: '',
-  specialities: [] as string[],
-})
+// Component refs
+const tasksSectionRef = ref<InstanceType<typeof TasksSection> | null>(null)
+
+// Activities
+const companyActivities = ref<Activity[]>([])
+const companyTasks = ref<Activity[]>([])
+const loadingActivities = ref(false)
+const loadingTasks = ref(false)
+const loadingContacts = ref(false)
+const loadingNotes = ref(false)
 
 // UI states
 const loading = ref(false)
 const error = ref<string | null>(null)
 const showModal = ref(false)
 const showDeleteModal = ref(false)
+const showTaskDialog = ref(false)
+const selectedTask = ref<Activity | null>(null)
+
+// Contact modal states
+const showContactModal = ref(false)
+const selectedContact = ref<CompanyContact | null>(null)
+const isEditingContact = ref(false)
+const isSubmittingContact = ref(false)
+
+// Note modal states
+const showNoteModal = ref(false)
+const selectedNote = ref<CompanyNote | null>(null)
+const isEditingNote = ref(false)
+const isSubmittingNote = ref(false)
 
 // Computed properties
 const companyStatuses = computed(() => statusStore.getStatusesByType('COMPANY'))
 const users = computed(() => userStore.users)
-const availableSpecialities = ref<Array<{ id: string; name: string }>>([])
+const availableSpecialities = ref<Speciality[]>([])
 
 // Fetch specialities list
 async function fetchSpecialities() {
@@ -465,6 +497,67 @@ async function fetchSpecialities() {
     toastStore.error(
       t('common.failedToFetchSpecialities', 'Erreur lors du chargement des spécialités'),
     )
+  }
+}
+
+// Fetch Recent Activities
+async function fetchCompanyActivities() {
+  loadingActivities.value = true
+  try {
+    await activityStore.fetchRecentActivities()
+    companyActivities.value = activityStore.activities.filter(
+      (activity) => activity.companyId === companyId.value,
+    )
+  } catch (err) {
+    console.error('Failed to fetch company activities', err)
+    toastStore.error(t('activities.failedToFetch', 'Erreur lors du chargement des activités'))
+  } finally {
+    loadingActivities.value = false
+  }
+}
+
+// Fonction pour charger les tâches de l'entreprise
+async function fetchCompanyTasks() {
+  loadingTasks.value = true
+  try {
+    await activityStore.fetchTasks()
+    companyTasks.value = activityStore.activities.filter(
+      (activity) => activity.type === 'TASK' && activity.companyId === companyId.value,
+    )
+  } catch (err) {
+    console.error('Failed to fetch company tasks', err)
+    toastStore.error(t('tasks.failedToFetch', 'Erreur lors du chargement des tâches'))
+  } finally {
+    loadingTasks.value = false
+  }
+}
+
+// Fetch Contacts
+async function fetchContacts() {
+  loadingContacts.value = true
+  try {
+    await companyStore.fetchCompanyContacts(companyId.value)
+    contacts.value = companyStore.companyContacts
+    console.log('Contacts fetched:', contacts.value)
+  } catch (err) {
+    console.error('Failed to fetch contacts', err)
+    toastStore.error(t('common.failedToFetchContacts', 'Erreur lors du chargement des contacts'))
+  } finally {
+    loadingContacts.value = false
+  }
+}
+
+// Fetch Notes
+async function fetchNotes() {
+  loadingNotes.value = true
+  try {
+    await companyStore.fetchCompanyNotes(companyId.value)
+    notes.value = companyStore.companyNotes
+  } catch (err) {
+    console.error('Failed to fetch notes', err)
+    toastStore.error(t('common.failedToFetchNotes', 'Erreur lors du chargement des notes'))
+  } finally {
+    loadingNotes.value = false
   }
 }
 
@@ -482,6 +575,10 @@ onMounted(async () => {
       statusStore.fetchStatusesByType('COMPANY'),
       userStore.fetchUsers(),
       fetchSpecialities(),
+      fetchContacts(),
+      fetchNotes(),
+      fetchCompanyActivities(),
+      fetchCompanyTasks(),
     ])
 
     await companyStore.fetchCompanyById(companyId.value)
@@ -501,49 +598,15 @@ onMounted(async () => {
 
 // Form handling
 function openEditModal() {
-  resetForm()
-  console.log('Company size from DB:', company.value?.size)
-  Object.assign(companyForm, {
-    id: company.value?.id,
-    name: company.value?.name || '',
-    industry: company.value?.industry || '',
-    size: company.value?.size || '',
-    address: company.value?.address || '',
-    city: company.value?.city || '',
-    zipCode: company.value?.zipCode || '',
-    country: company.value?.country || '',
-    statusId: company.value?.status?.id || '',
-    website: company.value?.website || '',
-    description: company.value?.description || '',
-    assignedToId: company.value?.assignedTo?.id || '',
-    specialities: company.value?.Specialities
-      ? company.value.Specialities.map((spec) => spec.id)
-      : [],
-  })
   showModal.value = true
 }
 
-async function submitCompanyForm() {
-  if (!company.value || !companyForm.id) return
+async function submitCompanyForm(formData: CompanyUpdateDto) {
+  if (!company.value) return
 
   loading.value = true
   try {
-    const updateData: CompanyUpdateDto = {
-      name: companyForm.name,
-      industry: companyForm.industry,
-      size: companyForm.size,
-      address: companyForm.address,
-      city: companyForm.city,
-      zipCode: companyForm.zipCode,
-      country: companyForm.country,
-      statusId: companyForm.statusId,
-      website: companyForm.website,
-      description: companyForm.description,
-      assignedToId: companyForm.assignedToId,
-      specialities: companyForm.specialities,
-    }
-
-    const result = await companyStore.updateCompany(companyForm.id, updateData)
+    const result = await companyStore.updateCompany(company.value.id, formData)
     if (result) {
       await companyStore.fetchCompanyById(companyId.value)
       if (companyStore.currentCompany) {
@@ -590,24 +653,6 @@ async function deleteCompany() {
 
 function closeModal() {
   showModal.value = false
-  resetForm()
-}
-
-function resetForm() {
-  Object.assign(companyForm, {
-    name: '',
-    industry: '',
-    size: '',
-    address: '',
-    city: '',
-    zipCode: '',
-    country: '',
-    statusId: '',
-    website: '',
-    description: '',
-    assignedToId: '',
-    specialities: [],
-  })
 }
 
 // Format website URL to ensure it starts with http:// or https://
@@ -653,5 +698,262 @@ function formattedRevenue(value: number): string {
 
 function getInitials(firstName: string, lastName: string): string {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
+}
+
+// Fonction pour déterminer le nombre d'employés pour le pluriel
+function getEmployeeCount(size: string): number {
+  if (!size) return 1
+
+  // Extraire le premier nombre de la chaîne de taille
+  const match = size.match(/(\d+)/)
+  if (match) {
+    return parseInt(match[1]) === 1 ? 1 : 2
+  }
+
+  // Par défaut, utiliser le pluriel
+  return 2
+}
+
+// Fonctions pour les tâches
+function openTaskDetails(task: Activity) {
+  selectedTask.value = task
+  showTaskDialog.value = true
+}
+
+function closeTaskDetails() {
+  showTaskDialog.value = false
+  selectedTask.value = null
+}
+
+async function completeTaskHandler(taskId: string) {
+  try {
+    await activityStore.completeTask(taskId)
+    toastStore.success(t('tasks.completedSuccessfully', 'Tâche marquée comme terminée'))
+    // Rafraîchir les tâches
+    fetchCompanyTasks()
+  } catch (error) {
+    console.error('Failed to complete task:', error)
+    toastStore.error(t('tasks.failedToComplete', 'Échec de la mise à jour de la tâche'))
+  }
+  closeTaskDetails()
+}
+
+async function reopenTaskHandler(taskId: string) {
+  try {
+    await activityStore.reopenTask(taskId)
+    toastStore.success(t('tasks.reopenedSuccessfully', 'Tâche rouverte avec succès'))
+    // Rafraîchir les tâches
+    fetchCompanyTasks()
+  } catch (error) {
+    console.error('Failed to reopen task:', error)
+    toastStore.error(t('tasks.failedToReopen', 'Échec de la réouverture de la tâche'))
+  }
+  closeTaskDetails()
+}
+
+function editTaskHandler(task: Activity) {
+  // Fermer le dialog des détails de la tâche
+  closeTaskDetails()
+
+  // Ouvrir le modal d'édition dans TasksSection
+  if (tasksSectionRef.value) {
+    tasksSectionRef.value.openTaskModal(task)
+  }
+}
+
+// Handlers pour les contacts
+function handleAddContact() {
+  selectedContact.value = null
+  isEditingContact.value = false
+  showContactModal.value = true
+}
+
+function handleEditContact(contact: CompanyContact) {
+  selectedContact.value = contact
+  isEditingContact.value = true
+  showContactModal.value = true
+}
+
+async function handleDeleteContact(contact: CompanyContact) {
+  if (!confirm(t('contacts.confirmDelete', 'Êtes-vous sûr de vouloir supprimer ce contact ?'))) {
+    return
+  }
+
+  try {
+    const success = await companyStore.deleteContact(contact.id)
+    if (success) {
+      toastStore.success(t('contacts.deletedSuccessfully', 'Contact supprimé avec succès'))
+    } else {
+      toastStore.error(t('contacts.failedToDelete', 'Échec de la suppression du contact'))
+    }
+  } catch (error) {
+    console.error('Failed to delete contact:', error)
+    toastStore.error(t('contacts.failedToDelete', 'Échec de la suppression du contact'))
+  }
+}
+
+function handleContactClick(contact: CompanyContact) {
+  console.log('View contact details:', contact)
+  // À implémenter - navigation vers les détails du contact
+}
+
+async function handleContactSubmit(data: ContactCreateDto | (ContactUpdateDto & { id: string })) {
+  isSubmittingContact.value = true
+
+  try {
+    if (isEditingContact.value && 'id' in data) {
+      // Mode édition
+      const result = await companyStore.updateContact(data.id, data)
+      if (result) {
+        toastStore.success(t('contacts.updatedSuccessfully', 'Contact mis à jour avec succès'))
+        showContactModal.value = false
+      } else {
+        toastStore.error(t('contacts.failedToUpdate', 'Échec de la mise à jour du contact'))
+      }
+    } else {
+      // Mode création
+      const result = await companyStore.createContact(data as ContactCreateDto)
+      if (result) {
+        toastStore.success(t('contacts.createdSuccessfully', 'Contact créé avec succès'))
+        showContactModal.value = false
+      } else {
+        toastStore.error(t('contacts.failedToCreate', 'Échec de la création du contact'))
+      }
+    }
+  } catch (error) {
+    console.error('Failed to save contact:', error)
+    const errorMessage = isEditingContact.value
+      ? t('contacts.failedToUpdate', 'Échec de la mise à jour du contact')
+      : t('contacts.failedToCreate', 'Échec de la création du contact')
+    toastStore.error(errorMessage)
+  } finally {
+    isSubmittingContact.value = false
+  }
+}
+
+function handleCloseContactModal() {
+  showContactModal.value = false
+  selectedContact.value = null
+  isEditingContact.value = false
+}
+
+// Handlers pour les notes
+function handleAddNote() {
+  selectedNote.value = null
+  isEditingNote.value = false
+  showNoteModal.value = true
+}
+
+function handleEditNote(note: CompanyNote) {
+  selectedNote.value = note
+  isEditingNote.value = true
+  showNoteModal.value = true
+}
+
+function handleViewNote(note: CompanyNote) {
+  // Pour l'instant, on ouvre en mode édition. On peut changer ça plus tard pour un mode lecture seule
+  handleEditNote(note)
+}
+
+async function handleDeleteNote(note: CompanyNote) {
+  if (!confirm(t('notes.confirmDelete', 'Êtes-vous sûr de vouloir supprimer cette note ?'))) {
+    return
+  }
+
+  try {
+    const result = await companyStore.deleteCompanyNote(note.id)
+    if (result) {
+      toastStore.success(t('notes.deletedSuccessfully', 'Note supprimée avec succès'))
+      // Rafraîchir la liste des notes
+      await fetchNotes()
+    } else {
+      toastStore.error(t('notes.failedToDelete', 'Échec de la suppression de la note'))
+    }
+  } catch (error) {
+    console.error('Failed to delete note:', error)
+    toastStore.error(t('notes.failedToDelete', 'Échec de la suppression de la note'))
+  }
+}
+
+function handleNoteClick(note: CompanyNote) {
+  console.log('View note details:', note)
+  // À implémenter - navigation vers les détails de la note ou affichage dans un modal
+}
+
+async function handleNoteSubmit(
+  data: CompanyNoteCreateDto | (CompanyNoteCreateDto & { id: string }),
+) {
+  isSubmittingNote.value = true
+
+  try {
+    if (isEditingNote.value && 'id' in data) {
+      // Mode édition
+      const result = await companyStore.updateCompanyNote(data.id, data)
+      if (result) {
+        toastStore.success(t('notes.updatedSuccessfully', 'Note mise à jour avec succès'))
+        showNoteModal.value = false
+        // Rafraîchir la liste des notes
+        await fetchNotes()
+      } else {
+        toastStore.error(t('notes.failedToUpdate', 'Échec de la mise à jour de la note'))
+      }
+    } else {
+      // Mode création
+      const result = await companyStore.addCompanyNote(data as CompanyNoteCreateDto)
+      if (result) {
+        toastStore.success(t('notes.createdSuccessfully', 'Note créée avec succès'))
+        showNoteModal.value = false
+        // Rafraîchir la liste des notes
+        await fetchNotes()
+      } else {
+        toastStore.error(t('notes.failedToCreate', 'Échec de la création de la note'))
+      }
+    }
+  } catch (error) {
+    console.error('Failed to save note:', error)
+    const errorMessage = isEditingNote.value
+      ? t('notes.failedToUpdate', 'Échec de la mise à jour de la note')
+      : t('notes.failedToCreate', 'Échec de la création de la note')
+    toastStore.error(errorMessage)
+  } finally {
+    isSubmittingNote.value = false
+  }
+}
+
+function handleCloseNoteModal() {
+  showNoteModal.value = false
+  selectedNote.value = null
+  isEditingNote.value = false
+}
+
+// Handlers pour les tâches
+async function handleTaskCreated(taskData: TaskCreateDto) {
+  try {
+    // Ajouter l'ID de l'entreprise aux données de la tâche
+    const taskWithCompany = {
+      ...taskData,
+      companyId: companyId.value,
+    }
+
+    await activityStore.createTask(taskWithCompany)
+    toastStore.success(t('tasks.createdSuccessfully', 'Tâche créée avec succès'))
+    // Rafraîchir les tâches
+    fetchCompanyTasks()
+  } catch (error) {
+    console.error('Failed to create task:', error)
+    toastStore.error(t('tasks.failedToCreate', 'Échec de la création de la tâche'))
+  }
+}
+
+async function handleTaskUpdated(taskData: TaskUpdateDto & { id: string }) {
+  try {
+    await activityStore.updateTask(taskData.id, taskData)
+    toastStore.success(t('tasks.updatedSuccessfully', 'Tâche mise à jour avec succès'))
+    // Rafraîchir les tâches
+    fetchCompanyTasks()
+  } catch (error) {
+    console.error('Failed to update task:', error)
+    toastStore.error(t('tasks.failedToUpdate', 'Échec de la mise à jour de la tâche'))
+  }
 }
 </script>

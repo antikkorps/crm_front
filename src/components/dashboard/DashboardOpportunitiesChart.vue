@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import { usePipelineStore } from '@/stores/pipeline'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import OpportunitySummaryCards from './OpportunitySummaryCards.vue'
+import { DashboardOpportunitySummaryCards as OpportunitySummaryCards } from './index'
 
 // Define the chart type
 interface ChartInstance {

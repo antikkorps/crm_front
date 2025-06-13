@@ -4,10 +4,13 @@ import type {
   CompanyContact,
   CompanyCreateDto,
   CompanyNote,
+  CompanyNoteCreateDto,
   CompanyQuote,
   CompanySearchParams,
   CompanyTask,
   CompanyUpdateDto,
+  ContactCreateDto,
+  ContactUpdateDto,
   Speciality,
 } from '@/types/company.types'
 import { defineStore } from 'pinia'
@@ -75,7 +78,6 @@ export const useCompanyStore = defineStore('company', () => {
       loading.value = false
     }
   }
-
   async function updateCompany(id: string, data: CompanyUpdateDto) {
     loading.value = true
     error.value = null
@@ -141,6 +143,72 @@ export const useCompanyStore = defineStore('company', () => {
     }
   }
 
+  // Contact management methods
+  async function createContact(data: ContactCreateDto) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const newContact = await CompanyService.createContact(data)
+      // Add to contacts list if we're viewing the same company
+      if (
+        companyContacts.value.length > 0 &&
+        companyContacts.value[0]?.companyId === data.companyId
+      ) {
+        companyContacts.value.push(newContact)
+      }
+      return newContact
+    } catch (err) {
+      error.value = 'Failed to create contact'
+      console.error(err)
+      return null
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function updateContact(id: string, data: ContactUpdateDto) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const updatedContact = await CompanyService.updateContact(id, data)
+      // Update in contacts list
+      const index = companyContacts.value.findIndex((contact) => contact.id === id)
+      if (index !== -1) {
+        companyContacts.value[index] = updatedContact
+      }
+      return updatedContact
+    } catch (err) {
+      error.value = 'Failed to update contact'
+      console.error(err)
+      return null
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function deleteContact(id: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      await CompanyService.deleteContact(id)
+      // Remove from contacts list
+      const index = companyContacts.value.findIndex((contact) => contact.id === id)
+      if (index !== -1) {
+        companyContacts.value.splice(index, 1)
+      }
+      return true
+    } catch (err) {
+      error.value = 'Failed to delete contact'
+      console.error(err)
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function fetchCompanyNotes(companyId: string) {
     loading.value = true
     error.value = null
@@ -155,18 +223,61 @@ export const useCompanyStore = defineStore('company', () => {
     }
   }
 
-  async function addCompanyNote(content: string, companyId: string) {
+  async function addCompanyNote(data: CompanyNoteCreateDto) {
     loading.value = true
     error.value = null
 
     try {
-      const newNote = await CompanyService.addCompanyNote({ content, companyId })
+      const newNote = await CompanyService.addCompanyNote(data)
       companyNotes.value = [newNote, ...companyNotes.value]
       return newNote
     } catch (err) {
       error.value = 'Failed to add company note'
       console.error(err)
       return null
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Note management methods
+  async function updateCompanyNote(id: string, data: CompanyNoteCreateDto) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const updatedNote = await CompanyService.updateCompanyNote(id, data)
+      // Update in notes list
+      const index = companyNotes.value.findIndex((note) => note.id === id)
+      if (index !== -1) {
+        companyNotes.value[index] = updatedNote
+      }
+      return updatedNote
+    } catch (err) {
+      error.value = 'Failed to update note'
+      console.error(err)
+      return null
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function deleteCompanyNote(id: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      await CompanyService.deleteCompanyNote(id)
+      // Remove from notes list
+      const index = companyNotes.value.findIndex((note) => note.id === id)
+      if (index !== -1) {
+        companyNotes.value.splice(index, 1)
+      }
+      return true
+    } catch (err) {
+      error.value = 'Failed to delete note'
+      console.error(err)
+      return false
     } finally {
       loading.value = false
     }
@@ -294,8 +405,13 @@ export const useCompanyStore = defineStore('company', () => {
     updateCompany,
     deleteCompany,
     fetchCompanyContacts,
+    createContact,
+    updateContact,
+    deleteContact,
     fetchCompanyNotes,
     addCompanyNote,
+    updateCompanyNote,
+    deleteCompanyNote,
     fetchCompanyTasks,
     fetchCompanyQuotes,
     fetchSpecialities,
