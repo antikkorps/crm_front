@@ -22,12 +22,12 @@
         <table class="table table-zebra w-full">
           <thead>
             <tr>
-              <th>{{ t('common.title', 'Titre') }}</th>
-              <th>{{ t('common.status', 'Statut') }}</th>
-              <th>{{ t('tasks.dueDate') }}</th>
-              <th>{{ t('tasks.priority') }}</th>
-              <th>{{ t('tasks.assignedTo') }}</th>
-              <th class="w-16">{{ t('common.actions') }}</th>
+              <th class="w-1/4 min-w-48">{{ t('common.title', 'Titre') }}</th>
+              <th class="w-32">{{ t('status.title', 'Statut') }}</th>
+              <th class="w-28">{{ t('tasks.dueDate') }}</th>
+              <th class="w-24">{{ t('tasks.priority') }}</th>
+              <th class="w-40">{{ t('tasks.assignedTo') }}</th>
+              <th class="w-32">{{ t('common.actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -47,20 +47,20 @@
                   {{ task.content }}
                 </div>
               </td>
-              <td>
+              <td class="whitespace-nowrap">
                 <span
                   :class="getTaskStatusClass(task.taskStatus || '')"
-                  class="px-2 py-1 text-xs rounded-full"
+                  class="px-2 py-1 text-xs rounded-full whitespace-nowrap"
                 >
                   {{ getTaskStatusLabel(task.taskStatus || '') }}
                 </span>
               </td>
-              <td>
+              <td class="whitespace-nowrap">
                 <span :class="getDueDateClass(task.dueDate || null)">
                   {{ task.dueDate ? formatDateOnly(task.dueDate) : '-' }}
                 </span>
               </td>
-              <td>
+              <td class="whitespace-nowrap">
                 <span :class="getTaskPriorityClass(task.priority || '')" class="badge">
                   {{ getTaskPriorityLabel(task.priority || '') }}
                 </span>

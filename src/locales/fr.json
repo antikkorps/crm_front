@@ -14,10 +14,8 @@
     "rememberMe": "Se souvenir de moi",
     "connexionPending": "Connexion en cours..."
   },
-  "form": {
-    "title": "Titre"
-  },
   "common": {
+    "title": "Titre",
     "home": "Accueil",
     "mainMenu": "Menu principal",
     "quickAccess": "Accès rapide",
@@ -249,6 +247,7 @@
       "allTasks": "Toutes les tâches"
     },
     "status": {
+      "title": "Status",
       "pending": "En attente",
       "inProgress": "En cours",
       "completed": "Terminée",
