@@ -83,7 +83,7 @@
           <ActivityIcon type="CALL" size="lg" />
         </div>
         <div class="stat-title text-xs">{{ t('activities.types.call') }}</div>
-        <div class="stat-value text-lg">{{ activityCounts.calls || 0 }}</div>
+        <div class="stat-value text-2xl">{{ activityCounts.calls || 0 }}</div>
       </div>
 
       <div class="stat bg-base-100 rounded-lg border border-base-200 p-4">
@@ -91,7 +91,7 @@
           <ActivityIcon type="MEETING" size="lg" />
         </div>
         <div class="stat-title text-xs">{{ t('activities.types.meeting') }}</div>
-        <div class="stat-value text-lg">{{ activityCounts.meetings || 0 }}</div>
+        <div class="stat-value text-2xl">{{ activityCounts.meetings || 0 }}</div>
       </div>
 
       <div class="stat bg-base-100 rounded-lg border border-base-200 p-4">
@@ -99,7 +99,7 @@
           <ActivityIcon type="EMAIL" size="lg" />
         </div>
         <div class="stat-title text-xs">{{ t('activities.types.email') }}</div>
-        <div class="stat-value text-lg">{{ activityCounts.emails || 0 }}</div>
+        <div class="stat-value text-2xl">{{ activityCounts.emails || 0 }}</div>
       </div>
 
       <div class="stat bg-base-100 rounded-lg border border-base-200 p-4">
@@ -107,7 +107,7 @@
           <ActivityIcon type="TASK" size="lg" />
         </div>
         <div class="stat-title text-xs">{{ t('activities.types.task') }}</div>
-        <div class="stat-value text-lg">{{ activityCounts.tasks || 0 }}</div>
+        <div class="stat-value text-2xl">{{ activityCounts.tasks || 0 }}</div>
       </div>
 
       <div class="stat bg-base-100 rounded-lg border border-base-200 p-4">
@@ -115,7 +115,7 @@
           <ActivityIcon type="NOTE" size="lg" />
         </div>
         <div class="stat-title text-xs">{{ t('activities.types.note') }}</div>
-        <div class="stat-value text-lg">{{ activityCounts.notes || 0 }}</div>
+        <div class="stat-value text-2xl">{{ activityCounts.notes || 0 }}</div>
       </div>
     </div>
 
@@ -276,19 +276,58 @@
 
     <!-- Modal de création/édition -->
     <dialog ref="activityModal" class="modal">
-      <div class="modal-box max-w-4xl">
+      <div class="modal-box max-w-5xl">
         <form method="dialog">
           <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
         </form>
-        <h3 class="font-bold text-lg mb-4">
-          {{ editingActivity ? t('activities.edit.title') : t('activities.create.title') }}
-        </h3>
 
-        <ActivityForm
-          v-if="showActivityForm"
-          :key="formKey"
+        <!-- Formulaires spécialisés -->
+        <CallForm
+          v-if="showActivityForm && selectedActivityType === 'CALL'"
+          :key="`call-${formKey}`"
           :activity="editingActivity"
-          :type="selectedActivityType"
+          :available-users="availableUsers"
+          :is-edit-mode="!!editingActivity"
+          @save="saveActivity"
+          @cancel="closeModal"
+        />
+
+        <MeetingForm
+          v-if="showActivityForm && selectedActivityType === 'MEETING'"
+          :key="`meeting-${formKey}`"
+          :activity="editingActivity"
+          :available-users="availableUsers"
+          :is-edit-mode="!!editingActivity"
+          @save="saveActivity"
+          @cancel="closeModal"
+        />
+
+        <EmailForm
+          v-if="showActivityForm && selectedActivityType === 'EMAIL'"
+          :key="`email-${formKey}`"
+          :activity="editingActivity"
+          :available-users="availableUsers"
+          :is-edit-mode="!!editingActivity"
+          @save="saveActivity"
+          @cancel="closeModal"
+        />
+
+        <TaskForm
+          v-if="showActivityForm && selectedActivityType === 'TASK'"
+          :key="`task-${formKey}`"
+          :activity="editingActivity"
+          :available-users="availableUsers"
+          :is-edit-mode="!!editingActivity"
+          @save="saveActivity"
+          @cancel="closeModal"
+        />
+
+        <NoteForm
+          v-if="showActivityForm && selectedActivityType === 'NOTE'"
+          :key="`note-${formKey}`"
+          :activity="editingActivity"
+          :available-users="availableUsers"
+          :is-edit-mode="!!editingActivity"
           @save="saveActivity"
           @cancel="closeModal"
         />
@@ -300,6 +339,7 @@
 <script setup lang="ts">
 import { ActivityService } from '@/services/activity.service'
 import { useToastStore } from '@/stores/toast'
+import { useUserStore } from '@/stores/user'
 import type {
   Activity,
   ActivityCounts,
@@ -313,11 +353,16 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ActivityCard from './ActivityCard.vue'
 import ActivityFilters from './ActivityFilters.vue'
-import ActivityForm from './ActivityForm.vue'
 import ActivityIcon from './ActivityIcon.vue'
+import CallForm from './forms/CallForm.vue'
+import EmailForm from './forms/EmailForm.vue'
+import MeetingForm from './forms/MeetingForm.vue'
+import NoteForm from './forms/NoteForm.vue'
+import TaskForm from './forms/TaskForm.vue'
 
 const { t } = useI18n()
 const toast = useToastStore()
+const userStore = useUserStore()
 
 // Props
 const props = defineProps<{
@@ -370,6 +415,8 @@ const activityCounts = ref<ActivityCounts>({
 // Computed
 const totalPages = computed(() => Math.ceil(totalActivities.value / pageSize.value))
 
+const availableUsers = computed(() => userStore.users)
+
 const visiblePages = computed(() => {
   const pages = []
   const start = Math.max(1, currentPage.value - 2)
@@ -395,6 +442,7 @@ watch(
 onMounted(() => {
   loadActivities()
   loadActivityCounts()
+  userStore.fetchUsers()
 })
 
 // Méthodes
@@ -483,7 +531,14 @@ function createActivity(type: ActivityType) {
 
 function editActivity(activity: Activity) {
   editingActivity.value = activity
-  selectedActivityType.value = activity.type as ActivityType
+  // Validation du type d'activité
+  const validTypes: ActivityType[] = ['CALL', 'MEETING', 'TASK', 'EMAIL', 'NOTE']
+  if (validTypes.includes(activity.type as ActivityType)) {
+    selectedActivityType.value = activity.type as ActivityType
+  } else {
+    console.warn("Type d'activité invalide:", activity.type)
+    selectedActivityType.value = 'TASK' // Type par défaut
+  }
   showActivityForm.value = true
   formKey.value++
   activityModal.value?.showModal()

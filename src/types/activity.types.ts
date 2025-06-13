@@ -39,12 +39,25 @@ export interface Activity {
   callDirection?: CallDirection | null
   duration?: number | null
   callOutcome?: CallOutcome | null
+  callContact?: string | null
+  callPhoneNumber?: string | null
   location?: string | null
   attendees?: string | null
   meetingType?: MeetingType | null
   emailSubject?: string | null
   emailStatus?: EmailStatus | null
   emailDirection?: CallDirection | null
+
+  // Champs spécifiques aux tâches
+  taskEstimatedDuration?: number | null
+  taskProgress?: number | null
+
+  // Champs spécifiques aux emails
+  emailAttachments?: number | null
+
+  // Champs spécifiques aux notes
+  noteCategory?: string | null
+  noteVisibility?: 'PRIVATE' | 'SHARED' | null
 }
 
 // Interfaces spécialisées pour chaque type d'activité
@@ -112,6 +125,8 @@ export interface CreateActivityDto {
   callDirection?: CallDirection
   duration?: number
   callOutcome?: CallOutcome
+  callContact?: string
+  callPhoneNumber?: string
 
   // Champs spécifiques MEETING
   location?: string

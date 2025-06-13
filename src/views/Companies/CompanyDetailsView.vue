@@ -274,7 +274,6 @@
 
           <!-- Activities Section -->
           <div class="rounded-lg shadow-md p-6 mb-6 w-full">
-            <h2 class="text-xl font-bold mb-4">{{ t('activities.title') }}</h2>
             <ActivitiesSection :company-id="companyId" />
           </div>
         </div>
@@ -402,6 +401,7 @@ import { ContactModal, ContactsSection } from '@/components/contacts'
 import { NoteModal, NotesSection } from '@/components/notes'
 import { TaskDetailsDialog, TasksSection } from '@/components/tasks'
 import type { TaskCreateDto, TaskUpdateDto } from '@/services/activity.service'
+import type { NoteCreateDto, NoteUpdateDto } from '@/services/note.service'
 import { useActivityStore } from '@/stores/activity'
 import { useCompanyStore } from '@/stores/company'
 import { useStatusStore } from '@/stores/status'
@@ -411,8 +411,6 @@ import type { Activity } from '@/types/activity.types'
 import type {
   Company,
   CompanyContact,
-  CompanyNote,
-  CompanyNoteCreateDto,
   CompanyUpdateDto,
   ContactCreateDto,
   ContactUpdateDto,
@@ -435,7 +433,7 @@ const { t } = useI18n()
 const company = ref<Company | null>(null)
 const companyId = ref<string>(route.params.id as string)
 const contacts = ref<CompanyContact[]>([])
-const notes = ref<CompanyNote[]>([])
+const notes = ref<Activity[]>([])
 
 // Component refs
 const tasksSectionRef = ref<InstanceType<typeof TasksSection> | null>(null)
@@ -462,7 +460,7 @@ const isSubmittingContact = ref(false)
 
 // Note modal states
 const showNoteModal = ref(false)
-const selectedNote = ref<CompanyNote | null>(null)
+const selectedNote = ref<Activity | null>(null)
 const isEditingNote = ref(false)
 const isSubmittingNote = ref(false)
 
@@ -515,7 +513,6 @@ async function fetchContacts() {
   }
 }
 
-// Fetch Notes
 async function fetchNotes() {
   loadingNotes.value = true
   try {
@@ -811,18 +808,18 @@ function handleAddNote() {
   showNoteModal.value = true
 }
 
-function handleEditNote(note: CompanyNote) {
+function handleEditNote(note: Activity) {
   selectedNote.value = note
   isEditingNote.value = true
   showNoteModal.value = true
 }
 
-function handleViewNote(note: CompanyNote) {
+function handleViewNote(note: Activity) {
   // Pour l'instant, on ouvre en mode édition. On peut changer ça plus tard pour un mode lecture seule
   handleEditNote(note)
 }
 
-async function handleDeleteNote(note: CompanyNote) {
+async function handleDeleteNote(note: Activity) {
   if (!confirm(t('notes.confirmDelete', 'Êtes-vous sûr de vouloir supprimer cette note ?'))) {
     return
   }
@@ -842,20 +839,22 @@ async function handleDeleteNote(note: CompanyNote) {
   }
 }
 
-function handleNoteClick(note: CompanyNote) {
+function handleNoteClick(note: Activity) {
   console.log('View note details:', note)
   // À implémenter - navigation vers les détails de la note ou affichage dans un modal
 }
 
-async function handleNoteSubmit(
-  data: CompanyNoteCreateDto | (CompanyNoteCreateDto & { id: string }),
-) {
+async function handleNoteSubmit(data: NoteCreateDto | (NoteUpdateDto & { id: string })) {
   isSubmittingNote.value = true
 
   try {
     if (isEditingNote.value && 'id' in data) {
       // Mode édition
-      const result = await companyStore.updateCompanyNote(data.id, data)
+      const updateData = {
+        ...(data.title !== undefined && { title: data.title }),
+        ...(data.content !== undefined && { content: data.content }),
+      }
+      const result = await companyStore.updateCompanyNote(data.id, updateData)
       if (result) {
         toastStore.success(t('notes.updatedSuccessfully', 'Note mise à jour avec succès'))
         showNoteModal.value = false
@@ -865,8 +864,19 @@ async function handleNoteSubmit(
         toastStore.error(t('notes.failedToUpdate', 'Échec de la mise à jour de la note'))
       }
     } else {
-      // Mode création
-      const result = await companyStore.addCompanyNote(data as CompanyNoteCreateDto)
+      // Mode création - on s'assure que les champs requis sont présents
+      const createData = data as NoteCreateDto
+      if (!createData.title || !createData.content) {
+        toastStore.error(t('notes.titleAndContentRequired', 'Le titre et le contenu sont requis'))
+        return
+      }
+
+      const noteData = {
+        title: createData.title,
+        content: createData.content,
+        companyId: companyId.value,
+      }
+      const result = await companyStore.addCompanyNote(noteData)
       if (result) {
         toastStore.success(t('notes.createdSuccessfully', 'Note créée avec succès'))
         showNoteModal.value = false

@@ -35,7 +35,11 @@
       <!-- Contenu spécialisé selon le type -->
       <div class="mb-3">
         <CallSummary v-if="activity.type === 'CALL'" :activity="activity" />
-        <MeetingSummary v-else-if="activity.type === 'MEETING'" :activity="activity" />
+        <MeetingSummary
+          v-else-if="activity.type === 'MEETING'"
+          :activity="activity"
+          @reschedule="$emit('edit', activity)"
+        />
         <EmailSummary v-else-if="activity.type === 'EMAIL'" :activity="activity" />
         <div v-else>
           <p v-if="activity.content" class="text-sm text-base-content/80 line-clamp-3">

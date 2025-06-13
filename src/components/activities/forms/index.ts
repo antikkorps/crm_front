@@ -1,0 +1,5 @@
+export { default as CallForm } from './CallForm.vue'
+export { default as EmailForm } from './EmailForm.vue'
+export { default as MeetingForm } from './MeetingForm.vue'
+export { default as NoteForm } from './NoteForm.vue'
+export { default as TaskForm } from './TaskForm.vue'

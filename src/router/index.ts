@@ -44,13 +44,6 @@ const routes = [
     props: true,
     meta: { layout: 'dashboard' },
   },
-  // Page de test des activités
-  {
-    path: '/activities/test',
-    name: 'activities-test',
-    component: () => import('../views/Activities/ActivitiesTestView.vue'),
-    meta: { layout: 'dashboard' },
-  },
   // Pages paramètres
   {
     path: '/settings',

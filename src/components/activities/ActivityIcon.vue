@@ -40,17 +40,17 @@ const iconBackgroundClass = computed(() => {
 
   switch (props.type) {
     case 'CALL':
-      return `bg-blue-500 ${baseClass}`
+      return `bg-primary ${baseClass}`
     case 'MEETING':
-      return `bg-purple-500 ${baseClass}`
+      return `bg-secondary ${baseClass}`
     case 'EMAIL':
-      return `bg-green-500 ${baseClass}`
+      return `bg-accent ${baseClass}`
     case 'TASK':
-      return `bg-orange-500 ${baseClass}`
+      return `bg-info ${baseClass}`
     case 'NOTE':
-      return `bg-gray-500 ${baseClass}`
+      return `bg-warning ${baseClass}`
     default:
-      return `bg-gray-400 ${baseClass}`
+      return `bg-neutral ${baseClass}`
   }
 })
 
