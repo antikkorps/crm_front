@@ -1,9 +1,8 @@
+import type { Activity, ActivityFilters } from '@/types/activity.types'
 import type {
   Company,
   CompanyContact,
   CompanyCreateDto,
-  CompanyNote,
-  CompanyNoteCreateDto,
   CompanyQuote,
   CompanyTask,
   CompanyUpdateDto,
@@ -12,6 +11,7 @@ import type {
   Speciality,
   Status,
 } from '@/types/company.types'
+import { ActivityService } from './activity.service'
 import { apiRequest } from './api.service'
 import { AuthService } from './auth.service'
 
@@ -122,32 +122,37 @@ export const CompanyService = {
   },
 
   // Récupérer les notes d'une entreprise
-  async getCompanyNotes(companyId: string): Promise<CompanyNote[]> {
-    const response = await apiRequest<{ items: CompanyNote[] }>(`/v1/notes/company/${companyId}`)
-    return response.items
+  async getCompanyNotes(companyId: string): Promise<Activity[]> {
+    const filters: ActivityFilters = {
+      type: ['NOTE'],
+      companyId,
+    }
+    return ActivityService.getAllActivities(filters)
   },
 
   // Ajouter une note à une entreprise
-  async addCompanyNote(data: CompanyNoteCreateDto): Promise<CompanyNote> {
-    return apiRequest<CompanyNote>('/v1/notes', {
-      method: 'POST',
-      body: data,
+  async addCompanyNote(data: {
+    title: string
+    content: string
+    companyId: string
+  }): Promise<Activity> {
+    return ActivityService.createSpecializedActivity({
+      ...data,
+      type: 'NOTE',
     })
   },
 
   // Mettre à jour une note
-  async updateCompanyNote(id: string, data: CompanyNoteCreateDto): Promise<CompanyNote> {
-    return apiRequest<CompanyNote>(`/v1/notes/${id}`, {
-      method: 'PUT',
-      body: data,
-    })
+  async updateCompanyNote(
+    id: string,
+    data: { title?: string; content?: string },
+  ): Promise<Activity> {
+    return ActivityService.updateSpecializedActivity(id, { ...data, type: 'NOTE' })
   },
 
   // Supprimer une note
   async deleteCompanyNote(id: string): Promise<void> {
-    await apiRequest<void>(`/v1/notes/${id}`, {
-      method: 'DELETE',
-    })
+    return ActivityService.deleteActivity(id)
   },
 
   // Récupérer les tâches liées à une entreprise

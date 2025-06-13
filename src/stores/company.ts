@@ -1,10 +1,9 @@
 import { CompanyService } from '@/services/company.service'
+import type { Activity } from '@/types/activity.types'
 import type {
   Company,
   CompanyContact,
   CompanyCreateDto,
-  CompanyNote,
-  CompanyNoteCreateDto,
   CompanyQuote,
   CompanySearchParams,
   CompanyTask,
@@ -21,7 +20,7 @@ export const useCompanyStore = defineStore('company', () => {
   const companies = ref<Company[]>([])
   const currentCompany = ref<Company | null>(null)
   const companyContacts = ref<CompanyContact[]>([])
-  const companyNotes = ref<CompanyNote[]>([])
+  const companyNotes = ref<Activity[]>([])
   const companyTasks = ref<CompanyTask[]>([])
   const companyQuotes = ref<CompanyQuote[]>([])
   const specialities = ref<Speciality[]>([])
@@ -223,7 +222,7 @@ export const useCompanyStore = defineStore('company', () => {
     }
   }
 
-  async function addCompanyNote(data: CompanyNoteCreateDto) {
+  async function addCompanyNote(data: { title: string; content: string; companyId: string }) {
     loading.value = true
     error.value = null
 
@@ -241,7 +240,7 @@ export const useCompanyStore = defineStore('company', () => {
   }
 
   // Note management methods
-  async function updateCompanyNote(id: string, data: CompanyNoteCreateDto) {
+  async function updateCompanyNote(id: string, data: { title?: string; content?: string }) {
     loading.value = true
     error.value = null
 
