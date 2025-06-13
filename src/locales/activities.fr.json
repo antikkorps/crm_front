@@ -32,6 +32,10 @@
     "duplicateError": "Erreur lors de la duplication",
     "loadError": "Erreur lors du chargement",
     "featureComingSoon": "Fonctionnalité bientôt disponible",
+    "filterByType": "Cliquez sur les cartes pour filtrer par type",
+    "typesSelected": "types sélectionnés",
+    "clearTypes": "Effacer les types",
+    "clickToFilter": "Cliquez pour filtrer",
     "types": {
       "call": "Appel",
       "meeting": "Réunion",
@@ -55,6 +59,32 @@
     },
     "status": {
       "unknown": "Inconnu"
+    },
+    "task": {
+      "progress": "Progression",
+      "notStarted": "Non commencée",
+      "started": "Commencée",
+      "inProgress": "En cours",
+      "almostDone": "Presque terminée",
+      "nearlyComplete": "Presque complète",
+      "completed": "Terminée",
+      "dueDate": "Date d'échéance",
+      "dueTime": "Heure d'échéance",
+      "estimatedDuration": "Durée estimée",
+      "hours": "heures",
+      "minutes": "minutes",
+      "status": "Statut",
+      "descriptionPlaceholder": "Description de la tâche...",
+      "overdue": "En retard de {days} jour(s)",
+      "dueToday": "À faire aujourd'hui",
+      "dueTomorrow": "À faire demain",
+      "dueInDays": "À faire dans {days} jour(s)",
+      "statuses": {
+        "todo": "À faire",
+        "inProgress": "En cours",
+        "completed": "Terminée",
+        "cancelled": "Annulée"
+      }
     }
   },
   "calls": {

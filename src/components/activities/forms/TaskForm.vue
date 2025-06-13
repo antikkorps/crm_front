@@ -109,7 +109,7 @@
           <label class="label">
             <span class="label-text font-medium">{{ t('activities.task.dueDate') }}</span>
           </label>
-          <input v-model="formData.dueDate" type="date" class="input input-bordered w-full" />
+          <input v-model="dueDateInput" type="date" class="input input-bordered w-full" />
         </div>
 
         <!-- Heure d'échéance -->
@@ -158,13 +158,13 @@
           </label>
           <div class="flex items-center gap-3">
             <input
-              v-model.number="formData.taskProgress"
+              v-model.number="formData.progress"
               type="range"
               min="0"
               max="100"
               class="range range-info"
             />
-            <span class="text-sm font-medium w-12">{{ formData.taskProgress }}%</span>
+            <span class="text-sm font-medium w-12">{{ formData.progress }}%</span>
           </div>
         </div>
       </div>
@@ -182,8 +182,8 @@
       ></textarea>
     </div>
 
-    <!-- Indicateur de date d'échéance -->
-    <div v-if="formData.dueDate" class="alert" :class="getDueDateAlertClass()">
+    <!-- Indicateur de date d'échéance (uniquement pour les dates importantes) -->
+    <div v-if="shouldShowDueDateAlert()" class="alert" :class="getDueDateAlertClass()">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"
@@ -242,12 +242,12 @@ const formData = ref({
   assignedToId: '',
   priority: 'MEDIUM' as 'LOW' | 'MEDIUM' | 'HIGH',
   taskStatus: 'TODO' as 'TODO' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED',
-  dueDate: '',
-  taskProgress: 0,
+  progress: 0,
   taskEstimatedDuration: 0,
 })
 
-// Gestion de l'heure séparément
+// Gestion séparée de la date et de l'heure pour éviter les conflits
+const dueDateInput = ref('') // Pour l'input date (format YYYY-MM-DD)
 const dueTime = ref('')
 const estimatedHours = ref(0)
 const estimatedMinutes = ref(0)
@@ -263,8 +263,7 @@ if (props.activity) {
     priority: (props.activity.priority as 'LOW' | 'MEDIUM' | 'HIGH') || 'MEDIUM',
     taskStatus:
       (props.activity.taskStatus as 'TODO' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED') || 'TODO',
-    dueDate: props.activity.dueDate || '',
-    taskProgress: props.activity.taskProgress || 0,
+    progress: props.activity.progress || 0,
     taskEstimatedDuration: props.activity.taskEstimatedDuration || 0,
   }
 
@@ -272,7 +271,7 @@ if (props.activity) {
   if (props.activity.dueDate) {
     const date = new Date(props.activity.dueDate)
     if (!isNaN(date.getTime())) {
-      formData.value.dueDate = date.toISOString().split('T')[0]
+      dueDateInput.value = date.toISOString().split('T')[0]
       dueTime.value = date.toTimeString().slice(0, 5)
     }
   }
@@ -285,13 +284,23 @@ if (props.activity) {
   }
 }
 
-// Mettre à jour la date d'échéance complète quand date ou heure change
-watch([() => formData.value.dueDate, dueTime], () => {
-  if (formData.value.dueDate) {
+// Calculer la date d'échéance finale (computed pour éviter les conflits)
+const finalDueDate = computed(() => {
+  if (!dueDateInput.value || dueDateInput.value.trim() === '') return ''
+
+  try {
     const dateTime = dueTime.value
-      ? `${formData.value.dueDate}T${dueTime.value}:00`
-      : `${formData.value.dueDate}T23:59:59`
-    formData.value.dueDate = dateTime
+      ? `${dueDateInput.value}T${dueTime.value}:00`
+      : `${dueDateInput.value}T23:59:59`
+
+    // Vérifier que la date est valide
+    const testDate = new Date(dateTime)
+    if (!isNaN(testDate.getTime())) {
+      return dateTime
+    }
+    return ''
+  } catch {
+    return ''
   }
 })
 
@@ -305,11 +314,24 @@ const isFormValid = computed(() => {
   return formData.value.title.trim().length > 0
 })
 
+// Fonction pour déterminer si l'alerte de date d'échéance doit être affichée
+function shouldShowDueDateAlert() {
+  if (!finalDueDate.value) return false
+
+  const dueDate = new Date(finalDueDate.value)
+  const now = new Date()
+  const timeDiff = dueDate.getTime() - now.getTime()
+  const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24))
+
+  // Afficher seulement si : en retard, dû aujourd'hui, ou dû demain
+  return daysDiff <= 1
+}
+
 // Classe CSS pour l'alerte de date d'échéance
 function getDueDateAlertClass() {
-  if (!formData.value.dueDate) return ''
+  if (!finalDueDate.value) return ''
 
-  const dueDate = new Date(formData.value.dueDate)
+  const dueDate = new Date(finalDueDate.value)
   const now = new Date()
   const timeDiff = dueDate.getTime() - now.getTime()
   const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24))
@@ -322,9 +344,9 @@ function getDueDateAlertClass() {
 
 // Message pour la date d'échéance
 function getDueDateMessage() {
-  if (!formData.value.dueDate) return ''
+  if (!finalDueDate.value) return ''
 
-  const dueDate = new Date(formData.value.dueDate)
+  const dueDate = new Date(finalDueDate.value)
   const now = new Date()
   const timeDiff = dueDate.getTime() - now.getTime()
   const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24))
@@ -341,6 +363,11 @@ function handleSubmit() {
 
   const data = { ...formData.value } as Record<string, unknown>
 
+  // Ajouter la date d'échéance si elle est valide
+  if (finalDueDate.value) {
+    data.dueDate = finalDueDate.value
+  }
+
   // Nettoyer les champs vides
   Object.keys(data).forEach((key) => {
     if (data[key] === '' || data[key] === 0) {
@@ -348,6 +375,7 @@ function handleSubmit() {
     }
   })
 
+  console.log('Données du formulaire à envoyer:', data)
   emit('save', data as CreateActivityDto | UpdateActivityDto)
 }
 </script>

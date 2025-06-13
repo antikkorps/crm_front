@@ -60,6 +60,7 @@ export interface TaskUpdateDto {
   dueDate?: string | null
   priority?: TaskPriority
   taskStatus?: TaskStatus
+  progress?: number // 0-100 (pourcentage de completion)
   assignedToId?: string | null
 }
 
@@ -127,10 +128,10 @@ export const ActivityService = {
     const params = new URLSearchParams()
 
     if (filters?.type?.length) {
-      params.append('type', filters.type.join(','))
+      params.append('types', filters.type.join(','))
     }
     if (filters?.assignedToId) {
-      params.append('assignedToId', filters.assignedToId)
+      params.append('assignedTo', filters.assignedToId)
     }
     if (filters?.contactId) {
       params.append('contactId', filters.contactId)
@@ -176,10 +177,10 @@ export const ActivityService = {
 
     // Autres filtres (pas companyId car il sera dans l'URL)
     if (filters?.type?.length) {
-      params.append('type', filters.type.join(','))
+      params.append('types', filters.type.join(','))
     }
     if (filters?.assignedToId) {
-      params.append('assignedToId', filters.assignedToId)
+      params.append('assignedTo', filters.assignedToId)
     }
     if (filters?.contactId) {
       params.append('contactId', filters.contactId)
@@ -190,6 +191,30 @@ export const ActivityService = {
     }
     if (filters?.status?.length) {
       params.append('status', filters.status.join(','))
+    }
+
+    // Ajouter les filtres manquants
+    if (filters?.priority) {
+      params.append('priority', filters.priority)
+    }
+    if (filters?.taskStatus) {
+      params.append('taskStatus', filters.taskStatus)
+    }
+    // Gestion des filtres de progression
+    if (filters?.progressMin !== undefined) {
+      params.append('progressMin', filters.progressMin.toString())
+    }
+    if (filters?.progressMax !== undefined) {
+      params.append('progressMax', filters.progressMax.toString())
+    }
+    if (filters?.callOutcome) {
+      params.append('callOutcome', filters.callOutcome)
+    }
+    if (filters?.emailStatus) {
+      params.append('emailStatus', filters.emailStatus)
+    }
+    if (filters?.createdBy) {
+      params.append('createdBy', filters.createdBy)
     }
 
     const queryString = params.toString()

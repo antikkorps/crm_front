@@ -82,7 +82,11 @@
 <script setup lang="ts">
 import { usePipelineStore } from '@/stores/pipeline'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import VueApexCharts from 'vue3-apexcharts'
 import { DashboardOpportunitySummaryCards as OpportunitySummaryCards } from './index'
+
+// Enregistrer le composant ApexChart
+const apexchart = VueApexCharts
 
 // Define the chart type
 interface ChartInstance {

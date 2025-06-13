@@ -50,7 +50,7 @@ export interface Activity {
 
   // Champs spécifiques aux tâches
   taskEstimatedDuration?: number | null
-  taskProgress?: number | null
+  progress?: number | null // 0-100 (pourcentage de progression)
 
   // Champs spécifiques aux emails
   emailAttachments?: number | null
@@ -79,6 +79,7 @@ export interface TaskActivity extends Activity {
   type: 'TASK'
   priority?: Priority
   taskStatus?: string
+  progress?: number // 0-100 (pourcentage de progression)
 }
 
 export interface EmailActivity extends Activity {
@@ -136,6 +137,7 @@ export interface CreateActivityDto {
   // Champs spécifiques TASK
   priority?: Priority
   taskStatus?: string
+  progress?: number // 0-100 (pourcentage de progression)
 
   // Champs spécifiques EMAIL
   emailSubject?: string
@@ -158,12 +160,13 @@ export interface ActivityFilters {
   assignedToId?: string
   companyId?: string
   contactId?: string
-}
-
-// Interface pour les filtres avec pagination
-export interface ActivityFiltersPaginated extends ActivityFilters {
-  page?: number
-  limit?: number
+  priority?: string
+  taskStatus?: string
+  callOutcome?: string
+  emailStatus?: string
+  createdBy?: string
+  progressMin?: number // Progression minimum (0-100)
+  progressMax?: number // Progression maximum (0-100)
 }
 
 // Interface pour les filtres avec pagination
@@ -182,6 +185,8 @@ export interface ActivityUIFilters {
   callOutcome: string
   emailStatus: string
   period: string
+  progressMin: string // Progression minimum des tâches (ex: "0" pour 0%)
+  progressMax: string // Progression maximum des tâches (ex: "100" pour 100%)
 }
 
 // Types pour les compteurs

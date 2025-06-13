@@ -77,45 +77,103 @@
     </div>
 
     <!-- Statistiques rapides -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-      <div class="stat bg-base-100 rounded-lg border border-base-200 p-4">
-        <div class="stat-figure text-primary">
-          <ActivityIcon type="CALL" size="lg" />
+    <div class="space-y-3">
+      <!-- Indication de filtrage -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-base-content/70">
+            {{ t('activities.filterByType') }}
+          </span>
+          <div v-if="selectedActivityTypes.size > 0" class="flex items-center gap-2">
+            <span class="badge badge-primary badge-sm">
+              {{ selectedActivityTypes.size }} {{ t('activities.typesSelected') }}
+            </span>
+            <button class="btn btn-ghost btn-xs" @click="clearTypeFilters">
+              {{ t('activities.clearTypes') }}
+            </button>
+          </div>
         </div>
-        <div class="stat-title text-xs">{{ t('activities.types.call') }}</div>
-        <div class="stat-value text-2xl">{{ activityCounts.calls || 0 }}</div>
+        <div class="text-xs text-base-content/50">
+          {{ t('activities.clickToFilter') }}
+        </div>
       </div>
 
-      <div class="stat bg-base-100 rounded-lg border border-base-200 p-4">
-        <div class="stat-figure text-secondary">
-          <ActivityIcon type="MEETING" size="lg" />
+      <!-- Cartes de statistiques -->
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div
+          class="stat bg-base-100 rounded-lg border border-base-200 p-4 cursor-pointer transition-all duration-200 hover:shadow-md"
+          :class="{
+            'ring-2 ring-primary bg-primary/5': selectedActivityTypes.has('CALL'),
+            'hover:bg-base-200': !selectedActivityTypes.has('CALL'),
+          }"
+          @click="toggleActivityTypeFilter('CALL')"
+        >
+          <div class="stat-figure text-primary">
+            <ActivityIcon type="CALL" size="lg" />
+          </div>
+          <div class="stat-title text-xs">{{ t('activities.types.call') }}</div>
+          <div class="stat-value text-2xl">{{ activityCounts.calls || 0 }}</div>
         </div>
-        <div class="stat-title text-xs">{{ t('activities.types.meeting') }}</div>
-        <div class="stat-value text-2xl">{{ activityCounts.meetings || 0 }}</div>
-      </div>
 
-      <div class="stat bg-base-100 rounded-lg border border-base-200 p-4">
-        <div class="stat-figure text-accent">
-          <ActivityIcon type="EMAIL" size="lg" />
+        <div
+          class="stat bg-base-100 rounded-lg border border-base-200 p-4 cursor-pointer transition-all duration-200 hover:shadow-md"
+          :class="{
+            'ring-2 ring-secondary bg-secondary/5': selectedActivityTypes.has('MEETING'),
+            'hover:bg-base-200': !selectedActivityTypes.has('MEETING'),
+          }"
+          @click="toggleActivityTypeFilter('MEETING')"
+        >
+          <div class="stat-figure text-secondary">
+            <ActivityIcon type="MEETING" size="lg" />
+          </div>
+          <div class="stat-title text-xs">{{ t('activities.types.meeting') }}</div>
+          <div class="stat-value text-2xl">{{ activityCounts.meetings || 0 }}</div>
         </div>
-        <div class="stat-title text-xs">{{ t('activities.types.email') }}</div>
-        <div class="stat-value text-2xl">{{ activityCounts.emails || 0 }}</div>
-      </div>
 
-      <div class="stat bg-base-100 rounded-lg border border-base-200 p-4">
-        <div class="stat-figure text-info">
-          <ActivityIcon type="TASK" size="lg" />
+        <div
+          class="stat bg-base-100 rounded-lg border border-base-200 p-4 cursor-pointer transition-all duration-200 hover:shadow-md"
+          :class="{
+            'ring-2 ring-accent bg-accent/5': selectedActivityTypes.has('EMAIL'),
+            'hover:bg-base-200': !selectedActivityTypes.has('EMAIL'),
+          }"
+          @click="toggleActivityTypeFilter('EMAIL')"
+        >
+          <div class="stat-figure text-accent">
+            <ActivityIcon type="EMAIL" size="lg" />
+          </div>
+          <div class="stat-title text-xs">{{ t('activities.types.email') }}</div>
+          <div class="stat-value text-2xl">{{ activityCounts.emails || 0 }}</div>
         </div>
-        <div class="stat-title text-xs">{{ t('activities.types.task') }}</div>
-        <div class="stat-value text-2xl">{{ activityCounts.tasks || 0 }}</div>
-      </div>
 
-      <div class="stat bg-base-100 rounded-lg border border-base-200 p-4">
-        <div class="stat-figure text-warning">
-          <ActivityIcon type="NOTE" size="lg" />
+        <div
+          class="stat bg-base-100 rounded-lg border border-base-200 p-4 cursor-pointer transition-all duration-200 hover:shadow-md"
+          :class="{
+            'ring-2 ring-info bg-info/5': selectedActivityTypes.has('TASK'),
+            'hover:bg-base-200': !selectedActivityTypes.has('TASK'),
+          }"
+          @click="toggleActivityTypeFilter('TASK')"
+        >
+          <div class="stat-figure text-info">
+            <ActivityIcon type="TASK" size="lg" />
+          </div>
+          <div class="stat-title text-xs">{{ t('activities.types.task') }}</div>
+          <div class="stat-value text-2xl">{{ activityCounts.tasks || 0 }}</div>
         </div>
-        <div class="stat-title text-xs">{{ t('activities.types.note') }}</div>
-        <div class="stat-value text-2xl">{{ activityCounts.notes || 0 }}</div>
+
+        <div
+          class="stat bg-base-100 rounded-lg border border-base-200 p-4 cursor-pointer transition-all duration-200 hover:shadow-md"
+          :class="{
+            'ring-2 ring-warning bg-warning/5': selectedActivityTypes.has('NOTE'),
+            'hover:bg-base-200': !selectedActivityTypes.has('NOTE'),
+          }"
+          @click="toggleActivityTypeFilter('NOTE')"
+        >
+          <div class="stat-figure text-warning">
+            <ActivityIcon type="NOTE" size="lg" />
+          </div>
+          <div class="stat-title text-xs">{{ t('activities.types.note') }}</div>
+          <div class="stat-value text-2xl">{{ activityCounts.notes || 0 }}</div>
+        </div>
       </div>
     </div>
 
@@ -380,6 +438,9 @@ const selectedActivityType = ref<ActivityType>('TASK')
 const showActivityForm = ref(false)
 const formKey = ref(0)
 
+// Filtres par type d'activité (via les cartes)
+const selectedActivityTypes = ref<Set<ActivityType>>(new Set())
+
 // Tabs et tri
 const activeTab = ref('all')
 const sortBy = ref('createdAt')
@@ -400,6 +461,8 @@ const filters = ref<ActivityUIFilters>({
   callOutcome: '',
   emailStatus: '',
   period: '',
+  progressMin: '',
+  progressMax: '',
 })
 
 // Statistiques
@@ -431,7 +494,7 @@ const visiblePages = computed(() => {
 
 // Watchers
 watch(
-  [filters, currentPage, activeTab, sortBy, sortOrder],
+  [filters, currentPage, activeTab, sortBy, sortOrder, selectedActivityTypes],
   () => {
     loadActivities()
   },
@@ -457,8 +520,9 @@ async function loadActivities() {
     }
 
     // Convertir les filtres UI en filtres service
-    if (filters.value.type) {
-      activityFilters.type = [filters.value.type as ActivityType]
+    if (selectedActivityTypes.value.size > 0) {
+      activityFilters.type = Array.from(selectedActivityTypes.value)
+      console.log('Types sélectionnés:', activityFilters.type)
     }
     if (filters.value.assignedToId) {
       activityFilters.assignedToId = filters.value.assignedToId
@@ -468,6 +532,22 @@ async function loadActivities() {
         start: filters.value.startDate,
         end: filters.value.endDate,
       }
+    }
+    if (filters.value.priority) {
+      activityFilters.priority = filters.value.priority
+    }
+    if (filters.value.callOutcome) {
+      activityFilters.callOutcome = filters.value.callOutcome
+    }
+    if (filters.value.emailStatus) {
+      activityFilters.emailStatus = filters.value.emailStatus
+    }
+    // Gestion des filtres de progression
+    if (filters.value.progressMin) {
+      activityFilters.progressMin = parseInt(filters.value.progressMin)
+    }
+    if (filters.value.progressMax) {
+      activityFilters.progressMax = parseInt(filters.value.progressMax)
     }
 
     // Filtrer par statut selon l'onglet actif
@@ -586,6 +666,10 @@ async function completeActivity(activity: Activity) {
 
 async function saveActivity(data: CreateActivityDto | UpdateActivityDto) {
   try {
+    console.log('Données reçues du formulaire:', data)
+    console.log('Mode édition:', !!editingActivity.value)
+    console.log("Type d'activité sélectionné:", selectedActivityType.value)
+
     if (editingActivity.value) {
       await ActivityService.updateActivity(editingActivity.value.id, data as UpdateActivityDto)
       toast.success(t('activities.updateSuccess'))
@@ -596,7 +680,8 @@ async function saveActivity(data: CreateActivityDto | UpdateActivityDto) {
         companyId: props.companyId,
         contactId: props.contactId,
       }
-      await ActivityService.createActivity(createData)
+      console.log("Données finales envoyées à l'API:", createData)
+      await ActivityService.createSpecializedActivity(createData)
       toast.success(t('activities.createSuccess'))
     }
 
@@ -631,12 +716,34 @@ function resetFilters() {
     callOutcome: '',
     emailStatus: '',
     period: '',
+    progressMin: '',
+    progressMax: '',
   }
+  selectedActivityTypes.value.clear()
+  selectedActivityTypes.value = new Set()
   currentPage.value = 1
 }
 
 // Gérer la mise à jour des filtres depuis le composant ActivityFilters
 function handleFiltersUpdate(newFilters: ActivityUIFilters) {
   Object.assign(filters.value, newFilters)
+}
+
+// Gestion des filtres par type d'activité via les cartes
+function toggleActivityTypeFilter(type: ActivityType) {
+  if (selectedActivityTypes.value.has(type)) {
+    selectedActivityTypes.value.delete(type)
+  } else {
+    selectedActivityTypes.value.add(type)
+  }
+  // Force reactivity update
+  selectedActivityTypes.value = new Set(selectedActivityTypes.value)
+  currentPage.value = 1
+}
+
+function clearTypeFilters() {
+  selectedActivityTypes.value.clear()
+  selectedActivityTypes.value = new Set()
+  currentPage.value = 1
 }
 </script>

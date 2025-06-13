@@ -1,25 +1,6 @@
 <template>
   <div class="bg-base-100 p-4 rounded-lg border border-base-200">
     <div class="flex flex-wrap gap-4">
-      <!-- Type d'activité -->
-      <div class="form-control min-w-40">
-        <label class="label">
-          <span class="label-text font-medium">{{ t('activities.type') }}</span>
-        </label>
-        <select
-          v-model="localFilters.type"
-          class="select select-bordered select-sm"
-          @change="emitFilters"
-        >
-          <option value="">{{ t('common.all') }}</option>
-          <option value="CALL">{{ t('activities.types.call') }}</option>
-          <option value="MEETING">{{ t('activities.types.meeting') }}</option>
-          <option value="EMAIL">{{ t('activities.types.email') }}</option>
-          <option value="TASK">{{ t('activities.types.task') }}</option>
-          <option value="NOTE">{{ t('activities.types.note') }}</option>
-        </select>
-      </div>
-
       <!-- Période -->
       <div class="form-control min-w-40">
         <label class="label">
@@ -84,11 +65,8 @@
         </select>
       </div>
 
-      <!-- Priorité (pour TASK et MEETING) -->
-      <div
-        v-if="localFilters.type && ['TASK', 'MEETING'].includes(localFilters.type)"
-        class="form-control min-w-32"
-      >
+      <!-- Priorité -->
+      <div class="form-control min-w-32">
         <label class="label">
           <span class="label-text font-medium">{{ t('activities.priority') }}</span>
         </label>
@@ -104,8 +82,8 @@
         </select>
       </div>
 
-      <!-- Statut spécialisé selon le type -->
-      <div v-if="localFilters.type === 'CALL'" class="form-control min-w-40">
+      <!-- Résultat d'appel -->
+      <div class="form-control min-w-40">
         <label class="label">
           <span class="label-text font-medium">{{ t('calls.outcome') }}</span>
         </label>
@@ -123,7 +101,8 @@
         </select>
       </div>
 
-      <div v-if="localFilters.type === 'EMAIL'" class="form-control min-w-40">
+      <!-- Statut email -->
+      <div class="form-control min-w-40">
         <label class="label">
           <span class="label-text font-medium">{{ t('emails.status') }}</span>
         </label>
@@ -140,6 +119,36 @@
           <option value="REPLIED">{{ t('emails.status.replied') }}</option>
           <option value="BOUNCED">{{ t('emails.status.bounced') }}</option>
         </select>
+      </div>
+
+      <!-- Progression des tâches -->
+      <div class="form-control min-w-48">
+        <label class="label">
+          <span class="label-text font-medium">{{ t('activities.task.progress') }}</span>
+        </label>
+        <div class="flex gap-2 items-center">
+          <input
+            v-model="localFilters.progressMin"
+            type="number"
+            min="0"
+            max="100"
+            class="input input-bordered input-sm w-20"
+            placeholder="Min"
+            @input="emitFilters"
+          />
+          <span class="text-sm">%</span>
+          <span class="text-sm">à</span>
+          <input
+            v-model="localFilters.progressMax"
+            type="number"
+            min="0"
+            max="100"
+            class="input input-bordered input-sm w-20"
+            placeholder="Max"
+            @input="emitFilters"
+          />
+          <span class="text-sm">%</span>
+        </div>
       </div>
 
       <!-- Actions -->
@@ -252,13 +261,6 @@ const hasActiveFilters = computed(() => {
 const activeFiltersList = computed(() => {
   const filters = []
 
-  if (localFilters.type) {
-    filters.push({
-      key: 'type',
-      label: t(`activities.types.${localFilters.type.toLowerCase()}`),
-    })
-  }
-
   if (localFilters.period && localFilters.period !== 'custom') {
     filters.push({
       key: 'period',
@@ -302,6 +304,26 @@ const activeFiltersList = computed(() => {
       key: 'emailStatus',
       label: t(`emails.status.${localFilters.emailStatus.toLowerCase()}`),
     })
+  }
+
+  // Gestion des filtres de progression
+  if (localFilters.progressMin || localFilters.progressMax) {
+    if (localFilters.progressMin && localFilters.progressMax) {
+      filters.push({
+        key: 'progressRange',
+        label: `Progression: ${localFilters.progressMin}% à ${localFilters.progressMax}%`,
+      })
+    } else if (localFilters.progressMin) {
+      filters.push({
+        key: 'progressMin',
+        label: `Progression: ≥ ${localFilters.progressMin}%`,
+      })
+    } else if (localFilters.progressMax) {
+      filters.push({
+        key: 'progressMax',
+        label: `Progression: ≤ ${localFilters.progressMax}%`,
+      })
+    }
   }
 
   if (localFilters.startDate && localFilters.endDate) {
@@ -350,7 +372,6 @@ function handlePeriodChange() {
 }
 
 function resetFilters() {
-  localFilters.type = ''
   localFilters.assignedToId = ''
   localFilters.startDate = ''
   localFilters.endDate = ''
@@ -358,14 +379,13 @@ function resetFilters() {
   localFilters.callOutcome = ''
   localFilters.emailStatus = ''
   localFilters.period = ''
+  localFilters.progressMin = ''
+  localFilters.progressMax = ''
   emit('reset')
 }
 
 function removeFilter(filterKey: string) {
   switch (filterKey) {
-    case 'type':
-      localFilters.type = ''
-      break
     case 'assignedToId':
       localFilters.assignedToId = ''
       break
@@ -386,6 +406,16 @@ function removeFilter(filterKey: string) {
     case 'dateRange':
       localFilters.startDate = ''
       localFilters.endDate = ''
+      break
+    case 'progressRange':
+      localFilters.progressMin = ''
+      localFilters.progressMax = ''
+      break
+    case 'progressMin':
+      localFilters.progressMin = ''
+      break
+    case 'progressMax':
+      localFilters.progressMax = ''
       break
   }
   emitFilters()

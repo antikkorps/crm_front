@@ -101,7 +101,7 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user'
 import type { Activity, CreateActivityDto, UpdateActivityDto } from '@/types/activity.types'
-import { computed, onMounted, reactive, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CallFields from './CallFields.vue'
 import EmailFields from './EmailFields.vue'
@@ -128,7 +128,7 @@ const emit = defineEmits<{
 const availableUsers = computed(() => userStore.users)
 
 // Données du formulaire
-const formData = reactive<CreateActivityDto>({
+const formData = ref<CreateActivityDto>({
   type: 'CALL',
   title: '',
   content: '',
@@ -140,7 +140,7 @@ const formData = reactive<CreateActivityDto>({
 
 // Validation du formulaire
 const isFormValid = computed(() => {
-  return formData.type && formData.title.trim()
+  return formData.value.type && formData.value.title.trim()
 })
 
 // Initialiser les données si en mode édition
@@ -148,7 +148,7 @@ watch(
   () => props.activity,
   (activity) => {
     if (activity && props.isEditMode) {
-      Object.assign(formData, {
+      Object.assign(formData.value, {
         type: activity.type,
         title: activity.title,
         content: activity.content || '',
@@ -183,30 +183,30 @@ function handleSubmit() {
   if (!isFormValid.value) return
 
   // Nettoyer les données selon le type
-  const cleanedData = { ...formData }
+  const cleanedData = { ...formData.value }
 
   // Retirer les propriétés non pertinentes selon le type
-  if (formData.type !== 'CALL') {
+  if (formData.value.type !== 'CALL') {
     delete cleanedData.callDirection
     delete cleanedData.duration
     delete cleanedData.callOutcome
   }
 
-  if (formData.type !== 'MEETING') {
+  if (formData.value.type !== 'MEETING') {
     delete cleanedData.meetingType
     delete cleanedData.location
   }
 
-  if (formData.type !== 'EMAIL') {
+  if (formData.value.type !== 'EMAIL') {
     delete cleanedData.emailSubject
     delete cleanedData.emailStatus
   }
 
-  if (formData.type !== 'TASK') {
+  if (formData.value.type !== 'TASK') {
     delete cleanedData.dueDate
   }
 
-  if (!['TASK', 'MEETING'].includes(formData.type)) {
+  if (!['TASK', 'MEETING'].includes(formData.value.type)) {
     delete cleanedData.priority
   }
 
