@@ -34,9 +34,9 @@
             >
               <td>
                 <div class="max-w-xs">
-                  <p class="text-sm font-medium truncate">{{ note.content }}</p>
+                  <p class="text-sm font-medium truncate">{{ note.title || note.content }}</p>
                   <p
-                    v-if="showPreview && note.content.length > 50"
+                    v-if="showPreview && note.content && note.content.length > 50"
                     class="text-xs text-gray-500 mt-1"
                   >
                     {{ note.content.substring(0, 100) }}{{ note.content.length > 100 ? '...' : '' }}
@@ -119,7 +119,7 @@
           <div class="card-body p-4">
             <div class="flex items-start justify-between mb-2">
               <div class="flex-1">
-                <p class="text-sm font-medium mb-2">{{ note.content }}</p>
+                <p class="text-sm font-medium mb-2">{{ note.title || note.content }}</p>
                 <div class="flex items-center gap-2 text-xs text-gray-500 mb-1">
                   <Iconify icon="mdi:calendar" class="w-3 h-3" />
                   <span>{{ formatDate(note.createdAt) }}</span>
@@ -167,12 +167,12 @@
 </template>
 
 <script setup lang="ts">
-import type { CompanyNote } from '@/types/company.types'
+import type { Activity } from '@/types/activity.types'
 import { formatDate } from '@/utils/date'
 import { useI18n } from 'vue-i18n'
 
 interface Props {
-  notes: CompanyNote[]
+  notes: Activity[]
   title?: string
   loading?: boolean
   showActions?: boolean
@@ -183,10 +183,10 @@ interface Props {
 
 interface Emits {
   (e: 'add'): void
-  (e: 'view', note: CompanyNote): void
-  (e: 'edit', note: CompanyNote): void
-  (e: 'delete', note: CompanyNote): void
-  (e: 'note-click', note: CompanyNote): void
+  (e: 'view', note: Activity): void
+  (e: 'edit', note: Activity): void
+  (e: 'delete', note: Activity): void
+  (e: 'note-click', note: Activity): void
 }
 
 withDefaults(defineProps<Props>(), {
@@ -200,7 +200,7 @@ const emit = defineEmits<Emits>()
 
 const { t } = useI18n()
 
-function handleNoteClick(note: CompanyNote) {
+function handleNoteClick(note: Activity) {
   if (defineProps<Props>().clickable) {
     emit('note-click', note)
   }

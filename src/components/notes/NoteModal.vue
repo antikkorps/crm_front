@@ -8,6 +8,7 @@
       <NoteForm
         :note="note"
         :company-id="companyId"
+        :contact-id="contactId"
         :is-edit-mode="isEditMode"
         :is-submitting="isSubmitting"
         @submit="handleSubmit"
@@ -22,7 +23,8 @@
 </template>
 
 <script setup lang="ts">
-import type { CompanyNote, CompanyNoteCreateDto } from '@/types/company.types'
+import type { NoteCreateDto, NoteUpdateDto } from '@/services/note.service'
+import type { Activity } from '@/types/activity.types'
 import { useI18n } from 'vue-i18n'
 import NoteForm from './NoteForm.vue'
 
@@ -30,18 +32,19 @@ const { t } = useI18n()
 
 defineProps<{
   isOpen: boolean
-  note?: CompanyNote | null
-  companyId: string
+  note?: Activity | null
+  companyId?: string
+  contactId?: string
   isEditMode?: boolean
   isSubmitting?: boolean
 }>()
 
 const emit = defineEmits<{
-  submit: [data: CompanyNoteCreateDto | (CompanyNoteCreateDto & { id: string })]
+  submit: [data: NoteCreateDto | (NoteUpdateDto & { id: string })]
   close: []
 }>()
 
-function handleSubmit(data: CompanyNoteCreateDto | (CompanyNoteCreateDto & { id: string })) {
+function handleSubmit(data: NoteCreateDto | (NoteUpdateDto & { id: string })) {
   emit('submit', data)
 }
 

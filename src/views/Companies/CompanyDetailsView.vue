@@ -271,50 +271,16 @@
             @delete="handleDeleteNote"
             @note-click="handleNoteClick"
           />
-        </div>
 
+          <!-- Activities Section -->
+          <div class="rounded-lg shadow-md p-6 mb-6 w-full">
+            <ActivitiesSection :company-id="companyId" />
+          </div>
+        </div>
         <!-- Sidebar -->
         <div class="col-span-1 w-full">
-          <!-- Activities Section (Placeholder) -->
-          <div class="rounded-lg shadow-md p-6 mb-6 w-full">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-lg font-bold">{{ t('activities.recentActivities') }}</h2>
-              <button class="btn btn-sm btn-outline">
-                <Iconify icon="mdi:plus" class="w-4 h-4" />
-                {{ t('activities.add') }}
-              </button>
-            </div>
-
-            <div v-if="loadingActivities" class="flex justify-center py-4">
-              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-            </div>
-
-            <div v-else-if="companyActivities.length" class="divide-y">
-              <div v-for="activity in companyActivities" :key="activity.id" class="py-3">
-                <div class="flex justify-between items-start">
-                  <div>
-                    <div class="font-medium">{{ activity.title }}</div>
-                    <div class="text-sm text-gray-500">{{ formatDate(activity.createdAt) }}</div>
-                    <p v-if="activity.content" class="text-sm mt-1">{{ activity.content }}</p>
-                  </div>
-                  <span class="badge badge-primary badge-outline text-xs">
-                    {{ t(`activities.types.${activity.type.toLowerCase()}`, activity.type) }}
-                  </span>
-                </div>
-                <div v-if="activity.createdBy" class="text-xs text-gray-500 mt-1">
-                  {{ t('common.by') }} {{ activity.createdBy.firstName }}
-                  {{ activity.createdBy.lastName }}
-                </div>
-              </div>
-            </div>
-
-            <div v-else class="text-center py-8 text-gray-500">
-              <p>{{ t('activities.noActivities') }}</p>
-            </div>
-          </div>
-
           <!-- Quotes Section (Placeholder) -->
-          <div class="rounded-lg shadow-md p-6 w-full">
+          <div class="rounded-lg shadow-md p-6 mb-6 w-full">
             <div class="flex justify-between items-center mb-4">
               <h2 class="text-lg font-bold">{{ t('quotes.title') }}</h2>
               <button class="btn btn-sm btn-outline">
@@ -324,6 +290,25 @@
             </div>
             <div class="text-center py-8 text-gray-500">
               <p>{{ t('quotes.noQuotes') }}</p>
+            </div>
+          </div>
+
+          <!-- Quick Stats ou autre contenu sidebar -->
+          <div class="rounded-lg shadow-md p-6 w-full">
+            <h2 class="text-lg font-bold mb-4">{{ t('companies.quickStats') }}</h2>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">{{ t('contacts.title') }}</span>
+                <span class="font-medium">{{ contacts.length }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">{{ t('tasks.title') }}</span>
+                <span class="font-medium">{{ companyTasks.length }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">{{ t('notes.title') }}</span>
+                <span class="font-medium">{{ notes.length }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -409,12 +394,14 @@
 </template>
 
 <script setup lang="ts">
+import { ActivitiesSection } from '@/components/activities'
 import { SpecialityBadgeWithTooltip } from '@/components/common'
 import { CompanyForm } from '@/components/companies'
 import { ContactModal, ContactsSection } from '@/components/contacts'
 import { NoteModal, NotesSection } from '@/components/notes'
 import { TaskDetailsDialog, TasksSection } from '@/components/tasks'
 import type { TaskCreateDto, TaskUpdateDto } from '@/services/activity.service'
+import type { NoteCreateDto, NoteUpdateDto } from '@/services/note.service'
 import { useActivityStore } from '@/stores/activity'
 import { useCompanyStore } from '@/stores/company'
 import { useStatusStore } from '@/stores/status'
@@ -424,14 +411,11 @@ import type { Activity } from '@/types/activity.types'
 import type {
   Company,
   CompanyContact,
-  CompanyNote,
-  CompanyNoteCreateDto,
   CompanyUpdateDto,
   ContactCreateDto,
   ContactUpdateDto,
   Speciality,
 } from '@/types/company.types'
-import { formatDate } from '@/utils/date'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -449,15 +433,13 @@ const { t } = useI18n()
 const company = ref<Company | null>(null)
 const companyId = ref<string>(route.params.id as string)
 const contacts = ref<CompanyContact[]>([])
-const notes = ref<CompanyNote[]>([])
+const notes = ref<Activity[]>([])
 
 // Component refs
 const tasksSectionRef = ref<InstanceType<typeof TasksSection> | null>(null)
 
 // Activities
-const companyActivities = ref<Activity[]>([])
 const companyTasks = ref<Activity[]>([])
-const loadingActivities = ref(false)
 const loadingTasks = ref(false)
 const loadingContacts = ref(false)
 const loadingNotes = ref(false)
@@ -478,7 +460,7 @@ const isSubmittingContact = ref(false)
 
 // Note modal states
 const showNoteModal = ref(false)
-const selectedNote = ref<CompanyNote | null>(null)
+const selectedNote = ref<Activity | null>(null)
 const isEditingNote = ref(false)
 const isSubmittingNote = ref(false)
 
@@ -497,22 +479,6 @@ async function fetchSpecialities() {
     toastStore.error(
       t('common.failedToFetchSpecialities', 'Erreur lors du chargement des spécialités'),
     )
-  }
-}
-
-// Fetch Recent Activities
-async function fetchCompanyActivities() {
-  loadingActivities.value = true
-  try {
-    await activityStore.fetchRecentActivities()
-    companyActivities.value = activityStore.activities.filter(
-      (activity) => activity.companyId === companyId.value,
-    )
-  } catch (err) {
-    console.error('Failed to fetch company activities', err)
-    toastStore.error(t('activities.failedToFetch', 'Erreur lors du chargement des activités'))
-  } finally {
-    loadingActivities.value = false
   }
 }
 
@@ -547,7 +513,6 @@ async function fetchContacts() {
   }
 }
 
-// Fetch Notes
 async function fetchNotes() {
   loadingNotes.value = true
   try {
@@ -577,7 +542,6 @@ onMounted(async () => {
       fetchSpecialities(),
       fetchContacts(),
       fetchNotes(),
-      fetchCompanyActivities(),
       fetchCompanyTasks(),
     ])
 
@@ -844,18 +808,18 @@ function handleAddNote() {
   showNoteModal.value = true
 }
 
-function handleEditNote(note: CompanyNote) {
+function handleEditNote(note: Activity) {
   selectedNote.value = note
   isEditingNote.value = true
   showNoteModal.value = true
 }
 
-function handleViewNote(note: CompanyNote) {
+function handleViewNote(note: Activity) {
   // Pour l'instant, on ouvre en mode édition. On peut changer ça plus tard pour un mode lecture seule
   handleEditNote(note)
 }
 
-async function handleDeleteNote(note: CompanyNote) {
+async function handleDeleteNote(note: Activity) {
   if (!confirm(t('notes.confirmDelete', 'Êtes-vous sûr de vouloir supprimer cette note ?'))) {
     return
   }
@@ -875,20 +839,22 @@ async function handleDeleteNote(note: CompanyNote) {
   }
 }
 
-function handleNoteClick(note: CompanyNote) {
+function handleNoteClick(note: Activity) {
   console.log('View note details:', note)
   // À implémenter - navigation vers les détails de la note ou affichage dans un modal
 }
 
-async function handleNoteSubmit(
-  data: CompanyNoteCreateDto | (CompanyNoteCreateDto & { id: string }),
-) {
+async function handleNoteSubmit(data: NoteCreateDto | (NoteUpdateDto & { id: string })) {
   isSubmittingNote.value = true
 
   try {
     if (isEditingNote.value && 'id' in data) {
       // Mode édition
-      const result = await companyStore.updateCompanyNote(data.id, data)
+      const updateData = {
+        ...(data.title !== undefined && { title: data.title }),
+        ...(data.content !== undefined && { content: data.content }),
+      }
+      const result = await companyStore.updateCompanyNote(data.id, updateData)
       if (result) {
         toastStore.success(t('notes.updatedSuccessfully', 'Note mise à jour avec succès'))
         showNoteModal.value = false
@@ -898,8 +864,19 @@ async function handleNoteSubmit(
         toastStore.error(t('notes.failedToUpdate', 'Échec de la mise à jour de la note'))
       }
     } else {
-      // Mode création
-      const result = await companyStore.addCompanyNote(data as CompanyNoteCreateDto)
+      // Mode création - on s'assure que les champs requis sont présents
+      const createData = data as NoteCreateDto
+      if (!createData.title || !createData.content) {
+        toastStore.error(t('notes.titleAndContentRequired', 'Le titre et le contenu sont requis'))
+        return
+      }
+
+      const noteData = {
+        title: createData.title,
+        content: createData.content,
+        companyId: companyId.value,
+      }
+      const result = await companyStore.addCompanyNote(noteData)
       if (result) {
         toastStore.success(t('notes.createdSuccessfully', 'Note créée avec succès'))
         showNoteModal.value = false

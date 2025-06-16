@@ -1,12 +1,33 @@
 <template>
   <form @submit.prevent="handleSubmit" class="space-y-6">
-    <!-- Section: Contenu de la note -->
+    <!-- Section: Titre de la note -->
     <div class="card bg-base-100 border border-base-300">
       <div class="card-body p-6">
         <h3 class="card-title text-lg mb-4">
           <Iconify icon="mdi:note-text" class="w-5 h-5" />
-          {{ t('notes.content') }}
+          {{ t('notes.basicInfo') }}
         </h3>
+
+        <!-- Titre de la note -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-medium">
+              {{ t('notes.title') }} <span class="text-error">*</span>
+            </span>
+          </label>
+          <input
+            v-model="formData.title"
+            type="text"
+            class="input input-bordered w-full"
+            :class="{ 'input-error': errors.title }"
+            :placeholder="t('notes.titlePlaceholder', 'Titre de la note...')"
+            required
+            @blur="validateField('title')"
+          />
+          <label v-if="errors.title" class="label">
+            <span class="label-text-alt text-error">{{ errors.title }}</span>
+          </label>
+        </div>
 
         <!-- Contenu de la note -->
         <div class="form-control">
@@ -56,32 +77,37 @@
 </template>
 
 <script setup lang="ts">
-import type { CompanyNote, CompanyNoteCreateDto } from '@/types/company.types'
+import type { NoteCreateDto, NoteUpdateDto } from '@/services/note.service'
+import type { Activity } from '@/types/activity.types'
 import { computed, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
 const props = defineProps<{
-  note?: CompanyNote | null
-  companyId: string
+  note?: Activity | null
+  companyId?: string
+  contactId?: string
   isEditMode?: boolean
   isSubmitting?: boolean
 }>()
 
 const emit = defineEmits<{
-  submit: [data: CompanyNoteCreateDto | (CompanyNoteCreateDto & { id: string })]
+  submit: [data: NoteCreateDto | (NoteUpdateDto & { id: string })]
   cancel: []
 }>()
 
 // Form data
-const formData = reactive<CompanyNoteCreateDto>({
+const formData = reactive<NoteCreateDto>({
+  title: '',
   content: '',
   companyId: props.companyId,
+  contactId: props.contactId,
 })
 
 // Form validation errors
 const errors = reactive({
+  title: '',
   content: '',
 })
 
@@ -90,8 +116,10 @@ watch(
   () => props.note,
   (newNote) => {
     if (newNote && props.isEditMode) {
-      formData.content = newNote.content
-      formData.companyId = newNote.companyId
+      formData.title = newNote.title || ''
+      formData.content = newNote.content || ''
+      formData.companyId = newNote.companyId || undefined
+      formData.contactId = newNote.contactId || undefined
     }
   },
   { immediate: true },
@@ -99,7 +127,11 @@ watch(
 
 // Form validation
 const isFormValid = computed(() => {
-  return formData.content.trim() !== '' && Object.values(errors).every((error) => error === '')
+  return (
+    formData.title.trim() !== '' &&
+    formData.content.trim() !== '' &&
+    Object.values(errors).every((error) => error === '')
+  )
 })
 
 // Validate individual fields
@@ -107,6 +139,20 @@ function validateField(field: keyof typeof errors) {
   errors[field] = ''
 
   switch (field) {
+    case 'title':
+      if (!formData.title.trim()) {
+        errors.title = t('validation.required', 'Ce champ est requis')
+      } else if (formData.title.trim().length < 3) {
+        errors.title = t('validation.minLength', { min: 3 }, 'Minimum 3 caractères requis')
+      } else if (formData.title.trim().length > 200) {
+        errors.title = t(
+          'validation.maxLength',
+          { max: 200 },
+          'Maximum 200 caractères autorisés',
+        )
+      }
+      break
+
     case 'content':
       if (!formData.content.trim()) {
         errors.content = t('validation.required', 'Ce champ est requis')
@@ -125,6 +171,7 @@ function validateField(field: keyof typeof errors) {
 
 // Validate all fields
 function validateForm(): boolean {
+  validateField('title')
   validateField('content')
   return Object.values(errors).every((error) => error === '')
 }
@@ -137,18 +184,22 @@ function handleSubmit() {
 
   if (props.isEditMode && props.note) {
     // Update mode
-    const updateData: CompanyNoteCreateDto & { id: string } = {
+    const updateData: NoteUpdateDto & { id: string } = {
       id: props.note.id,
+      title: formData.title.trim(),
       content: formData.content.trim(),
       companyId: props.companyId,
+      contactId: props.contactId,
     }
 
     emit('submit', updateData)
   } else {
     // Create mode
-    const createData: CompanyNoteCreateDto = {
+    const createData: NoteCreateDto = {
+      title: formData.title.trim(),
       content: formData.content.trim(),
       companyId: props.companyId,
+      contactId: props.contactId,
     }
 
     emit('submit', createData)
@@ -157,8 +208,10 @@ function handleSubmit() {
 
 // Reset form data
 function resetForm() {
+  formData.title = ''
   formData.content = ''
   formData.companyId = props.companyId
+  formData.contactId = props.contactId
 
   // Clear errors
   Object.keys(errors).forEach((key) => {
@@ -167,6 +220,11 @@ function resetForm() {
 }
 
 // Watch for field changes to validate on blur
+watch(
+  () => formData.title,
+  () => validateField('title'),
+)
+
 watch(
   () => formData.content,
   () => validateField('content'),
