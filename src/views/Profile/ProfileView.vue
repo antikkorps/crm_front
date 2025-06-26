@@ -198,29 +198,20 @@
         <div class="card bg-base-100 shadow-md">
           <div class="card-body text-center">
             <div class="avatar mb-4 flex justify-center">
-              <div
-                class="w-24 h-24 rounded-full bg-primary text-primary-content flex items-center justify-center text-2xl font-bold overflow-hidden"
-              >
-                <img
-                  v-if="userStore.currentUser?.avatarUrl"
-                  :src="userStore.currentUser.avatarUrl"
-                  alt="Avatar"
-                  class="w-full h-full object-cover"
-                />
-                <span v-else>
-                  {{ userInitials }}
-                </span>
-              </div>
+              <UserAvatar
+                :user="userStore.currentUser"
+                size="3xl"
+                ring
+                ring-color="primary"
+                :clickable="false"
+              />
             </div>
             <h3 class="font-semibold text-lg">
               {{ userStore.currentUser?.firstName }} {{ userStore.currentUser?.lastName }}
             </h3>
             <p class="text-sm text-gray-600">{{ userStore.currentUser?.email }}</p>
             <div class="mt-4">
-              <button class="btn btn-outline btn-sm">
-                <Iconify icon="mdi:camera" class="w-4 h-4 mr-1" />
-                {{ t('profile.changePhoto') }}
-              </button>
+              <AvatarSelector :user="userStore.currentUser" @update="handleAvatarUpdate" />
             </div>
           </div>
         </div>
@@ -294,12 +285,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useUserStore } from '@/stores/user'
-import { useToastStore } from '@/stores/toast'
-import { AuthService } from '@/services/auth.service'
+import AvatarSelector from '@/components/common/AvatarSelector.vue'
 import PageHeader from '@/components/common/PageHeader.vue'
+import UserAvatar from '@/components/common/UserAvatar.vue'
+import { AuthService } from '@/services/auth.service'
+import { useToastStore } from '@/stores/toast'
+import { useUserStore } from '@/stores/user'
+import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const userStore = useUserStore()
@@ -322,15 +315,6 @@ const passwordForm = ref({
   currentPassword: '',
   newPassword: '',
   confirmPassword: '',
-})
-
-// Computed properties
-const userInitials = computed(() => {
-  const user = userStore.currentUser
-  if (user?.firstName && user?.lastName) {
-    return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase()
-  }
-  return user?.email?.charAt(0).toUpperCase() || 'U'
 })
 
 // Fonctions
@@ -410,6 +394,15 @@ const changePassword = async () => {
   }
 }
 
+const handleAvatarUpdate = (avatarUrl: string) => {
+  // Mettre à jour l'utilisateur dans le store avec la nouvelle URL d'avatar
+  if (userStore.currentUser) {
+    userStore.updateCurrentUser({
+      avatarUrl: avatarUrl,
+    })
+  }
+}
+
 const resetForm = () => {
   loadUserData()
 }
@@ -451,7 +444,8 @@ const getTenantName = () => {
     const name = user.tenant.name
     return name.replace(/\s+Tenant$/, '')
   } else if (typeof user?.tenant === 'string') {
-    return user.tenant.replace(/\s+Tenant$/, '')
+    const tenantName = user.tenant as string
+    return tenantName.replace(/\s+Tenant$/, '')
   }
   return 'Aucun'
 }

@@ -295,7 +295,13 @@
     "passwordsDoNotMatch": "Passwords do not match",
     "currentPasswordIncorrect": "Current password is incorrect",
     "passwordValidationError": "New password does not meet security requirements",
-    "passwordUpdateMethodError": "Password update method error"
+    "passwordUpdateMethodError": "Password update method error",
+    "avatarUpdatedSuccess": "Avatar updated successfully",
+    "avatarUpdateError": "Error updating avatar",
+    "avatarBackgroundColor": "Background color",
+    "avatarScale": "Zoom",
+    "avatarRotation": "Rotation",
+    "selectAvatarPreview": "Select an avatar"
   },
   "activities": {
     "title": "Activities",

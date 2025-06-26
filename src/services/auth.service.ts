@@ -1,5 +1,12 @@
 import router from '@/router'
-import type { AuthResponse, LoginRequest, RegisterRequest, User } from '../types/auth.types'
+import type {
+  AuthResponse,
+  LoginRequest,
+  RegisterRequest,
+  UpdatePasswordRequest,
+  UpdateProfileRequest,
+  User,
+} from '../types/auth.types'
 import { getToken, removeToken, setToken } from '../utils/token'
 import { apiRequest } from './api.service'
 
@@ -48,24 +55,14 @@ export const AuthService = {
     }
   },
 
-  async updatePassword(passwordData: {
-    currentPassword: string
-    newPassword: string
-  }): Promise<void> {
+  async updatePassword(passwordData: UpdatePasswordRequest): Promise<void> {
     await apiRequest<void>('/auth/update-password', {
       method: 'PUT',
       body: passwordData,
     })
   },
 
-  async updateProfile(profileData: {
-    firstName?: string
-    lastName?: string
-    email?: string
-    phone?: string
-    jobTitle?: string
-    bio?: string
-  }): Promise<Partial<User>> {
+  async updateProfile(profileData: UpdateProfileRequest): Promise<Partial<User>> {
     return await apiRequest<Partial<User>>('/auth/update-profile', {
       method: 'PUT',
       body: profileData,

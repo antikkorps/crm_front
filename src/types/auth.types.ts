@@ -20,6 +20,15 @@ export interface User {
   lastName: string
   tenantId: string
   avatarUrl?: string
+  avatarStyle?: string
+  avatarSeed?: string
+  avatarBackgroundColor?: string
+  avatarScale?: number
+  avatarRotation?: number
+  phone?: string
+  jobTitle?: string
+  bio?: string
+  lastLoginAt?: string
   isActive?: boolean
   isSuperAdmin?: boolean
   createdAt?: string
@@ -54,4 +63,24 @@ export interface User {
 export interface AuthResponse {
   user: User
   token: string
+}
+
+export interface UpdateProfileRequest {
+  firstName?: string
+  lastName?: string
+  email?: string
+  phone?: string
+  jobTitle?: string
+  bio?: string
+  avatarUrl?: string
+  avatarStyle?: string
+  avatarSeed?: string
+  avatarBackgroundColor?: string
+  avatarScale?: number
+  avatarRotation?: number
+}
+
+export interface UpdatePasswordRequest {
+  currentPassword: string
+  newPassword: string
 }

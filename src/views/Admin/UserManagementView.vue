@@ -77,19 +77,7 @@
           <tr v-for="user in users" :key="user.id" class="hover:bg-base-200">
             <td>
               <div class="flex items-center gap-3">
-                <div class="avatar">
-                  <div
-                    class="w-10 h-10 rounded-full ring ring-primary ring-offset-2 ring-offset-base-100"
-                  >
-                    <img v-if="user.avatarUrl" :src="user.avatarUrl" alt="Avatar" />
-                    <div
-                      v-else
-                      class="bg-primary text-primary-content w-full h-full flex items-center justify-center"
-                    >
-                      {{ getUserInitials(user) }}
-                    </div>
-                  </div>
-                </div>
+                <UserAvatar :user="user" size="sm" ring ring-color="primary" :clickable="false" />
                 <div>
                   <div class="font-medium">{{ user.firstName }} {{ user.lastName }}</div>
                 </div>
@@ -110,7 +98,7 @@
                 }}
               </span>
             </td>
-            <td>{{ formatDate(user.createdAt) }}</td>
+            <td>{{ formatDate(user.createdAt || '') }}</td>
             <td>
               <div class="flex gap-2">
                 <button class="btn btn-sm btn-ghost" @click="editUser(user)">
@@ -168,12 +156,13 @@
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from '@/stores/user'
+import BackToDashboard from '@/components/common/BackToDashboard.vue'
+import UserAvatar from '@/components/common/UserAvatar.vue'
 import { useToastStore } from '@/stores/toast'
+import { useUserStore } from '@/stores/user'
 import type { User } from '@/types/auth.types'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import BackToDashboard from '@/components/common/BackToDashboard.vue'
 
 const { t } = useI18n()
 const userStore = useUserStore()
@@ -292,14 +281,9 @@ function confirmDelete(user: User) {
   }
 }
 
-function formatDate(date: string | Date): string {
+function formatDate(date: string | Date | undefined): string {
+  if (!date) return '-'
   return new Date(date).toLocaleDateString('fr-FR')
-}
-
-function getUserInitials(user: User): string {
-  const firstInitial = user.firstName ? user.firstName.charAt(0).toUpperCase() : ''
-  const lastInitial = user.lastName ? user.lastName.charAt(0).toUpperCase() : ''
-  return firstInitial + lastInitial || '??'
 }
 </script>
 

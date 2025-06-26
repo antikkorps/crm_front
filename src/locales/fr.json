@@ -254,6 +254,9 @@
     "confirmPasswordPlaceholder": "Confirmez votre nouveau mot de passe",
     "updatePassword": "Mettre à jour le mot de passe",
     "changePhoto": "Changer la photo",
+    "changeAvatar": "Changer l'avatar",
+    "selectAvatar": "Sélectionner un avatar",
+    "avatarPreview": "Aperçu de l'avatar",
     "accountInfo": "Informations du compte",
     "memberSince": "Membre depuis",
     "lastLogin": "Dernière connexion",
@@ -274,7 +277,26 @@
     "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
     "currentPasswordIncorrect": "Le mot de passe actuel est incorrect",
     "passwordValidationError": "Le nouveau mot de passe ne respecte pas les critères de sécurité",
-    "passwordUpdateMethodError": "Erreur de méthode pour la mise à jour du mot de passe"
+    "passwordUpdateMethodError": "Erreur de méthode pour la mise à jour du mot de passe",
+    "avatarUpdatedSuccess": "Avatar mis à jour avec succès",
+    "avatarUpdateError": "Erreur lors de la mise à jour de l'avatar",
+    "avatarBackgroundColor": "Couleur de fond",
+    "avatarScale": "Zoom",
+    "avatarRotation": "Rotation",
+    "selectAvatarPreview": "Sélectionnez un avatar",
+    "avatarStyle": {
+      "initials": "Initiales",
+      "avataaars": "Avataaars",
+      "bottts": "Bottts",
+      "identicon": "Identicon",
+      "lorelei": "Lorelei",
+      "micah": "Micah",
+      "miniavs": "Miniavs",
+      "notoEmoji": "Emoji",
+      "personas": "Personas",
+      "shapes": "Formes",
+      "thumbs": "Pouces"
+    }
   },
   "activities": {
     "title": "Activités",
