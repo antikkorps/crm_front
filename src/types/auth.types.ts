@@ -20,15 +20,34 @@ export interface User {
   lastName: string
   tenantId: string
   avatarUrl?: string
+  isActive?: boolean
+  isSuperAdmin?: boolean
+  createdAt?: string
+  updatedAt?: string
   role?: {
     id: string
     name: string
     permissions: string[] | Record<string, boolean>
   }
+  Role?: {
+    id: string
+    name: string
+    permissions: Record<string, Record<string, boolean>>
+    tenantId: string
+    createdAt: string
+    updatedAt: string
+  }
   tenant?: {
     id: string
     name: string
     domain: string
+  }
+  Tenant?: {
+    id: string
+    name: string
+    domain: string
+    createdAt: string
+    updatedAt: string
   }
 }
 

@@ -5,6 +5,7 @@ import CompanyDetailsView from '../views/Companies/CompanyDetailsView.vue'
 import Dashboard from '../views/Dashboard/DashboardIndexView.vue'
 import Home from '../views/HomeView.vue'
 import Login from '../views/LoginView.vue'
+import { mainGuard } from './guards'
 
 const routes = [
   {
@@ -52,10 +53,16 @@ const routes = [
     meta: { layout: 'dashboard', requiresAuth: true },
   },
   {
-    path: '/settings/status',
-    name: 'status-list',
-    component: () => import('../views/Settings/StatusListView.vue'),
+    path: '/profile',
+    name: 'profile',
+    component: () => import('../views/Profile/ProfileView.vue'),
     meta: { layout: 'dashboard', requiresAuth: true },
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: () => import('../views/Admin/AdminIndexView.vue'),
+    meta: { layout: 'dashboard', requiresAuth: true, requiresAdmin: true },
   },
   // Pour le futur
   {
@@ -74,5 +81,8 @@ const router = createRouter({
     return { top: 0 }
   },
 })
+
+// Appliquer le guard principal
+router.beforeEach(mainGuard)
 
 export default router

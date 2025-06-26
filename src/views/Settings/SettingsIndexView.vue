@@ -1,6 +1,6 @@
 <template>
   <div class="params-page container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-6">Paramètres</h1>
+    <PageHeader :title="t('settings.title')" :back-to="'/dashboard'" />
 
     <!-- Grille de cartes de paramètres -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
@@ -8,38 +8,17 @@
       <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
         <div class="card-body">
           <div class="flex justify-between items-center mb-2">
-            <h2 class="card-title">Profil utilisateur</h2>
+            <h2 class="card-title">{{ t('settings.userProfile') }}</h2>
             <div class="badge badge-primary p-3">
               <Iconify icon="mdi:account" class="w-5 h-5" />
             </div>
           </div>
           <p class="text-sm mb-4">
-            Gérez vos informations personnelles, mot de passe et préférences de compte.
+            {{ t('settings.userProfileDescription') }}
           </p>
           <div class="card-actions justify-end">
             <button class="btn btn-primary btn-sm" @click="navigateTo('profile')">
-              Gérer
-              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Carte statuts d'entreprise -->
-      <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
-        <div class="card-body">
-          <div class="flex justify-between items-center mb-2">
-            <h2 class="card-title">Statuts d'entreprise</h2>
-            <div class="badge badge-primary p-3">
-              <Iconify icon="mdi:tag-multiple" class="w-5 h-5" />
-            </div>
-          </div>
-          <p class="text-sm mb-4">
-            Personnalisez les statuts pour le suivi de vos entreprises et prospects.
-          </p>
-          <div class="card-actions justify-end">
-            <button class="btn btn-primary btn-sm" @click="navigateTo('statuses')">
-              Gérer
+              {{ t('common.manage') }}
               <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
             </button>
           </div>
@@ -50,59 +29,17 @@
       <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
         <div class="card-body">
           <div class="flex justify-between items-center mb-2">
-            <h2 class="card-title">Segments</h2>
+            <h2 class="card-title">{{ t('settings.segments') }}</h2>
             <div class="badge badge-primary p-3">
               <Iconify icon="mdi:filter-variant" class="w-5 h-5" />
             </div>
           </div>
           <p class="text-sm mb-4">
-            Créez des segments pour cibler des groupes spécifiques de clients.
+            {{ t('settings.segmentsDescription') }}
           </p>
           <div class="card-actions justify-end">
             <button class="btn btn-primary btn-sm" @click="navigateTo('segments')">
-              Gérer
-              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Carte plugins -->
-      <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
-        <div class="card-body">
-          <div class="flex justify-between items-center mb-2">
-            <h2 class="card-title">Extensions</h2>
-            <div class="badge badge-primary p-3">
-              <Iconify icon="mdi:puzzle" class="w-5 h-5" />
-            </div>
-          </div>
-          <p class="text-sm mb-4">
-            Gérez vos extensions et découvrez de nouvelles fonctionnalités.
-          </p>
-          <div class="flex justify-between items-center">
-            <span class="badge badge-outline badge-sm">Bientôt disponible</span>
-            <button class="btn btn-primary btn-sm" disabled>
-              Gérer
-              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Carte intégrations -->
-      <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
-        <div class="card-body">
-          <div class="flex justify-between items-center mb-2">
-            <h2 class="card-title">Intégrations</h2>
-            <div class="badge badge-primary p-3">
-              <Iconify icon="mdi:connection" class="w-5 h-5" />
-            </div>
-          </div>
-          <p class="text-sm mb-4">Connectez votre CRM à d'autres outils et services.</p>
-          <div class="flex justify-between items-center">
-            <span class="badge badge-outline badge-sm">Bientôt disponible</span>
-            <button class="btn btn-primary btn-sm" disabled>
-              Gérer
+              {{ t('common.manage') }}
               <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
             </button>
           </div>
@@ -113,18 +50,84 @@
       <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
         <div class="card-body">
           <div class="flex justify-between items-center mb-2">
-            <h2 class="card-title">Notifications</h2>
+            <h2 class="card-title">{{ t('settings.notifications') }}</h2>
             <div class="badge badge-primary p-3">
               <Iconify icon="mdi:bell" class="w-5 h-5" />
             </div>
           </div>
           <p class="text-sm mb-4">
-            Personnalisez vos préférences de notification par email et dans l'application.
+            {{ t('settings.notificationsDescription') }}
           </p>
           <div class="flex justify-between items-center">
-            <span class="badge badge-outline badge-sm">Bientôt disponible</span>
+            <span class="badge badge-outline badge-sm">{{ t('common.comingSoon') }}</span>
             <button class="btn btn-primary btn-sm" disabled>
-              Gérer
+              {{ t('common.manage') }}
+              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte préférences d'affichage -->
+      <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
+        <div class="card-body">
+          <div class="flex justify-between items-center mb-2">
+            <h2 class="card-title">{{ t('settings.displayPreferences') }}</h2>
+            <div class="badge badge-primary p-3">
+              <Iconify icon="mdi:palette" class="w-5 h-5" />
+            </div>
+          </div>
+          <p class="text-sm mb-4">
+            {{ t('settings.displayPreferencesDescription') }}
+          </p>
+          <div class="flex justify-between items-center">
+            <span class="badge badge-outline badge-sm">{{ t('common.comingSoon') }}</span>
+            <button class="btn btn-primary btn-sm" disabled>
+              {{ t('common.manage') }}
+              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte sécurité -->
+      <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
+        <div class="card-body">
+          <div class="flex justify-between items-center mb-2">
+            <h2 class="card-title">{{ t('settings.security') }}</h2>
+            <div class="badge badge-primary p-3">
+              <Iconify icon="mdi:shield" class="w-5 h-5" />
+            </div>
+          </div>
+          <p class="text-sm mb-4">
+            {{ t('settings.securityDescription') }}
+          </p>
+          <div class="flex justify-between items-center">
+            <span class="badge badge-outline badge-sm">{{ t('common.comingSoon') }}</span>
+            <button class="btn btn-primary btn-sm" disabled>
+              {{ t('common.manage') }}
+              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte export de données -->
+      <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
+        <div class="card-body">
+          <div class="flex justify-between items-center mb-2">
+            <h2 class="card-title">{{ t('settings.dataExport') }}</h2>
+            <div class="badge badge-primary p-3">
+              <Iconify icon="mdi:download" class="w-5 h-5" />
+            </div>
+          </div>
+          <p class="text-sm mb-4">
+            {{ t('settings.dataExportDescription') }}
+          </p>
+          <div class="flex justify-between items-center">
+            <span class="badge badge-outline badge-sm">{{ t('common.comingSoon') }}</span>
+            <button class="btn btn-primary btn-sm" disabled>
+              {{ t('common.manage') }}
               <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
             </button>
           </div>
@@ -136,17 +139,17 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import PageHeader from '@/components/common/PageHeader.vue'
 
 const router = useRouter()
+const { t } = useI18n()
 
 // Fonction pour naviguer vers les différentes sections de paramètres
 function navigateTo(section: string) {
   switch (section) {
     case 'profile':
       router.push('/profile')
-      break
-    case 'statuses':
-      router.push('/settings/status')
       break
     case 'segments':
       // Cette fonctionnalité n'est pas encore implémentée

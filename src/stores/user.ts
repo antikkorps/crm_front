@@ -269,6 +269,30 @@ export const useUserStore = defineStore('user', () => {
     currentUser.value = user
   }
 
+  // Mettre à jour l'utilisateur courant en fusionnant les données
+  function updateCurrentUser(updatedUser: Partial<User>) {
+    if (currentUser.value) {
+      // Préserver les propriétés importantes qui pourraient ne pas être retournées par l'API
+      const preservedProperties = {
+        avatarUrl: currentUser.value.avatarUrl,
+        isActive: currentUser.value.isActive,
+        isSuperAdmin: currentUser.value.isSuperAdmin,
+        role: currentUser.value.role,
+        Role: currentUser.value.Role,
+        tenant: currentUser.value.tenant,
+        Tenant: currentUser.value.Tenant,
+        createdAt: currentUser.value.createdAt,
+        updatedAt: currentUser.value.updatedAt,
+      }
+
+      currentUser.value = {
+        ...currentUser.value,
+        ...updatedUser,
+        ...preservedProperties, // Réappliquer les propriétés préservées
+      }
+    }
+  }
+
   return {
     // State
     users,
@@ -294,5 +318,6 @@ export const useUserStore = defineStore('user', () => {
     getUserSettings,
     updateUserSettings,
     setCurrentUser,
+    updateCurrentUser,
   }
 })

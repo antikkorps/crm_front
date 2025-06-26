@@ -156,6 +156,9 @@
             t('common.configuration')
           }}</router-link>
         </li>
+        <li v-if="canAccessAdminSection">
+          <router-link to="/admin" @click="closeSidebar">{{ t('common.admin') }}</router-link>
+        </li>
         <li>
           <router-link to="/profile" @click="closeSidebar">{{ t('common.profile') }}</router-link>
         </li>
@@ -212,6 +215,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ThemeToggle from './ThemeToggle.vue'
+import { canAccessAdmin } from '@/utils/permissions'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -379,6 +383,11 @@ const getUserInitials = (user: User | null): string => {
 const closeSidebar = () => {
   sidebarOpen.value = false
 }
+
+// Computed pour vérifier si l'utilisateur peut accéder à l'administration
+const canAccessAdminSection = computed(() => {
+  return canAccessAdmin(currentUser.value)
+})
 </script>
 
 <style scoped>
