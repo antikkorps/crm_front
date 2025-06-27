@@ -84,3 +84,7 @@ export interface UpdatePasswordRequest {
   currentPassword: string
   newPassword: string
 }
+
+export interface UpdateAvatarRequest {
+  avatarUrl: string
+}

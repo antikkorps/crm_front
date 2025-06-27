@@ -274,7 +274,6 @@ export const useUserStore = defineStore('user', () => {
     if (currentUser.value) {
       // Préserver les propriétés importantes qui pourraient ne pas être retournées par l'API
       const preservedProperties = {
-        avatarUrl: currentUser.value.avatarUrl,
         isActive: currentUser.value.isActive,
         isSuperAdmin: currentUser.value.isSuperAdmin,
         role: currentUser.value.role,

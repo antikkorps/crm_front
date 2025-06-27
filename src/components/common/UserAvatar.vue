@@ -108,9 +108,10 @@ const avatarUrl = computed(() => {
   if (imageError.value) return null
   if (!props.user?.avatarUrl) return null
 
-  // Ajouter un paramètre de cache-busting pour forcer le rechargement
+  // Cache-busting intelligent basé sur l'URL de l'avatar
   const separator = props.user.avatarUrl.includes('?') ? '&' : '?'
-  return `${props.user.avatarUrl}${separator}t=${Date.now()}`
+  const cacheBuster = props.user.avatarUrl.split('/').pop()?.split('?')[0] || 'avatar'
+  return `${props.user.avatarUrl}${separator}v=${cacheBuster}`
 })
 
 const dicebearUrl = computed(() => {

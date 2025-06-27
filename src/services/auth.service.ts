@@ -3,6 +3,7 @@ import type {
   AuthResponse,
   LoginRequest,
   RegisterRequest,
+  UpdateAvatarRequest,
   UpdatePasswordRequest,
   UpdateProfileRequest,
   User,
@@ -67,6 +68,14 @@ export const AuthService = {
       method: 'PUT',
       body: profileData,
     })
+  },
+
+  async updateAvatar(avatarUrl: string): Promise<Partial<User>> {
+    const response = await apiRequest<{ user: Partial<User> }>('/auth/update-avatar', {
+      method: 'PUT',
+      body: { avatarUrl } as UpdateAvatarRequest,
+    })
+    return response.user
   },
 
   logout(redirectToLogin = false): void {

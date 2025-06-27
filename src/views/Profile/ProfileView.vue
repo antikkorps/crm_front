@@ -394,12 +394,23 @@ const changePassword = async () => {
   }
 }
 
-const handleAvatarUpdate = (avatarUrl: string) => {
-  // Mettre à jour l'utilisateur dans le store avec la nouvelle URL d'avatar
-  if (userStore.currentUser) {
-    userStore.updateCurrentUser({
-      avatarUrl: avatarUrl,
-    })
+const handleAvatarUpdate = async (avatarUrl: string) => {
+  try {
+    // Sauvegarder l'avatar en base de données avec la route dédiée
+    const updatedUser = await AuthService.updateAvatar(avatarUrl)
+
+    // Mettre à jour l'utilisateur dans le store avec les données mises à jour
+    userStore.updateCurrentUser(updatedUser)
+
+    // Forcer la réactivité en mettant à jour explicitement l'avatar
+    if (userStore.currentUser) {
+      userStore.currentUser.avatarUrl = avatarUrl
+    }
+
+    toastStore.success(t('profile.avatarUpdatedSuccess'))
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour de l'avatar:", error)
+    toastStore.error(t('profile.avatarUpdateError'))
   }
 }
 
