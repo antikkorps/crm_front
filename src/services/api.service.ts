@@ -39,6 +39,11 @@ export async function apiRequest<T>(endpoint: string, options: RequestOptions = 
 
       // Gestion spécifique des erreurs d'authentification
       if (response.status === 401) {
+        // Pour les endpoints de login/register, ne pas traiter comme une session expirée
+        if (endpoint === '/auth/login' || endpoint === '/auth/register') {
+          throw new Error('Email ou mot de passe erroné')
+        }
+
         console.error("Erreur d'authentification: Session expirée ou token invalide")
         // Supprimer le token invalide
         removeToken()

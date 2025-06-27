@@ -1,5 +1,13 @@
 import router from '@/router'
-import type { AuthResponse, LoginRequest, RegisterRequest, User } from '../types/auth.types'
+import type {
+  AuthResponse,
+  LoginRequest,
+  RegisterRequest,
+  UpdateAvatarRequest,
+  UpdatePasswordRequest,
+  UpdateProfileRequest,
+  User,
+} from '../types/auth.types'
 import { getToken, removeToken, setToken } from '../utils/token'
 import { apiRequest } from './api.service'
 
@@ -37,8 +45,10 @@ export const AuthService = {
       return await apiRequest<User>('/auth/me')
     } catch (error) {
       // Si l'erreur est due à une authentification invalide, déconnexion silencieuse
-      if ((error as Error).message?.includes('Session expirée') || 
-          (error as Error).message?.includes('authentification')) {
+      if (
+        (error as Error).message?.includes('Session expirée') ||
+        (error as Error).message?.includes('authentification')
+      ) {
         this.logout()
         throw new Error('Session utilisateur expirée')
       }
@@ -46,13 +56,36 @@ export const AuthService = {
     }
   },
 
+  async updatePassword(passwordData: UpdatePasswordRequest): Promise<void> {
+    await apiRequest<void>('/auth/update-password', {
+      method: 'PUT',
+      body: passwordData,
+    })
+  },
+
+  async updateProfile(profileData: UpdateProfileRequest): Promise<Partial<User>> {
+    return await apiRequest<Partial<User>>('/auth/update-profile', {
+      method: 'PUT',
+      body: profileData,
+    })
+  },
+
+  async updateAvatar(avatarUrl: string): Promise<Partial<User>> {
+    const response = await apiRequest<{ user: Partial<User> }>('/auth/update-avatar', {
+      method: 'PUT',
+      body: { avatarUrl } as UpdateAvatarRequest,
+    })
+    return response.user
+  },
+
   logout(redirectToLogin = false): void {
     removeToken()
-    
+
     // Si demandé, rediriger vers la page de login
     if (redirectToLogin) {
       const currentPath = window.location.pathname
-      const redirectParam = currentPath !== '/login' ? `?redirect=${encodeURIComponent(currentPath)}` : ''
+      const redirectParam =
+        currentPath !== '/login' ? `?redirect=${encodeURIComponent(currentPath)}` : ''
       router.push(`/login${redirectParam}`)
     }
   },
@@ -60,11 +93,11 @@ export const AuthService = {
   isAuthenticated(): boolean {
     return !!getToken()
   },
-  
+
   // Vérifier la validité du token
   async checkTokenValidity(): Promise<boolean> {
     if (!this.isAuthenticated()) return false
-    
+
     try {
       await this.getCurrentUser()
       return true
@@ -73,27 +106,28 @@ export const AuthService = {
       return false
     }
   },
-  
+
   // Redirection si non authentifié
   async requireAuth(redirectPath?: string): Promise<boolean> {
     if (!this.isAuthenticated()) {
       this.redirectToLogin(redirectPath)
       return false
     }
-    
+
     const tokenValid = await this.checkTokenValidity()
     if (!tokenValid) {
       this.redirectToLogin(redirectPath)
       return false
     }
-    
+
     return true
   },
-  
+
   // Utilitaire pour la redirection vers la page de login
   redirectToLogin(path?: string): void {
     const redirectPath = path || window.location.pathname
-    const redirectParam = redirectPath !== '/login' ? `?redirect=${encodeURIComponent(redirectPath)}` : ''
+    const redirectParam =
+      redirectPath !== '/login' ? `?redirect=${encodeURIComponent(redirectPath)}` : ''
     router.push(`/login${redirectParam}`)
-  }
+  },
 }
