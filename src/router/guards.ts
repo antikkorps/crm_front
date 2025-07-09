@@ -1,4 +1,5 @@
 import { AuthService } from '@/services/auth.service'
+import { useUserStore } from '@/stores/user'
 import { canAccessAdmin } from '@/utils/permissions'
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 
@@ -73,7 +74,20 @@ export async function mainGuard(
 
   if (requiresAdmin) {
     try {
-      const currentUser = await AuthService.getCurrentUser()
+      // Utiliser le store utilisateur pour éviter les appels répétés à l'API
+      const userStore = useUserStore()
+      let currentUser = userStore.currentUser
+
+      // Si l'utilisateur n'est pas dans le store, le charger
+      if (!currentUser) {
+        try {
+          currentUser = await userStore.loadCurrentUser()
+        } catch (error) {
+          console.error("Erreur lors du chargement de l'utilisateur:", error)
+          next({ name: 'Login', query: { redirect: to.fullPath } })
+          return
+        }
+      }
 
       if (!canAccessAdmin(currentUser)) {
         next({ name: 'dashboard' })
@@ -81,6 +95,15 @@ export async function mainGuard(
       }
     } catch (error) {
       console.error("Erreur lors de la vérification des permissions d'administration:", error)
+      // Si l'erreur est liée à l'authentification, rediriger vers login
+      if (
+        (error as Error).message?.includes('Session') ||
+        (error as Error).message?.includes('authentification')
+      ) {
+        next({ name: 'Login', query: { redirect: to.fullPath } })
+        return
+      }
+      // Sinon rediriger vers le dashboard
       next({ name: 'dashboard' })
       return
     }

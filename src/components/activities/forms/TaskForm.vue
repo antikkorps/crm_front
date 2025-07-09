@@ -81,7 +81,7 @@
             <span class="label-text font-medium">{{ t('activities.task.status') }}</span>
           </label>
           <select v-model="formData.taskStatus" class="select select-bordered w-full">
-            <option value="TODO">{{ t('activities.task.statuses.todo') }}</option>
+            <option value="PENDING">{{ t('activities.task.statuses.todo') }}</option>
             <option value="IN_PROGRESS">{{ t('activities.task.statuses.inProgress') }}</option>
             <option value="COMPLETED">{{ t('activities.task.statuses.completed') }}</option>
             <option value="CANCELLED">{{ t('activities.task.statuses.cancelled') }}</option>
@@ -200,8 +200,14 @@
       <button type="button" class="btn btn-ghost" @click="$emit('cancel')">
         {{ t('common.cancel') }}
       </button>
-      <button type="submit" class="btn btn-info" :disabled="!isFormValid">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <button type="submit" class="btn btn-info" :disabled="!isFormValid || isSubmitting">
+        <svg
+          v-if="!isSubmitting"
+          class="w-4 h-4 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -209,7 +215,23 @@
             d="M5 13l4 4L19 7"
           />
         </svg>
-        {{ isEditMode ? t('common.update') : t('common.create') }}
+        <svg
+          v-else
+          class="w-4 h-4 mr-2 animate-spin"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
+        </svg>
+        {{
+          isSubmitting ? t('common.saving') : isEditMode ? t('common.update') : t('common.create')
+        }}
       </button>
     </div>
   </form>
@@ -241,10 +263,13 @@ const formData = ref({
   content: '',
   assignedToId: '',
   priority: 'MEDIUM' as 'LOW' | 'MEDIUM' | 'HIGH',
-  taskStatus: 'TODO' as 'TODO' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED',
+  taskStatus: 'PENDING' as 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED',
   progress: 0,
   taskEstimatedDuration: 0,
 })
+
+// État de soumission pour éviter les doubles clics
+const isSubmitting = ref(false)
 
 // Gestion séparée de la date et de l'heure pour éviter les conflits
 const dueDateInput = ref('') // Pour l'input date (format YYYY-MM-DD)
@@ -254,6 +279,9 @@ const estimatedMinutes = ref(0)
 
 // Initialiser le formulaire si on édite
 if (props.activity) {
+  // Réinitialiser l'état de soumission
+  isSubmitting.value = false
+
   // Mapping des champs de l'activité vers le formulaire
   formData.value = {
     ...formData.value,
@@ -262,7 +290,8 @@ if (props.activity) {
     assignedToId: props.activity.assignedToId || '',
     priority: (props.activity.priority as 'LOW' | 'MEDIUM' | 'HIGH') || 'MEDIUM',
     taskStatus:
-      (props.activity.taskStatus as 'TODO' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED') || 'TODO',
+      (props.activity.taskStatus as 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED') ||
+      'PENDING',
     progress: props.activity.progress || 0,
     taskEstimatedDuration: props.activity.taskEstimatedDuration || 0,
   }
@@ -308,6 +337,14 @@ const finalDueDate = computed(() => {
 watch([estimatedHours, estimatedMinutes], () => {
   formData.value.taskEstimatedDuration = estimatedHours.value * 60 + estimatedMinutes.value
 })
+
+// Réinitialiser l'état de soumission quand l'activité change
+watch(
+  () => props.activity,
+  () => {
+    isSubmitting.value = false
+  },
+)
 
 // Validation du formulaire
 const isFormValid = computed(() => {
@@ -359,7 +396,9 @@ function getDueDateMessage() {
 
 // Soumission du formulaire
 function handleSubmit() {
-  if (!isFormValid.value) return
+  if (!isFormValid.value || isSubmitting.value) return
+
+  isSubmitting.value = true
 
   const data = { ...formData.value } as Record<string, unknown>
 
@@ -378,4 +417,38 @@ function handleSubmit() {
   console.log('Données du formulaire à envoyer:', data)
   emit('save', data as CreateActivityDto | UpdateActivityDto)
 }
+
+// Méthode pour réinitialiser l'état de soumission (exposée au parent)
+function resetSubmissionState() {
+  isSubmitting.value = false
+}
+
+// Méthode pour réinitialiser complètement le formulaire
+function resetForm() {
+  isSubmitting.value = false
+
+  // Réinitialiser le formulaire aux valeurs par défaut
+  formData.value = {
+    type: 'TASK' as const,
+    title: '',
+    content: '',
+    assignedToId: '',
+    priority: 'MEDIUM' as 'LOW' | 'MEDIUM' | 'HIGH',
+    taskStatus: 'PENDING' as 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED',
+    progress: 0,
+    taskEstimatedDuration: 0,
+  }
+
+  // Réinitialiser les champs de date et durée
+  dueDateInput.value = ''
+  dueTime.value = ''
+  estimatedHours.value = 0
+  estimatedMinutes.value = 0
+}
+
+// Exposer les méthodes au parent
+defineExpose({
+  resetSubmissionState,
+  resetForm,
+})
 </script>

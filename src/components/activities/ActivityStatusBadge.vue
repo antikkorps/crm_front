@@ -1,5 +1,8 @@
 <template>
-  <div class="badge badge-sm" :class="badgeClass">
+  <div
+    class="badge badge-sm font-medium transition-all duration-300 hover:scale-110 animate-pulse"
+    :class="badgeClass"
+  >
     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
         v-if="getStatusIcon() === 'check'"
@@ -125,63 +128,67 @@ const badgeClass = computed(() => {
     case 'CALL':
       switch (props.activity.callOutcome) {
         case 'ANSWERED':
-          return 'badge-success'
+          return 'badge-success bg-success/20 text-success border-success/30'
         case 'NO_ANSWER':
         case 'BUSY':
         case 'VOICEMAIL':
-          return 'badge-warning'
+          return 'badge-warning bg-warning/20 text-warning border-warning/30'
         case 'CALLBACK_REQUESTED':
-          return 'badge-info'
+          return 'badge-info bg-info/20 text-info border-info/30'
         default:
-          return 'badge-neutral'
+          return 'badge-neutral bg-neutral/20 text-neutral border-neutral/30'
       }
 
     case 'EMAIL':
       switch (props.activity.emailStatus) {
         case 'DRAFT':
-          return 'badge-warning'
+          return 'badge-warning bg-warning/20 text-warning border-warning/30'
         case 'SENT':
-          return 'badge-info'
+          return 'badge-info bg-info/20 text-info border-info/30'
         case 'OPENED':
-          return 'badge-primary'
+          return 'badge-primary bg-primary/20 text-primary border-primary/30'
         case 'CLICKED':
-          return 'badge-success'
+          return 'badge-success bg-success/20 text-success border-success/30'
         case 'BOUNCED':
-          return 'badge-error'
+          return 'badge-error bg-error/20 text-error border-error/30'
         default:
-          return 'badge-neutral'
+          return 'badge-neutral bg-neutral/20 text-neutral border-neutral/30'
       }
 
     case 'MEETING':
-      if (!props.activity.startTime) return 'badge-neutral'
+      if (!props.activity.startTime)
+        return 'badge-neutral bg-neutral/20 text-neutral border-neutral/30'
       const now = new Date()
       const start = new Date(props.activity.startTime)
       const end = props.activity.endTime
         ? new Date(props.activity.endTime)
         : new Date(start.getTime() + 60 * 60 * 1000)
 
-      if (now < start) return 'badge-info'
-      if (now >= start && now <= end) return 'badge-warning'
-      return 'badge-success'
+      if (now < start) return 'badge-info bg-info/20 text-info border-info/30'
+      if (now >= start && now <= end)
+        return 'badge-warning bg-warning/20 text-warning border-warning/30'
+      return 'badge-success bg-success/20 text-success border-success/30'
 
     case 'TASK':
-      if (!props.activity.dueDate) return 'badge-neutral'
+      if (!props.activity.dueDate)
+        return 'badge-neutral bg-neutral/20 text-neutral border-neutral/30'
       const dueDate = new Date(props.activity.dueDate)
       const today = new Date()
       today.setHours(0, 0, 0, 0)
       dueDate.setHours(0, 0, 0, 0)
 
-      if (dueDate < today) return 'badge-error'
-      if (dueDate.getTime() === today.getTime()) return 'badge-warning'
+      if (dueDate < today) return 'badge-error bg-error/20 text-error border-error/30'
+      if (dueDate.getTime() === today.getTime())
+        return 'badge-warning bg-warning/20 text-warning border-warning/30'
       const diffDays = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-      if (diffDays <= 3) return 'badge-warning'
-      return 'badge-success'
+      if (diffDays <= 3) return 'badge-warning bg-warning/20 text-warning border-warning/30'
+      return 'badge-success bg-success/20 text-success border-success/30'
 
     case 'NOTE':
-      return 'badge-accent'
+      return 'badge-accent bg-accent/20 text-accent border-accent/30'
 
     default:
-      return 'badge-neutral'
+      return 'badge-neutral bg-neutral/20 text-neutral border-neutral/30'
   }
 })
 
@@ -198,25 +205,25 @@ function getStatusIcon(): string {
         case 'VOICEMAIL':
           return 'mail'
         case 'CALLBACK_REQUESTED':
-          return 'clock'
+          return 'reply'
         default:
-          return 'clock'
+          return 'question'
       }
 
     case 'EMAIL':
       switch (props.activity.emailStatus) {
         case 'DRAFT':
-          return 'clock'
+          return 'warning'
         case 'SENT':
           return 'mail'
         case 'OPENED':
           return 'eye'
         case 'CLICKED':
-          return 'reply'
+          return 'check'
         case 'BOUNCED':
-          return 'warning'
+          return 'x'
         default:
-          return 'mail'
+          return 'question'
       }
 
     case 'MEETING':
@@ -232,17 +239,49 @@ function getStatusIcon(): string {
       return 'check'
 
     case 'TASK':
-      if (!props.activity.dueDate) return 'clock'
+      if (!props.activity.dueDate) return 'question'
       const dueDate = new Date(props.activity.dueDate)
       const today = new Date()
-      if (dueDate < today) return 'warning'
-      return 'clock'
+      today.setHours(0, 0, 0, 0)
+      dueDate.setHours(0, 0, 0, 0)
+
+      if (dueDate < today) return 'x'
+      if (dueDate.getTime() === today.getTime()) return 'warning'
+      const diffDays = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+      if (diffDays <= 3) return 'warning'
+      return 'check'
 
     case 'NOTE':
       return 'check'
 
     default:
-      return 'info'
+      return 'question'
   }
 }
 </script>
+
+<style scoped>
+.badge {
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.badge:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+</style>

@@ -8,71 +8,6 @@
 
     <!-- Grille de cartes d'administration -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-      <!-- Carte gestion des utilisateurs -->
-      <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
-        <div class="card-body">
-          <div class="flex justify-between items-center mb-2">
-            <h2 class="card-title">{{ t('admin.userManagement') }}</h2>
-            <div class="badge badge-primary p-3">
-              <Iconify icon="mdi:account-multiple" class="w-5 h-5" />
-            </div>
-          </div>
-          <p class="text-sm mb-4">
-            {{ t('admin.userManagementDescription') }}
-          </p>
-          <div class="card-actions justify-end">
-            <button class="btn btn-primary btn-sm" @click="navigateTo('users')">
-              {{ t('common.manage') }}
-              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Carte gestion des rôles -->
-      <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
-        <div class="card-body">
-          <div class="flex justify-between items-center mb-2">
-            <h2 class="card-title">{{ t('admin.roleManagement') }}</h2>
-            <div class="badge badge-primary p-3">
-              <Iconify icon="mdi:shield-account" class="w-5 h-5" />
-            </div>
-          </div>
-          <p class="text-sm mb-4">
-            {{ t('admin.roleManagementDescription') }}
-          </p>
-          <div class="flex justify-between items-center">
-            <span class="badge badge-outline badge-sm">{{ t('common.comingSoon') }}</span>
-            <button class="btn btn-primary btn-sm" disabled>
-              {{ t('common.manage') }}
-              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Carte gestion des permissions -->
-      <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
-        <div class="card-body">
-          <div class="flex justify-between items-center mb-2">
-            <h2 class="card-title">{{ t('admin.permissionManagement') }}</h2>
-            <div class="badge badge-primary p-3">
-              <Iconify icon="mdi:lock" class="w-5 h-5" />
-            </div>
-          </div>
-          <p class="text-sm mb-4">
-            {{ t('admin.permissionManagementDescription') }}
-          </p>
-          <div class="flex justify-between items-center">
-            <span class="badge badge-outline badge-sm">{{ t('common.comingSoon') }}</span>
-            <button class="btn btn-primary btn-sm" disabled>
-              {{ t('common.manage') }}
-              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
       <!-- Carte gestion des tenants (Super Admin uniquement) -->
       <div
         v-if="isSuperAdminUser"
@@ -90,72 +25,6 @@
           </p>
           <div class="card-actions justify-end">
             <button class="btn btn-secondary btn-sm" @click="navigateTo('tenants')">
-              {{ t('common.manage') }}
-              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Carte extensions -->
-      <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
-        <div class="card-body">
-          <div class="flex justify-between items-center mb-2">
-            <h2 class="card-title">{{ t('admin.extensions') }}</h2>
-            <div class="badge badge-primary p-3">
-              <Iconify icon="mdi:puzzle" class="w-5 h-5" />
-            </div>
-          </div>
-          <p class="text-sm mb-4">
-            {{ t('admin.extensionsDescription') }}
-          </p>
-          <div class="flex justify-between items-center">
-            <span class="badge badge-outline badge-sm">{{ t('common.comingSoon') }}</span>
-            <button class="btn btn-primary btn-sm" disabled>
-              {{ t('common.manage') }}
-              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Carte intégrations -->
-      <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
-        <div class="card-body">
-          <div class="flex justify-between items-center mb-2">
-            <h2 class="card-title">{{ t('admin.integrations') }}</h2>
-            <div class="badge badge-primary p-3">
-              <Iconify icon="mdi:connection" class="w-5 h-5" />
-            </div>
-          </div>
-          <p class="text-sm mb-4">
-            {{ t('admin.integrationsDescription') }}
-          </p>
-          <div class="flex justify-between items-center">
-            <span class="badge badge-outline badge-sm">{{ t('common.comingSoon') }}</span>
-            <button class="btn btn-primary btn-sm" disabled>
-              {{ t('common.manage') }}
-              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Carte import de données -->
-      <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
-        <div class="card-body">
-          <div class="flex justify-between items-center mb-2">
-            <h2 class="card-title">{{ t('admin.dataImport') }}</h2>
-            <div class="badge badge-primary p-3">
-              <Iconify icon="mdi:upload" class="w-5 h-5" />
-            </div>
-          </div>
-          <p class="text-sm mb-4">
-            {{ t('admin.dataImportDescription') }}
-          </p>
-          <div class="flex justify-between items-center">
-            <span class="badge badge-outline badge-sm">{{ t('common.comingSoon') }}</span>
-            <button class="btn btn-primary btn-sm" disabled>
               {{ t('common.manage') }}
               <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
             </button>
@@ -302,12 +171,12 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import { ref, onMounted, computed } from 'vue'
+import PageHeader from '@/components/common/PageHeader.vue'
 import { useUserStore } from '@/stores/user'
 import { isSuperAdmin } from '@/utils/permissions'
-import PageHeader from '@/components/common/PageHeader.vue'
+import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -330,17 +199,8 @@ const databaseSize = ref('')
 // Fonction pour naviguer vers les différentes sections d'administration
 const navigateTo = (section: string) => {
   switch (section) {
-    case 'users':
-      router.push('/admin/users')
-      break
     case 'tenants':
       router.push('/admin/tenants')
-      break
-    case 'roles':
-      router.push('/admin/roles')
-      break
-    case 'permissions':
-      router.push('/admin/permissions')
       break
     case 'audit':
       router.push('/admin/audit')

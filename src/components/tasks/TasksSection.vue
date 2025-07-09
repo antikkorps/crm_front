@@ -222,6 +222,7 @@
         </h3>
 
         <TaskForm
+          ref="taskFormRef"
           :task="currentTask"
           :isEditMode="isEditMode"
           :companyId="props.companyId"
@@ -282,6 +283,7 @@ const emit = defineEmits<{
 
 // État local
 const taskModalRef = ref<HTMLDialogElement | null>(null)
+const taskFormRef = ref<{ resetSubmissionState: () => void; resetForm: () => void } | null>(null)
 const isEditMode = ref(false)
 const currentTask = ref<Activity | null>(null)
 const taskFilter = ref<'mine' | 'all'>('all')
@@ -356,6 +358,13 @@ function openTaskModal(task: Activity | null) {
   currentTask.value = task
   isEditMode.value = !!task
 
+  // Réinitialiser le formulaire si c'est une nouvelle tâche
+  if (!task && taskFormRef.value) {
+    taskFormRef.value.resetForm()
+  } else if (taskFormRef.value) {
+    taskFormRef.value.resetSubmissionState()
+  }
+
   if (taskModalRef.value) {
     taskModalRef.value.showModal()
   }
@@ -368,16 +377,33 @@ function closeTaskModal() {
   }
   currentTask.value = null
   isEditMode.value = false
+
+  // Réinitialiser l'état de soumission du formulaire
+  if (taskFormRef.value) {
+    taskFormRef.value.resetSubmissionState()
+  }
 }
 
 // Enregistrer une tâche (création ou modification)
-function saveTask(formData: TaskCreateDto | TaskUpdateDto) {
-  if (isEditMode.value && currentTask.value) {
-    emit('task-updated', { ...formData, id: currentTask.value.id })
-  } else {
-    emit('task-created', formData as TaskCreateDto)
+async function saveTask(formData: TaskCreateDto | TaskUpdateDto) {
+  try {
+    if (isEditMode.value && currentTask.value) {
+      emit('task-updated', { ...formData, id: currentTask.value.id })
+    } else {
+      emit('task-created', formData as TaskCreateDto)
+    }
+    closeTaskModal()
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde de la tâche:', error)
+  } finally {
+    // Réinitialiser l'état de soumission et le formulaire si c'était une création
+    if (taskFormRef.value) {
+      taskFormRef.value.resetSubmissionState()
+      if (!isEditMode.value) {
+        taskFormRef.value.resetForm()
+      }
+    }
   }
-  closeTaskModal()
 }
 
 function handleTaskClick(task: Activity) {

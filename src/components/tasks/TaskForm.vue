@@ -119,10 +119,17 @@
 
     <div class="modal-action mt-6 pt-3 border-t">
       <slot name="buttons">
-        <button type="button" class="btn" @click="$emit('cancel')">Annuler</button>
-        <button type="submit" class="btn btn-primary">
-          <Iconify :icon="isEditMode ? 'mdi:content-save' : 'mdi:plus'" class="w-5 h-5 mr-1" />
-          {{ isEditMode ? 'Enregistrer' : 'Créer' }}
+        <button type="button" class="btn" @click="$emit('cancel')" :disabled="isSubmitting">
+          Annuler
+        </button>
+        <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
+          <Iconify
+            v-if="!isSubmitting"
+            :icon="isEditMode ? 'mdi:content-save' : 'mdi:plus'"
+            class="w-5 h-5 mr-1"
+          />
+          <span v-else class="loading loading-spinner loading-sm mr-1"></span>
+          {{ isSubmitting ? 'Enregistrement...' : isEditMode ? 'Enregistrer' : 'Créer' }}
         </button>
       </slot>
     </div>
@@ -207,10 +214,16 @@ const formData = ref<TaskCreateDto | (TaskUpdateDto & { contactId?: string; comp
   type: 'TASK',
 })
 
+// État de soumission pour éviter les doubles clics
+const isSubmitting = ref(false)
+
 // Observer les changements de la prop task
 watch(
   () => props.task,
   (newTask) => {
+    // Réinitialiser l'état de soumission à chaque changement
+    isSubmitting.value = false
+
     if (newTask) {
       formData.value = {
         title: newTask.title || '',
@@ -276,8 +289,40 @@ const fetchRelatedData = async () => {
 }
 
 const handleSubmit = () => {
+  if (isSubmitting.value) return
+
+  isSubmitting.value = true
   emit('submit', formData.value)
 }
+
+// Méthode pour réinitialiser l'état de soumission (exposée au parent)
+function resetSubmissionState() {
+  isSubmitting.value = false
+}
+
+// Méthode pour réinitialiser complètement le formulaire
+function resetForm() {
+  isSubmitting.value = false
+
+  // Réinitialiser le formulaire aux valeurs par défaut
+  formData.value = {
+    title: '',
+    content: '',
+    dueDate: null,
+    priority: TaskPriority.MEDIUM,
+    taskStatus: TaskStatus.PENDING,
+    assignedToId: null,
+    contactId: undefined,
+    companyId: props.companyId || undefined,
+    type: 'TASK',
+  }
+}
+
+// Exposer les méthodes au parent
+defineExpose({
+  resetSubmissionState,
+  resetForm,
+})
 
 // Charger les données associées au montage du composant
 onMounted(() => {

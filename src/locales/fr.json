@@ -14,7 +14,9 @@
     "rememberMe": "Se souvenir de moi",
     "connexionPending": "Connexion en cours...",
     "loginSuccess": "Connexion réussie",
-    "loginError": "Email ou mot de passe erroné"
+    "loginError": "Email ou mot de passe erroné",
+    "sessionExpired": "Votre session est terminée, veuillez vous reconnecter",
+    "sessionExpiredDefault": "Votre session est terminée, veuillez vous reconnecter"
   },
   "common": {
     "title": "Titre",
@@ -303,335 +305,295 @@
     "subtitle": "Gérez toutes vos activités commerciales",
     "total": "activités",
     "new": "Nouvelle activité",
+    "more": "Plus",
     "create": "Créer une activité",
     "edit": "Modifier l'activité",
-    "filters": "Filtres",
+    "filtersTitle": "Filtres",
     "noActivities": "Aucune activité",
     "noActivitiesDesc": "Commencez par créer votre première activité",
     "createFirst": "Créer la première activité",
     "type": "Type d'activité",
     "assignedTo": "Assigné à",
-    "priority": "Priorité",
-    "period": "Période",
-    "titlePlaceholder": "Titre de l'activité",
-    "descriptionPlaceholder": "Description de l'activité",
-    "noDescription": "Aucune description",
-    "activeFilters": "Filtres actifs",
-    "savePreset": "Sauvegarder le préréglage",
-    "loadPreset": "Charger un préréglage",
-    "deleteConfirmTitle": "Confirmer la suppression",
-    "deleteConfirmMessage": "Êtes-vous sûr de vouloir supprimer l'activité \"{title}\" ?",
-    "createSuccess": "Activité créée avec succès",
-    "updateSuccess": "Activité mise à jour avec succès",
-    "deleteSuccess": "Activité supprimée avec succès",
-    "duplicateSuccess": "Activité dupliquée avec succès",
-    "createError": "Erreur lors de la création",
-    "updateError": "Erreur lors de la mise à jour",
-    "deleteError": "Erreur lors de la suppression",
-    "duplicateError": "Erreur lors de la duplication",
-    "loadError": "Erreur lors du chargement",
-    "featureComingSoon": "Fonctionnalité bientôt disponible",
-    "add": "Ajouter une activité",
-    "recentActivities": "Activités récentes",
-    "types": {
-      "call": "Appel",
-      "email": "Email",
-      "meeting": "Réunion",
-      "task": "Tâche",
-      "note": "Note",
-      "quote": "Devis",
-      "opportunity": "Opportunité",
-      "contact": "Contact",
-      "follow_up": "Suivi",
-      "demo": "Démonstration"
-    },
-    "priority": {
-      "low": "Faible",
-      "medium": "Moyenne",
-      "high": "Élevée"
-    },
-    "periods": {
-      "today": "Aujourd'hui",
-      "yesterday": "Hier",
-      "thisWeek": "Cette semaine",
-      "lastWeek": "Semaine dernière",
-      "thisMonth": "Ce mois",
-      "lastMonth": "Mois dernier",
-      "custom": "Personnalisé"
-    },
-    "status": {
-      "unknown": "Inconnu"
-    }
-  },
-  "tasks": {
-    "title": "Tâches",
-    "add": "Ajouter une tâche",
-    "edit": "Modifier la tâche",
-    "delete": "Supprimer la tâche",
-    "noTasks": "Aucune tâche trouvée",
-    "startAdding": "Commencez par ajouter votre première tâche",
-    "dueDate": "Date d'échéance",
-    "priority": "Priorité",
-    "details": "Détails de la tâche",
-    "complete": "Marquer comme terminée",
-    "reopen": "Rouvrir",
-    "assignedTo": "Assignée à",
-    "completedSuccessfully": "Tâche marquée comme terminée",
-    "failedToComplete": "Échec de la mise à jour de la tâche",
-    "reopenedSuccessfully": "Tâche rouverte avec succès",
-    "failedToReopen": "Échec de la réouverture de la tâche",
-    "filters": {
-      "myTasks": "Mes tâches",
-      "allTasks": "Toutes les tâches"
-    },
-    "status": {
-      "title": "Status",
+    "filterByType": "Filtrer par type",
+    "typesSelected": "types sélectionnés",
+    "clickToFilter": "Cliquez pour filtrer",
+    "clearTypes": "déselectionner",
+    "quickAdd": "Ajout rapide",
+    "tabs": {
+      "all": "Toutes",
       "pending": "En attente",
-      "inProgress": "En cours",
-      "completed": "Terminée",
-      "cancelled": "Annulée"
+      "completed": "Terminées",
+      "overdue": "En retard"
     },
-    "priorityLevel": {
-      "low": "Basse",
-      "medium": "Moyenne",
-      "high": "Élevée"
-    }
-  },
-  "status": {
-    "prospect": "Prospect",
-    "customer": "Client",
-    "partner": "Partenaire",
-    "inactive": "Inactif"
-  },
-  "filters": {
-    "title": "Filtres avancés",
-    "hideFilters": "Masquer les filtres",
-    "showFilters": "Afficher les filtres",
-    "allSizes": "Toutes tailles",
-    "allStatuses": "Tous statuts",
-    "allUsers": "Tous les utilisateurs",
-    "minRevenue": "CA min",
-    "maxRevenue": "CA max",
-    "filterByIndustry": "Filtrer par industrie",
-    "filterByCity": "Filtrer par ville",
-    "filterByCountry": "Filtrer par pays"
-  },
-  "statistics": {
-    "title": "Statistiques"
-  },
-  "quotes": {
-    "title": "Devis",
-    "add": "Ajouter un devis",
-    "edit": "Modifier le devis",
-    "delete": "Supprimer le devis",
-    "noQuotes": "Aucun devis trouvé",
-    "startAdding": "Commencez par ajouter votre premier devis",
-    "quoteNumber": "Numéro de devis",
-    "date": "Date",
-    "amount": "Montant",
-    "status": "Statut du devis"
-  },
-  "invoices": {
-    "title": "Factures",
-    "add": "Ajouter une facture",
-    "edit": "Modifier la facture",
-    "delete": "Supprimer la facture",
-    "noInvoices": "Aucune facture trouvée",
-    "startAdding": "Commencez par ajouter votre première facture",
-    "invoiceNumber": "Numéro de facture",
-    "date": "Date",
-    "amount": "Montant",
-    "status": "Statut de la facture"
-  },
-  "activities": {
-    "title": "Activités",
-    "subtitle": "Gérez toutes vos activités commerciales",
-    "total": "activités",
-    "new": "Nouvelle activité",
-    "create": "Créer une activité",
-    "edit": "Modifier l'activité",
-    "filters": "Filtres",
-    "noActivities": "Aucune activité",
-    "noActivitiesDesc": "Commencez par créer votre première activité",
-    "createFirst": "Créer la première activité",
-    "type": "Type d'activité",
-    "assignedTo": "Assigné à",
-    "priority": "Priorité",
-    "period": "Période",
-    "titlePlaceholder": "Titre de l'activité",
-    "descriptionPlaceholder": "Description de l'activité",
-    "noDescription": "Aucune description",
-    "activeFilters": "Filtres actifs",
-    "savePreset": "Sauvegarder le préréglage",
-    "loadPreset": "Charger un préréglage",
-    "deleteConfirmTitle": "Confirmer la suppression",
-    "deleteConfirmMessage": "Êtes-vous sûr de vouloir supprimer l'activité \"{title}\" ?",
-    "createSuccess": "Activité créée avec succès",
-    "updateSuccess": "Activité mise à jour avec succès",
-    "deleteSuccess": "Activité supprimée avec succès",
-    "duplicateSuccess": "Activité dupliquée avec succès",
-    "createError": "Erreur lors de la création",
-    "updateError": "Erreur lors de la mise à jour",
-    "deleteError": "Erreur lors de la suppression",
-    "duplicateError": "Erreur lors de la duplication",
-    "loadError": "Erreur lors du chargement",
-    "featureComingSoon": "Fonctionnalité bientôt disponible",
-    "types": {
-      "call": "Appel",
-      "meeting": "Réunion",
-      "email": "Email",
-      "task": "Tâche",
-      "note": "Note"
+    "sortBy": "Trier par",
+    "sort": {
+      "prioritySort": "Priorité",
+      "dateSort": "Date",
+      "dueDateSort": "Date d'échéance",
+      "typeSort": "Type",
+      "period": "Période",
+      "titlePlaceholder": "Titre de l'activité",
+      "descriptionPlaceholder": "Description de l'activité",
+      "noDescription": "Aucune description",
+      "activeFilters": "Filtres actifs",
+      "savePreset": "Sauvegarder le préréglage",
+      "loadPreset": "Charger un préréglage",
+      "deleteConfirmTitle": "Confirmer la suppression",
+      "deleteConfirmMessage": "Êtes-vous sûr de vouloir supprimer l'activité \"{title}\" ?",
+      "createSuccess": "Activité créée avec succès",
+      "updateSuccess": "Activité mise à jour avec succès",
+      "deleteSuccess": "Activité supprimée avec succès",
+      "duplicateSuccess": "Activité dupliquée avec succès",
+      "createError": "Erreur lors de la création",
+      "updateError": "Erreur lors de la mise à jour",
+      "deleteError": "Erreur lors de la suppression",
+      "duplicateError": "Erreur lors de la duplication",
+      "loadError": "Erreur lors du chargement",
+      "featureComingSoon": "Fonctionnalité bientôt disponible",
+      "add": "Ajouter une activité",
+      "recentActivities": "Activités récentes",
+      "types": {
+        "call": "Appel",
+        "email": "Email",
+        "meeting": "Réunion",
+        "task": "Tâche",
+        "note": "Note",
+        "quote": "Devis",
+        "opportunity": "Opportunité",
+        "contact": "Contact",
+        "follow_up": "Suivi",
+        "demo": "Démonstration"
+      },
+      "priority": {
+        "low": "Faible",
+        "medium": "Moyenne",
+        "high": "Élevée"
+      },
+      "periods": {
+        "today": "Aujourd'hui",
+        "yesterday": "Hier",
+        "thisWeek": "Cette semaine",
+        "lastWeek": "Semaine dernière",
+        "thisMonth": "Ce mois",
+        "lastMonth": "Mois dernier",
+        "custom": "Personnalisé"
+      },
+      "status": {
+        "unknown": "Inconnu"
+      }
     },
-    "priority": {
-      "low": "Faible",
-      "medium": "Moyenne",
-      "high": "Élevée"
-    },
-    "periods": {
-      "today": "Aujourd'hui",
-      "yesterday": "Hier",
-      "thisWeek": "Cette semaine",
-      "lastWeek": "Semaine dernière",
-      "thisMonth": "Ce mois",
-      "lastMonth": "Mois dernier",
-      "custom": "Personnalisé"
+    "tasks": {
+      "title": "Tâches",
+      "add": "Ajouter une tâche",
+      "edit": "Modifier la tâche",
+      "delete": "Supprimer la tâche",
+      "noTasks": "Aucune tâche trouvée",
+      "startAdding": "Commencez par ajouter votre première tâche",
+      "dueDate": "Date d'échéance",
+      "priority": "Priorité",
+      "details": "Détails de la tâche",
+      "complete": "Marquer comme terminée",
+      "reopen": "Rouvrir",
+      "assignedTo": "Assignée à",
+      "completedSuccessfully": "Tâche marquée comme terminée",
+      "failedToComplete": "Échec de la mise à jour de la tâche",
+      "reopenedSuccessfully": "Tâche rouverte avec succès",
+      "failedToReopen": "Échec de la réouverture de la tâche",
+      "filters": {
+        "myTasks": "Mes tâches",
+        "allTasks": "Toutes les tâches"
+      },
+      "status": {
+        "title": "Status",
+        "pending": "En attente",
+        "inProgress": "En cours",
+        "completed": "Terminée",
+        "cancelled": "Annulée"
+      },
+      "priorityLevel": {
+        "low": "Basse",
+        "medium": "Moyenne",
+        "high": "Élevée"
+      }
     },
     "status": {
-      "unknown": "Inconnu"
-    }
-  },
-  "calls": {
-    "direction": "Direction",
-    "duration": "Durée",
-    "durationPlaceholder": "Durée en minutes",
-    "minutes": "minutes",
-    "outcome": "Résultat",
-    "callback": "Rappeler",
-    "followUp": "Suivi",
-    "scheduleFollowUp": "Planifier un suivi",
-    "direction": {
-      "incoming": "Entrant",
-      "outgoing": "Sortant"
+      "prospect": "Prospect",
+      "customer": "Client",
+      "partner": "Partenaire",
+      "inactive": "Inactif"
     },
-    "outcome": {
-      "answered": "Répondu",
-      "noAnswer": "Pas de réponse",
-      "busy": "Occupé",
-      "voicemail": "Messagerie",
-      "failed": "Échec",
-      "unknown": "Inconnu"
-    }
-  },
-  "meetings": {
-    "type": "Type de réunion",
-    "location": "Lieu",
-    "startDate": "Date de début",
-    "endDate": "Date de fin",
-    "minutes": "minutes",
-    "joinMeeting": "Rejoindre la réunion",
-    "addNotes": "Ajouter des notes",
-    "reschedule": "Reprogrammer",
-    "type": {
-      "inPerson": "En personne",
-      "videoCall": "Visioconférence",
-      "phoneCall": "Appel téléphonique",
-      "webinar": "Webinaire"
+    "filters": {
+      "title": "Filtres avancés",
+      "hideFilters": "Masquer les filtres",
+      "showFilters": "Afficher les filtres",
+      "allSizes": "Toutes tailles",
+      "allStatuses": "Tous statuts",
+      "allUsers": "Tous les utilisateurs",
+      "minRevenue": "CA min",
+      "maxRevenue": "CA max",
+      "filterByIndustry": "Filtrer par industrie",
+      "filterByCity": "Filtrer par ville",
+      "filterByCountry": "Filtrer par pays"
     },
-    "locationPlaceholder": {
-      "inPerson": "Adresse du lieu de réunion",
-      "videoCall": "Lien de la visioconférence",
-      "phoneCall": "Numéro de téléphone",
-      "webinar": "Lien du webinaire",
-      "default": "Lieu de la réunion"
+    "statistics": {
+      "title": "Statistiques"
     },
-    "status": {
-      "planned": "Planifiée",
-      "upcoming": "À venir",
-      "ongoing": "En cours",
-      "completed": "Terminée"
-    }
-  },
-  "emails": {
-    "to": "À",
-    "cc": "Copie",
-    "status": "Statut",
-    "sentDate": "Date d'envoi",
-    "recipients": "destinataires",
-    "recipientsList": "Liste des destinataires",
-    "send": "Envoyer",
-    "reply": "Répondre",
-    "forward": "Transférer",
-    "resend": "Renvoyer",
-    "toPlaceholder": "email1@example.com, email2@example.com",
-    "ccPlaceholder": "Copie cachée (optionnel)",
-    "toHint": "Séparez les emails par des virgules",
-    "ccHint": "Copie cachée (optionnel)",
-    "status": {
-      "draft": "Brouillon",
-      "sent": "Envoyé",
-      "delivered": "Livré",
-      "opened": "Ouvert",
-      "replied": "Répondu",
-      "bounced": "Rejeté",
-      "failed": "Échec",
-      "unknown": "Inconnu"
+    "quotes": {
+      "title": "Devis",
+      "add": "Ajouter un devis",
+      "edit": "Modifier le devis",
+      "delete": "Supprimer le devis",
+      "noQuotes": "Aucun devis trouvé",
+      "startAdding": "Commencez par ajouter votre premier devis",
+      "quoteNumber": "Numéro de devis",
+      "date": "Date",
+      "amount": "Montant",
+      "status": "Statut du devis"
     },
-    "metrics": {
-      "opened": "Ouvert",
-      "replied": "Répondu",
-      "instant": "Instantané"
+    "invoices": {
+      "title": "Factures",
+      "add": "Ajouter une facture",
+      "edit": "Modifier la facture",
+      "delete": "Supprimer la facture",
+      "noInvoices": "Aucune facture trouvée",
+      "startAdding": "Commencez par ajouter votre première facture",
+      "invoiceNumber": "Numéro de facture",
+      "date": "Date",
+      "amount": "Montant",
+      "status": "Statut de la facture"
+    },
+    "calls": {
+      "direction": "Direction",
+      "duration": "Durée",
+      "durationPlaceholder": "Durée en minutes",
+      "minutes": "minutes",
+      "outcome": "Résultat",
+      "callback": "Rappeler",
+      "followUp": "Suivi",
+      "scheduleFollowUp": "Planifier un suivi",
+      "direction": {
+        "incoming": "Entrant",
+        "outgoing": "Sortant"
+      },
+      "outcome": {
+        "answered": "Répondu",
+        "noAnswer": "Pas de réponse",
+        "busy": "Occupé",
+        "voicemail": "Messagerie",
+        "failed": "Échec",
+        "unknown": "Inconnu"
+      }
+    },
+    "meetings": {
+      "type": "Type de réunion",
+      "location": "Lieu",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "minutes": "minutes",
+      "joinMeeting": "Rejoindre la réunion",
+      "addNotes": "Ajouter des notes",
+      "reschedule": "Reprogrammer",
+      "type": {
+        "inPerson": "En personne",
+        "videoCall": "Visioconférence",
+        "phoneCall": "Appel téléphonique",
+        "webinar": "Webinaire"
+      },
+      "locationPlaceholder": {
+        "inPerson": "Adresse du lieu de réunion",
+        "videoCall": "Lien de la visioconférence",
+        "phoneCall": "Numéro de téléphone",
+        "webinar": "Lien du webinaire",
+        "default": "Lieu de la réunion"
+      },
+      "status": {
+        "planned": "Planifiée",
+        "upcoming": "À venir",
+        "ongoing": "En cours",
+        "completed": "Terminée"
+      }
+    },
+    "emails": {
+      "to": "À",
+      "cc": "Copie",
+      "status": "Statut",
+      "sentDate": "Date d'envoi",
+      "recipients": "destinataires",
+      "recipientsList": "Liste des destinataires",
+      "send": "Envoyer",
+      "reply": "Répondre",
+      "forward": "Transférer",
+      "resend": "Renvoyer",
+      "toPlaceholder": "email1@example.com, email2@example.com",
+      "ccPlaceholder": "Copie cachée (optionnel)",
+      "toHint": "Séparez les emails par des virgules",
+      "ccHint": "Copie cachée (optionnel)",
+      "status": {
+        "draft": "Brouillon",
+        "sent": "Envoyé",
+        "delivered": "Livré",
+        "opened": "Ouvert",
+        "replied": "Répondu",
+        "bounced": "Rejeté",
+        "failed": "Échec",
+        "unknown": "Inconnu"
+      },
+      "metrics": {
+        "opened": "Ouvert",
+        "replied": "Répondu",
+        "instant": "Instantané"
+      }
+    },
+    "tasks": {
+      "dueDate": "Date d'échéance",
+      "markComplete": "Marquer comme terminé",
+      "changeDueDate": "Modifier l'échéance",
+      "status": {
+        "noDue": "Pas d'échéance",
+        "overdue": "En retard",
+        "dueToday": "À faire aujourd'hui",
+        "dueSoon": "À faire bientôt",
+        "upcoming": "À venir"
+      }
+    },
+    "admin": {
+      "title": "Administration",
+      "adminDescription": "Gestion administrative de votre organisation",
+      "superAdminDescription": "Gestion administrative système et multi-tenants",
+      "userManagement": "Gestion des utilisateurs",
+      "userManagementDescription": "Créez, modifiez et gérez les comptes utilisateurs de votre organisation.",
+      "roleManagement": "Gestion des rôles",
+      "roleManagementDescription": "Définissez et gérez les rôles et permissions des utilisateurs.",
+      "permissionManagement": "Gestion des permissions",
+      "permissionManagementDescription": "Configurez les permissions détaillées pour chaque rôle.",
+      "tenantManagement": "Gestion des tenants",
+      "tenantManagementDescription": "Gérez les tenants et leurs configurations système.",
+      "auditLogs": "Audit et logs",
+      "auditLogsDescription": "Consultez les logs d'activité et les actions des utilisateurs.",
+      "backupRestore": "Sauvegarde et restauration",
+      "backupRestoreDescription": "Sauvegardez et restaurez les données de votre système.",
+      "systemStats": "Statistiques système",
+      "systemStatsDescription": "Consultez les métriques système, performances et utilisation des ressources.",
+      "totalUsers": "Total utilisateurs",
+      "activeUsers": "Utilisateurs actifs",
+      "totalCompanies": "Total entreprises",
+      "totalContacts": "Total contacts",
+      "totalActivities": "Total activités",
+      "totalTenants": "Total tenants",
+      "activeTenants": "Tenants actifs",
+      "systemResources": "Ressources système",
+      "cpuUsage": "Utilisation CPU",
+      "databaseSize": "Taille base de données",
+      "storageUsed": "Stockage utilisé",
+      "lastMonth": "Ce mois-ci",
+      "manage": "Gérer",
+      "comingSoon": "Bientôt disponible",
+      "extensions": "Extensions",
+      "extensionsDescription": "Gérez vos extensions et découvrez de nouvelles fonctionnalités pour votre CRM.",
+      "integrations": "Intégrations",
+      "integrationsDescription": "Connectez votre CRM à d'autres outils et services externes.",
+      "dataImport": "Import de données",
+      "dataImportDescription": "Importez des données depuis des fichiers CSV, Excel ou d'autres sources externes."
     }
-  },
-  "tasks": {
-    "dueDate": "Date d'échéance",
-    "markComplete": "Marquer comme terminé",
-    "changeDueDate": "Modifier l'échéance",
-    "status": {
-      "noDue": "Pas d'échéance",
-      "overdue": "En retard",
-      "dueToday": "À faire aujourd'hui",
-      "dueSoon": "À faire bientôt",
-      "upcoming": "À venir"
-    }
-  },
-  "admin": {
-    "title": "Administration",
-    "adminDescription": "Gestion administrative de votre organisation",
-    "superAdminDescription": "Gestion administrative système et multi-tenants",
-    "userManagement": "Gestion des utilisateurs",
-    "userManagementDescription": "Créez, modifiez et gérez les comptes utilisateurs de votre organisation.",
-    "roleManagement": "Gestion des rôles",
-    "roleManagementDescription": "Définissez et gérez les rôles et permissions des utilisateurs.",
-    "permissionManagement": "Gestion des permissions",
-    "permissionManagementDescription": "Configurez les permissions détaillées pour chaque rôle.",
-    "tenantManagement": "Gestion des tenants",
-    "tenantManagementDescription": "Gérez les tenants et leurs configurations système.",
-    "auditLogs": "Audit et logs",
-    "auditLogsDescription": "Consultez les logs d'activité et les actions des utilisateurs.",
-    "backupRestore": "Sauvegarde et restauration",
-    "backupRestoreDescription": "Sauvegardez et restaurez les données de votre système.",
-    "systemStats": "Statistiques système",
-    "systemStatsDescription": "Consultez les métriques système, performances et utilisation des ressources.",
-    "totalUsers": "Total utilisateurs",
-    "activeUsers": "Utilisateurs actifs",
-    "totalCompanies": "Total entreprises",
-    "totalContacts": "Total contacts",
-    "totalActivities": "Total activités",
-    "totalTenants": "Total tenants",
-    "activeTenants": "Tenants actifs",
-    "systemResources": "Ressources système",
-    "cpuUsage": "Utilisation CPU",
-    "databaseSize": "Taille base de données",
-    "storageUsed": "Stockage utilisé",
-    "lastMonth": "Ce mois-ci",
-    "manage": "Gérer",
-    "comingSoon": "Bientôt disponible",
-    "extensions": "Extensions",
-    "extensionsDescription": "Gérez vos extensions et découvrez de nouvelles fonctionnalités pour votre CRM.",
-    "integrations": "Intégrations",
-    "integrationsDescription": "Connectez votre CRM à d'autres outils et services externes.",
-    "dataImport": "Import de données",
-    "dataImportDescription": "Importez des données depuis des fichiers CSV, Excel ou d'autres sources externes."
   }
 }

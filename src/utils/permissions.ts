@@ -126,3 +126,85 @@ export function canManageTenants(user: User | null): boolean {
 export function canSeeSuperAdminFeatures(user: User | null): boolean {
   return isSuperAdmin(user)
 }
+
+/**
+ * Parse les permissions JSON de l'utilisateur
+ */
+export function parseUserPermissions(
+  user: User | null,
+): Record<string, Record<string, boolean>> | null {
+  if (!user) return null
+
+  const userRole = user.role || user.Role
+  if (!userRole?.permissions) return null
+
+  try {
+    const permissions =
+      typeof userRole.permissions === 'string'
+        ? JSON.parse(userRole.permissions)
+        : userRole.permissions
+
+    return permissions
+  } catch (error) {
+    console.error('Erreur lors du parsing des permissions:', error)
+    return null
+  }
+}
+
+/**
+ * Vérifie si l'utilisateur a une permission spécifique sur une ressource
+ */
+export function hasResourcePermission(
+  user: User | null,
+  resource: string,
+  action: 'read' | 'create' | 'update' | 'delete',
+): boolean {
+  if (isSuperAdmin(user)) return true
+
+  const permissions = parseUserPermissions(user)
+  if (!permissions) return false
+
+  return permissions[resource]?.[action] === true
+}
+
+/**
+ * Vérifie si l'utilisateur peut gérer les utilisateurs
+ */
+export function canManageUsers(user: User | null): boolean {
+  if (isSuperAdmin(user)) return true
+  if (!isAdmin(user)) return false
+
+  return (
+    hasResourcePermission(user, 'users', 'create') ||
+    hasResourcePermission(user, 'users', 'update') ||
+    hasResourcePermission(user, 'users', 'delete')
+  )
+}
+
+/**
+ * Vérifie si l'utilisateur peut gérer les rôles
+ */
+export function canManageRoles(user: User | null): boolean {
+  if (isSuperAdmin(user)) return true
+  if (!isAdmin(user)) return false
+
+  return (
+    hasResourcePermission(user, 'roles', 'create') ||
+    hasResourcePermission(user, 'roles', 'update') ||
+    hasResourcePermission(user, 'roles', 'delete')
+  )
+}
+
+/**
+ * Vérifie si l'utilisateur peut gérer les permissions
+ */
+export function canManagePermissions(user: User | null): boolean {
+  if (isSuperAdmin(user)) return true
+  if (!isAdmin(user)) return false
+
+  return (
+    hasResourcePermission(user, 'roles', 'create') ||
+    hasResourcePermission(user, 'roles', 'update') ||
+    hasResourcePermission(user, 'roles', 'delete')
+  )
+}

@@ -44,13 +44,12 @@ export const AuthService = {
     try {
       return await apiRequest<User>('/auth/me')
     } catch (error) {
-      // Si l'erreur est due à une authentification invalide, déconnexion silencieuse
+      // Ne pas déconnecter automatiquement, laisser le guard gérer
       if (
-        (error as Error).message?.includes('Session expirée') ||
+        (error as Error).message === 'SESSION_EXPIRED' ||
         (error as Error).message?.includes('authentification')
       ) {
-        this.logout()
-        throw new Error('Session utilisateur expirée')
+        throw new Error('SESSION_EXPIRED')
       }
       throw error
     }

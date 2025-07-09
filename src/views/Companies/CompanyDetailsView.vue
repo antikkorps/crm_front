@@ -912,10 +912,14 @@ async function handleTaskCreated(taskData: TaskCreateDto) {
       companyId: companyId.value,
     }
 
-    await activityStore.createTask(taskWithCompany)
-    toastStore.success(t('tasks.createdSuccessfully', 'Tâche créée avec succès'))
-    // Rafraîchir les tâches
-    fetchCompanyTasks()
+    const newTask = await activityStore.createTask(taskWithCompany)
+    if (newTask) {
+      toastStore.success(t('tasks.createdSuccessfully', 'Tâche créée avec succès'))
+      // Rafraîchir les tâches
+      await fetchCompanyTasks()
+    } else {
+      toastStore.error(t('tasks.failedToCreate', 'Échec de la création de la tâche'))
+    }
   } catch (error) {
     console.error('Failed to create task:', error)
     toastStore.error(t('tasks.failedToCreate', 'Échec de la création de la tâche'))
@@ -924,10 +928,14 @@ async function handleTaskCreated(taskData: TaskCreateDto) {
 
 async function handleTaskUpdated(taskData: TaskUpdateDto & { id: string }) {
   try {
-    await activityStore.updateTask(taskData.id, taskData)
-    toastStore.success(t('tasks.updatedSuccessfully', 'Tâche mise à jour avec succès'))
-    // Rafraîchir les tâches
-    fetchCompanyTasks()
+    const updatedTask = await activityStore.updateTask(taskData.id, taskData)
+    if (updatedTask) {
+      toastStore.success(t('tasks.updatedSuccessfully', 'Tâche mise à jour avec succès'))
+      // Rafraîchir les tâches
+      await fetchCompanyTasks()
+    } else {
+      toastStore.error(t('tasks.failedToUpdate', 'Échec de la mise à jour de la tâche'))
+    }
   } catch (error) {
     console.error('Failed to update task:', error)
     toastStore.error(t('tasks.failedToUpdate', 'Échec de la mise à jour de la tâche'))
