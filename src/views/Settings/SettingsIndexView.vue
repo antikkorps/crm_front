@@ -46,6 +46,130 @@
         </div>
       </div>
 
+      <!-- Carte gestion des utilisateurs (Admin uniquement) -->
+      <div
+        v-if="canManageUsersComputed"
+        class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow"
+      >
+        <div class="card-body">
+          <div class="flex justify-between items-center mb-2">
+            <h2 class="card-title">{{ t('admin.userManagement') }}</h2>
+            <div class="badge badge-primary p-3">
+              <Iconify icon="mdi:account-multiple" class="w-5 h-5" />
+            </div>
+          </div>
+          <p class="text-sm mb-4">
+            {{ t('admin.userManagementDescription') }}
+          </p>
+          <div class="card-actions justify-end">
+            <button class="btn btn-primary btn-sm" @click="navigateTo('users')">
+              {{ t('common.manage') }}
+              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte gestion des rôles (Admin uniquement) -->
+      <div
+        v-if="canManageRolesComputed"
+        class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow"
+      >
+        <div class="card-body">
+          <div class="flex justify-between items-center mb-2">
+            <h2 class="card-title">{{ t('admin.roleManagement') }}</h2>
+            <div class="badge badge-primary p-3">
+              <Iconify icon="mdi:shield-account" class="w-5 h-5" />
+            </div>
+          </div>
+          <p class="text-sm mb-4">
+            {{ t('admin.roleManagementDescription') }}
+          </p>
+          <div class="flex justify-between items-center">
+            <span class="badge badge-outline badge-sm">{{ t('common.comingSoon') }}</span>
+            <button class="btn btn-primary btn-sm" disabled>
+              {{ t('common.manage') }}
+              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte gestion des permissions (Admin uniquement) -->
+      <div
+        v-if="canManagePermissionsComputed"
+        class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow"
+      >
+        <div class="card-body">
+          <div class="flex justify-between items-center mb-2">
+            <h2 class="card-title">{{ t('admin.permissionManagement') }}</h2>
+            <div class="badge badge-primary p-3">
+              <Iconify icon="mdi:lock" class="w-5 h-5" />
+            </div>
+          </div>
+          <p class="text-sm mb-4">
+            {{ t('admin.permissionManagementDescription') }}
+          </p>
+          <div class="flex justify-between items-center">
+            <span class="badge badge-outline badge-sm">{{ t('common.comingSoon') }}</span>
+            <button class="btn btn-primary btn-sm" disabled>
+              {{ t('common.manage') }}
+              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte extensions (Admin uniquement) -->
+      <div
+        v-if="canManageUsersComputed"
+        class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow"
+      >
+        <div class="card-body">
+          <div class="flex justify-between items-center mb-2">
+            <h2 class="card-title">{{ t('admin.extensions') }}</h2>
+            <div class="badge badge-primary p-3">
+              <Iconify icon="mdi:puzzle" class="w-5 h-5" />
+            </div>
+          </div>
+          <p class="text-sm mb-4">
+            {{ t('admin.extensionsDescription') }}
+          </p>
+          <div class="flex justify-between items-center">
+            <span class="badge badge-outline badge-sm">{{ t('common.comingSoon') }}</span>
+            <button class="btn btn-primary btn-sm" disabled>
+              {{ t('common.manage') }}
+              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte intégrations (Admin uniquement) -->
+      <div
+        v-if="canManageUsersComputed"
+        class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow"
+      >
+        <div class="card-body">
+          <div class="flex justify-between items-center mb-2">
+            <h2 class="card-title">{{ t('admin.integrations') }}</h2>
+            <div class="badge badge-primary p-3">
+              <Iconify icon="mdi:connection" class="w-5 h-5" />
+            </div>
+          </div>
+          <p class="text-sm mb-4">
+            {{ t('admin.integrationsDescription') }}
+          </p>
+          <div class="flex justify-between items-center">
+            <span class="badge badge-outline badge-sm">{{ t('common.comingSoon') }}</span>
+            <button class="btn btn-primary btn-sm" disabled>
+              {{ t('common.manage') }}
+              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Carte notifications -->
       <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
         <div class="card-body">
@@ -133,17 +257,51 @@
           </div>
         </div>
       </div>
+
+      <!-- Carte import de données (Admin uniquement) -->
+      <div
+        v-if="canManageUsersComputed"
+        class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow"
+      >
+        <div class="card-body">
+          <div class="flex justify-between items-center mb-2">
+            <h2 class="card-title">{{ t('admin.dataImport') }}</h2>
+            <div class="badge badge-primary p-3">
+              <Iconify icon="mdi:upload" class="w-5 h-5" />
+            </div>
+          </div>
+          <p class="text-sm mb-4">
+            {{ t('admin.dataImportDescription') }}
+          </p>
+          <div class="flex justify-between items-center">
+            <span class="badge badge-outline badge-sm">{{ t('common.comingSoon') }}</span>
+            <button class="btn btn-primary btn-sm" disabled>
+              {{ t('common.manage') }}
+              <Iconify icon="mdi:chevron-right" class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
 import PageHeader from '@/components/common/PageHeader.vue'
+import { useUserStore } from '@/stores/user'
+import { canManagePermissions, canManageRoles, canManageUsers } from '@/utils/permissions'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const { t } = useI18n()
+const userStore = useUserStore()
+
+// Vérifier les permissions spécifiques basées sur le JSON des permissions
+const canManageUsersComputed = computed(() => canManageUsers(userStore.currentUser))
+const canManageRolesComputed = computed(() => canManageRoles(userStore.currentUser))
+const canManagePermissionsComputed = computed(() => canManagePermissions(userStore.currentUser))
 
 // Fonction pour naviguer vers les différentes sections de paramètres
 function navigateTo(section: string) {
@@ -154,6 +312,21 @@ function navigateTo(section: string) {
     case 'segments':
       // Cette fonctionnalité n'est pas encore implémentée
       router.push('/settings/segments')
+      break
+    case 'users':
+      router.push('/admin/users')
+      break
+    case 'roles':
+      router.push('/admin/roles')
+      break
+    case 'permissions':
+      router.push('/admin/permissions')
+      break
+    case 'extensions':
+      router.push('/admin/extensions')
+      break
+    case 'integrations':
+      router.push('/admin/integrations')
       break
     default:
       console.warn(`La section ${section} n'est pas encore implémentée`)

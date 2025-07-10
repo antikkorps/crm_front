@@ -37,6 +37,11 @@ export async function apiRequest<T>(endpoint: string, options: RequestOptions = 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
 
+      // Log détaillé de l'erreur
+      console.log('🔍 [DEBUG] API Error - Status:', response.status)
+      console.log('🔍 [DEBUG] API Error - Data:', errorData)
+      console.log('🔍 [DEBUG] API Error - Endpoint:', endpoint)
+
       // Gestion spécifique des erreurs d'authentification
       if (response.status === 401) {
         // Pour les endpoints de login/register, ne pas traiter comme une session expirée
@@ -52,7 +57,9 @@ export async function apiRequest<T>(endpoint: string, options: RequestOptions = 
         const currentPath = window.location.pathname
         router.push(`/login?redirect=${encodeURIComponent(currentPath)}`)
 
-        throw new Error('Session expirée. Veuillez vous reconnecter.')
+        // Ne pas lancer d'erreur pour éviter les toasts rouges
+        // L'erreur sera gérée par les composants qui peuvent afficher un message informatif
+        throw new Error('SESSION_EXPIRED')
       }
 
       throw new Error(errorData.error || `Erreur HTTP ${response.status}`)

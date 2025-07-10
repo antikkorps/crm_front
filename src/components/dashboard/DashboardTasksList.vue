@@ -195,6 +195,7 @@ import {
 import { useToastStore } from '@/stores/toast'
 import type { ApiActivity } from '@/types/dashboard.types'
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 // Props
 const props = defineProps({
@@ -220,6 +221,9 @@ const props = defineProps({
     default: true, // Par défaut, cacher les tâches terminées sur le tableau de bord
   },
 })
+
+// I18n
+const { t } = useI18n()
 
 // État
 const allTasks = ref<ApiActivity[]>([])
@@ -254,8 +258,8 @@ const fetchTasks = async () => {
 
     const errorMessage = error instanceof Error ? error.message : String(error)
 
-    if (errorMessage.includes('Session expirée')) {
-      toastStore.error('Votre session a expiré, vous allez être redirigé vers la page de connexion')
+    if (errorMessage === 'SESSION_EXPIRED') {
+      toastStore.info(t('auth.sessionExpired'))
       return
     } else {
       toastStore.error('Erreur lors du chargement des tâches')

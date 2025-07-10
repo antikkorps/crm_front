@@ -264,6 +264,23 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  // Charger l'utilisateur courant depuis l'API
+  async function loadCurrentUser() {
+    if (!currentUser.value) {
+      try {
+        const { AuthService } = await import('@/services/auth.service')
+        const user = await AuthService.getCurrentUser()
+        currentUser.value = user
+        return user
+      } catch (error) {
+        console.error("Erreur lors du chargement de l'utilisateur courant:", error)
+        currentUser.value = null
+        throw error
+      }
+    }
+    return currentUser.value
+  }
+
   // Définir l'utilisateur courant
   function setCurrentUser(user: User | null) {
     currentUser.value = user
@@ -316,6 +333,7 @@ export const useUserStore = defineStore('user', () => {
     updateAvatar,
     getUserSettings,
     updateUserSettings,
+    loadCurrentUser,
     setCurrentUser,
     updateCurrentUser,
   }

@@ -11,6 +11,7 @@ import type {
   UpdateActivityDto,
 } from '../types/activity.types'
 import type { ApiActivity } from '../types/dashboard.types'
+import { getToken } from '../utils/token'
 import { apiRequest } from './api.service'
 
 // Fonction utilitaire pour convertir ApiActivity vers Activity
@@ -97,6 +98,18 @@ export const ActivityService = {
 
   // Créer une nouvelle tâche
   async createTask(data: TaskCreateDto): Promise<Activity> {
+    console.log('🔍 [DEBUG] createTask - Données reçues:', JSON.stringify(data, null, 2))
+    console.log('🔍 [DEBUG] createTask - taskStatus:', data.taskStatus)
+    console.log('🔍 [DEBUG] createTask - Type de taskStatus:', typeof data.taskStatus)
+
+    // Vérifier le token d'authentification
+    const token = getToken()
+    console.log('🔍 [DEBUG] createTask - Token présent:', !!token)
+    console.log(
+      '🔍 [DEBUG] createTask - Token (premiers caractères):',
+      token ? token.substring(0, 20) + '...' : 'null',
+    )
+
     const response = await apiRequest<ApiActivity>('/v1/activities', {
       method: 'POST',
       body: data,
@@ -261,6 +274,8 @@ export const ActivityService = {
 
   // Créer une nouvelle activité (générique)
   async createActivity(data: ActivityCreateDto): Promise<Activity> {
+    console.log('🔍 [DEBUG] createActivity - Données reçues:', JSON.stringify(data, null, 2))
+    console.log("🔍 [DEBUG] createActivity - Type d'activité:", data.type)
     const response = await apiRequest<ApiActivity>('/v1/activities', {
       method: 'POST',
       body: data,

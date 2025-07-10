@@ -64,11 +64,42 @@ const routes = [
     component: () => import('../views/Admin/AdminIndexView.vue'),
     meta: { layout: 'dashboard', requiresAuth: true, requiresAdmin: true },
   },
-  // Pour le futur
   {
-    path: '/settings/segments',
+    path: '/contacts',
+    name: 'contacts-index',
+    component: () => import('../views/Contacts/ContactsIndexView.vue'),
+    meta: { layout: 'dashboard', requiresAuth: true },
+  },
+  {
+    path: '/contacts/list',
+    name: 'contacts-list',
+    component: () => import('../views/Contacts/ContactsListView.vue'),
+    meta: { layout: 'dashboard', requiresAuth: true },
+  },
+  {
+    path: '/contacts/:id',
+    name: 'contact-detail',
+    component: () => import('../views/Contacts/ContactDetailsView.vue'),
+    props: true,
+    meta: { layout: 'dashboard', requiresAuth: true },
+  },
+  {
+    path: '/segments',
     name: 'segments',
-    component: () => import('../views/Settings/SettingsIndexView.vue'),
+    component: () => import('../views/Segments/SegmentsListView.vue'),
+    meta: { layout: 'dashboard', requiresAuth: true },
+  },
+  {
+    path: '/segments/create',
+    name: 'segment-create',
+    component: () => import('../views/Segments/SegmentFormView.vue'),
+    meta: { layout: 'dashboard', requiresAuth: true },
+  },
+  {
+    path: '/segments/:id',
+    name: 'segment-detail',
+    component: () => import('../views/Segments/SegmentDetailsView.vue'),
+    props: true,
     meta: { layout: 'dashboard', requiresAuth: true },
   },
 ]

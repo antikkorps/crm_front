@@ -50,6 +50,20 @@ export const useToastStore = defineStore('toast', () => {
     return addToast({ message, type: 'info', duration })
   }
 
+  // Fonction utilitaire pour gérer les erreurs de session expirée
+  const handleError = (error: unknown, defaultMessage: string, sessionExpiredMessage?: string) => {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+
+    if (errorMessage === 'SESSION_EXPIRED') {
+      // Utiliser le message personnalisé ou le message par défaut traduit
+      const message =
+        sessionExpiredMessage || 'Votre session est terminée, veuillez vous reconnecter'
+      return addToast({ message, type: 'info', duration: 4000 })
+    } else {
+      return addToast({ message: defaultMessage, type: 'error', duration: 5000 })
+    }
+  }
+
   return {
     toasts,
     addToast,
@@ -58,5 +72,6 @@ export const useToastStore = defineStore('toast', () => {
     error,
     warning,
     info,
+    handleError,
   }
 })
