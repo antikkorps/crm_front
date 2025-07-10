@@ -211,11 +211,11 @@
 import { AuthService } from '@/services/auth.service'
 import { useUserStore } from '@/stores/user'
 import type { User } from '@/types/auth.types'
+import { canAccessAdmin } from '@/utils/permissions'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ThemeToggle from './ThemeToggle.vue'
-import { canAccessAdmin } from '@/utils/permissions'
 
 const { t } = useI18n()
 const router = useRouter()
