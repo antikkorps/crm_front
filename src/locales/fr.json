@@ -138,7 +138,13 @@
     "percentage": "Pourcentage",
     "user": "Utilisateur",
     "days": "jours",
-    "contacts": "Contacts"
+    "contacts": "Contacts",
+    "showMore": "Afficher plus",
+    "showLess": "Afficher moins",
+    "customize": "Personnaliser",
+    "additionalActions": "Actions supplémentaires",
+    "viewAll": "Voir tout",
+    "vsLastMonth": "vs mois dernier"
   },
   "companies": {
     "title": "Entreprises",
@@ -230,7 +236,17 @@
     "contactsByCompany": "Contacts par entreprise",
     "count": "Nombre",
     "percentage": "Pourcentage",
-    "user": "Utilisateur"
+    "user": "Utilisateur",
+    "mainStatistics": "Statistiques principales",
+    "performanceIndicators": "Indicateurs de performance",
+    "detailedAnalytics": "Analyses détaillées",
+    "findDuplicates": "Rechercher les doublons",
+    "bulkEdit": "Édition en masse",
+    "manageTags": "Gérer les tags",
+    "recentActivity": "Activité récente",
+    "noStatusData": "Aucune donnée de statut disponible",
+    "noUserData": "Aucune donnée utilisateur disponible",
+    "noCompanyData": "Aucune donnée d'entreprise disponible"
   },
   "segments": {
     "title": "Segments",
@@ -303,7 +319,9 @@
     "dynamic": "Dynamique",
     "manual": "Manuel",
     "noRulesDefined": "Aucune règle définie",
-    "addFirstRule": "Ajoutez votre première règle pour commencer"
+    "addFirstRule": "Ajoutez votre première règle pour commencer",
+    "segmentAnalytics": "Analyses des segments",
+    "noSegmentData": "Aucune donnée de segment disponible"
   },
   "notes": {
     "title": "Notes",
