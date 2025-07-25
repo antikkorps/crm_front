@@ -77,6 +77,12 @@ const routes = [
     meta: { layout: 'dashboard', requiresAuth: true },
   },
   {
+    path: '/contacts/create',
+    name: 'contact-create',
+    component: () => import('../views/Contacts/ContactCreateView.vue'),
+    meta: { layout: 'dashboard', requiresAuth: true },
+  },
+  {
     path: '/contacts/:id',
     name: 'contact-detail',
     component: () => import('../views/Contacts/ContactDetailsView.vue'),

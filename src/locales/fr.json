@@ -93,6 +93,7 @@
     "operatingRooms": "Salles de chirurgie",
     "allUsers": "Tous les utilisateurs",
     "selectSize": "Sélectionner la taille",
+    "results": "résultats",
     "revenue": "Chiffre d'affaires",
     "search": "Rechercher",
     "filter": "Filtrer",
@@ -138,7 +139,21 @@
     "percentage": "Pourcentage",
     "user": "Utilisateur",
     "days": "jours",
-    "contacts": "Contacts"
+    "contacts": "Contacts",
+    "showMore": "Afficher plus",
+    "showLess": "Afficher moins",
+    "customize": "Personnaliser",
+    "additionalActions": "Actions supplémentaires",
+    "viewAll": "Voir tout",
+    "vsLastMonth": "vs mois dernier",
+    "showing": "Affichage de",
+    "of": "sur",
+    "clear": "Effacer",
+    "company": "Entreprise",
+    "noCompany": "Aucune entreprise",
+    "firstNamePlaceholder": "Prénom",
+    "lastNamePlaceholder": "Nom",
+    "phonePlaceholder": "+33 1 23 45 67 89"
   },
   "companies": {
     "title": "Entreprises",
@@ -156,6 +171,7 @@
     "startAddingCompany": "Commencez par ajouter votre première entreprise",
     "searchCompanyPlaceholder": "Rechercher une entreprise...",
     "noCompany": "Aucune entreprise trouvée",
+    "noResults": "Aucune entreprise trouvée",
     "companyNotFound": "Entreprise non trouvée",
     "companyNotFoundMessage": "l'entreprise que vous recherchez n'a pas été trouvée",
     "failedToLoadCompanies": "Échec du chargement des entreprises",
@@ -167,7 +183,9 @@
     "clientInfo": "Informations client",
     "contactInfo": "Informations de contact",
     "addressInfo": "Adresse",
-    "additionalInfo": "Informations supplémentaires"
+    "additionalInfo": "Informations supplémentaires",
+    "all": "Toutes",
+    "allCompanies": "Toutes les entreprises"
   },
   "contacts": {
     "title": "Contacts",
@@ -176,6 +194,8 @@
     "delete": "Supprimer le contact",
     "noAddress": "Pas d'adresse renseignée",
     "noContacts": "Aucun contact trouvé",
+    "noContactsDescription": "Commencez par ajouter votre premier contact",
+    "addFirstContact": "Ajouter votre premier contact",
     "main": "Contact principal",
     "secondary": "Contact secondaire",
     "defineAsMain": "Définir comme contact principal",
@@ -183,6 +203,8 @@
     "allContactsDescription": "Gérez tous vos contacts avec des filtres avancés et des actions en lot.",
     "totalContacts": "Total contacts",
     "contactsInSystem": "contacts dans le système",
+    "contactsCount": "contacts",
+    "results": "résultats",
     "mainContacts": "Contacts principaux",
     "primaryContacts": "contacts principaux",
     "quickActions": "Actions rapides",
@@ -190,6 +212,7 @@
     "importContacts": "Importer des contacts",
     "exportContacts": "Exporter des contacts",
     "searchContacts": "Rechercher des contacts...",
+    "searchPlaceholder": "Rechercher par nom, email...",
     "filterByStatus": "Filtrer par statut",
     "filterByCompany": "Filtrer par entreprise",
     "filterByAssignedTo": "Filtrer par assigné",
@@ -208,12 +231,13 @@
     "editContact": "Modifier le contact",
     "positionPlaceholder": "Ex: Directeur, Manager, Chef de service...",
     "createdSuccessfully": "Contact créé avec succès",
+    "contactCreatedSuccess": "Contact créé avec succès",
     "updatedSuccessfully": "Contact mis à jour avec succès",
     "deletedSuccessfully": "Contact supprimé avec succès",
     "failedToCreate": "Échec de la création du contact",
     "failedToUpdate": "Échec de la mise à jour du contact",
     "failedToDelete": "Échec de la suppression du contact",
-    "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce contact ?",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer {name} ?",
     "assignedContacts": "Contacts assignés",
     "contactsAssignedToUser": "contacts assignés à un utilisateur",
     "contactsWithEmail": "contacts avec email",
@@ -230,7 +254,20 @@
     "contactsByCompany": "Contacts par entreprise",
     "count": "Nombre",
     "percentage": "Pourcentage",
-    "user": "Utilisateur"
+    "user": "Utilisateur",
+    "mainStatistics": "Statistiques principales",
+    "performanceIndicators": "Indicateurs de performance",
+    "detailedAnalytics": "Analyses détaillées",
+    "findDuplicates": "Rechercher les doublons",
+    "bulkEdit": "Édition en masse",
+    "manageTags": "Gérer les tags",
+    "recentActivity": "Activité récente",
+    "noStatusData": "Aucune donnée de statut disponible",
+    "noUserData": "Aucune donnée utilisateur disponible",
+    "noCompanyData": "Aucune donnée d'entreprise disponible",
+    "selectCompany": "Sélectionner une entreprise",
+    "selectCompanyPlaceholder": "Rechercher et sélectionner une entreprise...",
+    "companyEditNote": "L'entreprise ne peut pas être modifiée après création"
   },
   "segments": {
     "title": "Segments",
@@ -303,7 +340,9 @@
     "dynamic": "Dynamique",
     "manual": "Manuel",
     "noRulesDefined": "Aucune règle définie",
-    "addFirstRule": "Ajoutez votre première règle pour commencer"
+    "addFirstRule": "Ajoutez votre première règle pour commencer",
+    "segmentAnalytics": "Analyses des segments",
+    "noSegmentData": "Aucune donnée de segment disponible"
   },
   "notes": {
     "title": "Notes",
@@ -725,5 +764,15 @@
       "dataImport": "Import de données",
       "dataImportDescription": "Importez des données depuis des fichiers CSV, Excel ou d'autres sources externes."
     }
+  },
+  "validation": {
+    "required": "Ce champ est requis",
+    "minLength": "Minimum {min} caractères requis",
+    "maxLength": "Maximum {max} caractères autorisés",
+    "invalidName": "Seules les lettres, espaces, apostrophes et tirets sont autorisés",
+    "invalidEmail": "Adresse email invalide",
+    "invalidPhone": "Format de numéro de téléphone invalide",
+    "phoneMinLength": "Le numéro doit contenir au moins 8 chiffres",
+    "phoneMaxLength": "Le numéro ne peut dépasser 20 caractères"
   }
 }

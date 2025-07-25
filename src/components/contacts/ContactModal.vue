@@ -8,6 +8,7 @@
       <ContactForm
         :contact="contact"
         :company-id="companyId"
+        :companies="companies"
         :is-edit-mode="isEditMode"
         :is-submitting="isSubmitting"
         @submit="handleSubmit"
@@ -22,7 +23,8 @@
 </template>
 
 <script setup lang="ts">
-import type { CompanyContact, ContactCreateDto, ContactUpdateDto } from '@/types/company.types'
+import type { Contact, ContactCreateDto, ContactUpdateDto } from '@/types/contact.types'
+import type { Company } from '@/types/company.types'
 import { useI18n } from 'vue-i18n'
 import ContactForm from './ContactForm.vue'
 
@@ -30,18 +32,19 @@ const { t } = useI18n()
 
 defineProps<{
   isOpen: boolean
-  contact?: CompanyContact | null
+  contact?: Contact | null
   companyId: string
+  companies: Company[]
   isEditMode?: boolean
   isSubmitting?: boolean
 }>()
 
 const emit = defineEmits<{
   close: []
-  submit: [data: ContactCreateDto | (ContactUpdateDto & { id: string })]
+  submit: [data: any]
 }>()
 
-function handleSubmit(data: ContactCreateDto | (ContactUpdateDto & { id: string })) {
+function handleSubmit(data: any) {
   emit('submit', data)
 }
 

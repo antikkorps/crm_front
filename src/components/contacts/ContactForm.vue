@@ -1,178 +1,184 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="space-y-6">
-    <!-- Section: Informations personnelles -->
-    <div class="card bg-base-100 border border-base-300">
-      <div class="card-body p-6">
-        <h3 class="card-title text-lg mb-4">
-          <Iconify icon="mdi:account" class="w-5 h-5" />
-          {{ t('contacts.personalInfo', 'Informations personnelles') }}
-        </h3>
-
-        <!-- Nom et Prénom -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text font-medium">
-                {{ t('common.firstName') }} <span class="text-error">*</span>
-              </span>
-            </label>
-            <input
-              v-model="formData.firstName"
-              type="text"
-              class="input input-bordered w-full"
-              :class="{ 'input-error': errors.firstName }"
-              :placeholder="t('common.firstNamePlaceholder', 'Prénom du contact')"
-              required
-              @blur="validateField('firstName')"
-            />
-            <label v-if="errors.firstName" class="label">
-              <span class="label-text-alt text-error">{{ errors.firstName }}</span>
-            </label>
+  <form @submit.prevent="handleSubmit" class="space-y-4">
+    <!-- Layout en grille compacte -->
+    <div class="bg-base-100 rounded-lg border border-base-300 p-4">
+      <!-- Entreprise (en haut, pleine largeur) -->
+      <div class="mb-4">
+        <!-- Mode édition : affichage lecture seule -->
+        <div v-if="isEditMode" class="form-control">
+          <label class="label label-text font-medium mb-1">
+            <Iconify icon="mdi:office-building" class="w-4 h-4 mr-2" />
+            {{ t('common.company') }}
+          </label>
+          <div class="input input-sm input-bordered bg-base-200 flex items-center">
+            <span>{{ contact?.company?.name || t('common.noCompany', 'Aucune entreprise') }}</span>
           </div>
-
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text font-medium">
-                {{ t('common.lastName') }} <span class="text-error">*</span>
-              </span>
-            </label>
-            <input
-              v-model="formData.lastName"
-              type="text"
-              class="input input-bordered w-full"
-              :class="{ 'input-error': errors.lastName }"
-              :placeholder="t('common.lastNamePlaceholder', 'Nom de famille du contact')"
-              required
-              @blur="validateField('lastName')"
-            />
-            <label v-if="errors.lastName" class="label">
-              <span class="label-text-alt text-error">{{ errors.lastName }}</span>
-            </label>
+          <div class="text-xs text-base-content/70 mt-1">
+            {{ t('contacts.companyEditNote', 'L\'entreprise ne peut pas être modifiée après création') }}
           </div>
         </div>
 
-        <!-- Position -->
+        <!-- Mode création : sélection de l'entreprise -->
+        <div v-else>
+          <CompanySearch
+            v-model="formData.companyId"
+            :label="t('common.company')"
+            :placeholder="t('contacts.selectCompanyPlaceholder', 'Rechercher et sélectionner une entreprise...')"
+            :error-message="errors.companyId"
+            required
+            @company-selected="onCompanySelected"
+          />
+        </div>
+      </div>
+
+      <!-- Grille des champs principaux -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Prénom -->
         <div class="form-control">
-          <label class="label">
-            <span class="label-text font-medium">{{ t('common.position') }}</span>
+          <label class="label label-text font-medium mb-1">
+            {{ t('common.firstName') }} <span class="text-error">*</span>
           </label>
           <input
-            v-model="formData.position"
+            v-model="formData.firstName"
             type="text"
-            class="input input-bordered w-full"
-            :class="{ 'input-error': errors.position }"
-            :placeholder="
-              t('contacts.positionPlaceholder', 'Ex: Directeur, Manager, Chef de service...')
-            "
-            @blur="validateField('position')"
+            class="input input-sm input-bordered w-full"
+            :class="{ 'input-error': errors.firstName }"
+            :placeholder="t('common.firstNamePlaceholder', 'Prénom')"
+            required
+            @blur="validateField('firstName')"
           />
-          <label v-if="errors.position" class="label">
-            <span class="label-text-alt text-error">{{ errors.position }}</span>
+          <div v-if="errors.firstName" class="text-xs text-error mt-1">
+            {{ errors.firstName }}
+          </div>
+        </div>
+
+        <!-- Nom -->
+        <div class="form-control">
+          <label class="label label-text font-medium mb-1">
+            {{ t('common.lastName') }} <span class="text-error">*</span>
           </label>
+          <input
+            v-model="formData.lastName"
+            type="text"
+            class="input input-sm input-bordered w-full"
+            :class="{ 'input-error': errors.lastName }"
+            :placeholder="t('common.lastNamePlaceholder', 'Nom')"
+            required
+            @blur="validateField('lastName')"
+          />
+          <div v-if="errors.lastName" class="text-xs text-error mt-1">
+            {{ errors.lastName }}
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-control">
+          <label class="label label-text font-medium mb-1">
+            <Iconify icon="mdi:email" class="w-4 h-4 mr-1" />
+            {{ t('common.email') }}
+          </label>
+          <input
+            v-model="formData.email"
+            type="email"
+            class="input input-sm input-bordered w-full"
+            :class="{ 'input-error': errors.email }"
+            placeholder="contact@entreprise.com"
+            @blur="validateField('email')"
+          />
+          <div v-if="errors.email" class="text-xs text-error mt-1">
+            {{ errors.email }}
+          </div>
+        </div>
+
+        <!-- Téléphone -->
+        <div class="form-control">
+          <label class="label label-text font-medium mb-1">
+            <Iconify icon="mdi:phone" class="w-4 h-4 mr-1" />
+            {{ t('common.phone') }}
+          </label>
+          <input
+            v-model="formData.phone"
+            type="tel"
+            class="input input-sm input-bordered w-full"
+            :class="{ 'input-error': errors.phone }"
+            :placeholder="t('common.phonePlaceholder', '+33 1 23 45 67 89')"
+            @blur="validateField('phone')"
+          />
+          <div v-if="errors.phone" class="text-xs text-error mt-1">
+            {{ errors.phone }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Position (pleine largeur en bas) -->
+      <div class="form-control mt-4">
+        <label class="label label-text font-medium mb-1">
+          <Iconify icon="mdi:briefcase" class="w-4 h-4 mr-1" />
+          {{ t('common.position') }}
+        </label>
+        <input
+          v-model="formData.position"
+          type="text"
+          class="input input-sm input-bordered w-full"
+          :class="{ 'input-error': errors.position }"
+          :placeholder="t('contacts.positionPlaceholder', 'Ex: Directeur, Manager...')"
+          @blur="validateField('position')"
+        />
+        <div v-if="errors.position" class="text-xs text-error mt-1">
+          {{ errors.position }}
         </div>
       </div>
     </div>
 
-    <!-- Section: Informations de contact -->
-    <div class="card bg-base-100 border border-base-300">
-      <div class="card-body p-6">
-        <h3 class="card-title text-lg mb-4">
-          <Iconify icon="mdi:phone-message" class="w-5 h-5" />
-          {{ t('contacts.contactInfo', 'Informations de contact') }}
-        </h3>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Email -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text font-medium">
-                <Iconify icon="mdi:email" class="w-4 h-4 inline mr-1" />
-                {{ t('common.email') }}
-              </span>
-            </label>
-            <input
-              v-model="formData.email"
-              type="email"
-              class="input input-bordered w-full"
-              :class="{ 'input-error': errors.email }"
-              placeholder="contact@entreprise.com"
-              @blur="validateField('email')"
-            />
-            <label v-if="errors.email" class="label">
-              <span class="label-text-alt text-error">{{ errors.email }}</span>
-            </label>
-          </div>
-
-          <!-- Téléphone -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text font-medium">
-                <Iconify icon="mdi:phone" class="w-4 h-4 inline mr-1" />
-                {{ t('common.phone') }}
-              </span>
-            </label>
-            <input
-              v-model="formData.phone"
-              type="tel"
-              class="input input-bordered w-full"
-              :class="{ 'input-error': errors.phone }"
-              :placeholder="t('common.phonePlaceholder', '+33 1 23 45 67 89')"
-              @blur="validateField('phone')"
-            />
-            <label v-if="errors.phone" class="label">
-              <span class="label-text-alt text-error">{{ errors.phone }}</span>
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Actions -->
-    <div class="flex justify-end space-x-3 pt-4 border-t border-base-300">
+    <!-- Actions compactes -->
+    <div class="flex justify-end space-x-2 pt-3">
       <button
         type="button"
-        class="btn btn-outline"
+        class="btn btn-outline btn-sm"
         @click="$emit('cancel')"
         :disabled="isSubmitting"
       >
-        <Iconify icon="mdi:close" class="w-4 h-4 mr-1" />
-        {{ t('common.cancel') }}
+        <Iconify icon="mdi:close" class="w-4 h-4" />
+        <span class="hidden sm:inline ml-1">{{ t('common.cancel') }}</span>
       </button>
       <button
         type="submit"
-        class="btn btn-primary"
+        class="btn btn-primary btn-sm"
         :disabled="isSubmitting || !isFormValid"
         :class="{ 'btn-disabled': !isFormValid }"
       >
-        <span v-if="isSubmitting" class="loading loading-spinner loading-sm mr-1"></span>
-        <Iconify v-else :icon="isEditMode ? 'mdi:content-save' : 'mdi:plus'" class="w-4 h-4 mr-1" />
-        {{ isEditMode ? t('common.update') : t('contacts.add') }}
+        <span v-if="isSubmitting" class="loading loading-spinner loading-xs mr-1"></span>
+        <Iconify v-else :icon="isEditMode ? 'mdi:content-save' : 'mdi:plus'" class="w-4 h-4" />
+        <span class="hidden sm:inline ml-1">{{ isEditMode ? t('common.update') : t('contacts.add') }}</span>
       </button>
     </div>
   </form>
 </template>
 
 <script setup lang="ts">
-import type { CompanyContact, ContactCreateDto, ContactUpdateDto } from '@/types/company.types'
+import CompanySearch from '@/components/common/CompanySearch.vue'
+import type { Contact, ContactCreateDto, ContactUpdateDto } from '@/types/contact.types'
+import type { Company } from '@/types/company.types'
 import { computed, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
 const props = defineProps<{
-  contact?: CompanyContact | null
+  contact?: Contact | null
   companyId: string
+  companies: Company[]
   isEditMode?: boolean
   isSubmitting?: boolean
 }>()
 
 const emit = defineEmits<{
-  submit: [data: ContactCreateDto | (ContactUpdateDto & { id: string })]
+  submit: [data: any]
   cancel: []
 }>()
 
 // Form data
-const formData = reactive<ContactCreateDto>({
+const formData = reactive({
   firstName: '',
   lastName: '',
   email: '',
@@ -188,6 +194,7 @@ const errors = reactive({
   email: '',
   phone: '',
   position: '',
+  companyId: '',
 })
 
 // Initialize form data when editing
@@ -200,7 +207,7 @@ watch(
       formData.email = newContact.email || ''
       formData.phone = newContact.phone || ''
       formData.position = newContact.position || ''
-      formData.companyId = newContact.companyId
+      formData.companyId = newContact.company?.id || props.companyId
     }
   },
   { immediate: true },
@@ -211,6 +218,7 @@ const isFormValid = computed(() => {
   return (
     formData.firstName.trim() !== '' &&
     formData.lastName.trim() !== '' &&
+    (props.isEditMode || formData.companyId.trim() !== '') &&
     Object.values(errors).every((error) => error === '')
   )
 })
@@ -289,6 +297,12 @@ function validateField(field: keyof typeof errors) {
         }
       }
       break
+
+    case 'companyId':
+      if (!props.isEditMode && !formData.companyId) {
+        errors.companyId = t('validation.required', 'Ce champ est requis')
+      }
+      break
   }
 }
 
@@ -298,6 +312,8 @@ function validateForm(): boolean {
   validateField('lastName')
   validateField('email')
   validateField('phone')
+  validateField('position')
+  validateField('companyId')
 
   return Object.values(errors).every((error) => error === '')
 }
@@ -310,7 +326,7 @@ function handleSubmit() {
 
   if (props.isEditMode && props.contact) {
     // Update mode
-    const updateData: ContactUpdateDto & { id: string } = {
+    const updateData: any = {
       id: props.contact.id,
       firstName: formData.firstName.trim(),
       lastName: formData.lastName.trim(),
@@ -330,7 +346,7 @@ function handleSubmit() {
     emit('submit', updateData)
   } else {
     // Create mode
-    const createData: ContactCreateDto = {
+    const createData: any = {
       firstName: formData.firstName.trim(),
       lastName: formData.lastName.trim(),
       companyId: props.companyId,
@@ -383,6 +399,15 @@ watch(
   () => formData.phone,
   () => validateField('phone'),
 )
+watch(
+  () => formData.companyId,
+  () => validateField('companyId'),
+)
+
+// Gestionnaire pour la sélection de compagnie
+function onCompanySelected() {
+  validateField('companyId')
+}
 
 // Expose functions for parent component
 defineExpose({

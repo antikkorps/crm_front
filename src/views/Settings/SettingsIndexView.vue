@@ -310,8 +310,7 @@ function navigateTo(section: string) {
       router.push('/profile')
       break
     case 'segments':
-      // Cette fonctionnalité n'est pas encore implémentée
-      router.push('/settings/segments')
+      router.push('/contacts')
       break
     case 'users':
       router.push('/admin/users')
