@@ -17,19 +17,17 @@
       </div>
     </div>
 
-    <div v-else class="flex flex-col flex-col-spaced">
+    <div v-else class="space-y-6">
       <!-- En-tête du segment -->
       <div class="card bg-base-100 shadow-md">
         <div class="card-body">
-          <div
-            class="flex flex-col md:flex-row justify-between items-start md:items-center flex-col-spaced-md"
-          >
-            <div>
-              <h1 class="text-2xl font-bold">{{ currentSegment.name }}</h1>
-              <p v-if="currentSegment.description" class="text-gray-600 mt-1">
+          <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+            <div class="flex-1">
+              <h1 class="text-2xl font-bold mb-2">{{ currentSegment.name }}</h1>
+              <p v-if="currentSegment.description" class="text-gray-600 mb-3">
                 {{ currentSegment.description }}
               </p>
-              <div class="flex items-center flex-col-spaced-sm mt-2">
+              <div class="flex flex-wrap gap-2">
                 <span
                   :class="['badge', currentSegment.isDynamic ? 'badge-primary' : 'badge-secondary']"
                 >
@@ -41,7 +39,7 @@
               </div>
             </div>
 
-            <div class="flex flex-col-spaced-sm">
+            <div class="flex flex-col sm:flex-row gap-2 lg:flex-col lg:items-end">
               <button
                 v-if="currentSegment.isDynamic"
                 @click="evaluateSegment"
@@ -87,29 +85,29 @@
       </div>
 
       <!-- Informations du segment -->
-      <div class="grid grid-cols-1 md:grid-cols-2 flex-col-spaced-md">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="card bg-base-100 shadow-md">
           <div class="card-body">
-            <h3 class="card-title">{{ t('segments.segmentInfo') }}</h3>
-            <div class="flex flex-col text-sm">
-              <div class="flex justify-between">
-                <span class="text-gray-600">{{ t('segments.createdBy') }}:</span>
-                <span
-                  >{{ currentSegment.createdBy.firstName }}
-                  {{ currentSegment.createdBy.lastName }}</span
-                >
+            <h3 class="card-title mb-4">{{ t('segments.segmentInfo') }}</h3>
+            <div class="space-y-3 text-sm">
+              <div class="flex justify-between items-start">
+                <span class="text-gray-600 font-medium">{{ t('segments.createdBy') }}:</span>
+                <span class="text-right">
+                  {{ currentSegment.createdBy.firstName }}
+                  {{ currentSegment.createdBy.lastName }}
+                </span>
               </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">{{ t('segments.createdAt') }}:</span>
-                <span>{{ formatDate(currentSegment.createdAt) }}</span>
+              <div class="flex justify-between items-start">
+                <span class="text-gray-600 font-medium">{{ t('segments.createdAt') }}:</span>
+                <span class="text-right">{{ formatDate(currentSegment.createdAt) }}</span>
               </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">{{ t('segments.updatedAt') }}:</span>
-                <span>{{ formatDate(currentSegment.updatedAt) }}</span>
+              <div class="flex justify-between items-start">
+                <span class="text-gray-600 font-medium">{{ t('segments.updatedAt') }}:</span>
+                <span class="text-right">{{ formatDate(currentSegment.updatedAt) }}</span>
               </div>
-              <div v-if="currentSegment.lastEvaluatedAt" class="flex justify-between">
-                <span class="text-gray-600">{{ t('segments.lastEvaluated') }}:</span>
-                <span>{{ formatDate(currentSegment.lastEvaluatedAt) }}</span>
+              <div v-if="currentSegment.lastEvaluatedAt" class="flex justify-between items-start">
+                <span class="text-gray-600 font-medium">{{ t('segments.lastEvaluated') }}:</span>
+                <span class="text-right">{{ formatDate(currentSegment.lastEvaluatedAt) }}</span>
               </div>
             </div>
           </div>
@@ -120,11 +118,17 @@
           class="card bg-base-100 shadow-md"
         >
           <div class="card-body">
-            <h3 class="card-title">{{ t('segments.segmentRules') }}</h3>
-            <div class="text-sm">
-              <div v-for="(rule, index) in currentSegment.rules" :key="index" class="mb-2">
-                <div class="font-medium">{{ t('segments.rule') }} {{ index + 1 }}:</div>
-                <div class="text-gray-600 ml-2">
+            <h3 class="card-title mb-4">{{ t('segments.segmentRules') }}</h3>
+            <div class="space-y-3 text-sm">
+              <div
+                v-for="(rule, index) in currentSegment.rules"
+                :key="index"
+                class="p-3 bg-base-200 rounded-lg"
+              >
+                <div class="font-medium text-primary mb-1">
+                  {{ t('segments.rule') }} {{ index + 1 }}:
+                </div>
+                <div class="text-gray-600">
                   {{ formatRule(rule) }}
                 </div>
               </div>
@@ -136,22 +140,20 @@
       <!-- Liste des contacts -->
       <div class="card bg-base-100 shadow-md">
         <div class="card-body">
-          <div
-            class="flex flex-col md:flex-row justify-between items-start md:items-center flex-col-spaced-md mb-4"
-          >
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
             <h3 class="card-title">{{ t('segments.segmentContacts') }}</h3>
-            <div class="flex flex-col-spaced-sm">
+            <div class="flex flex-col sm:flex-row gap-3">
               <input
                 v-model="searchQuery"
                 type="text"
                 :placeholder="t('contacts.searchContacts')"
-                class="input input-bordered input-sm"
+                class="input input-bordered input-sm w-full sm:w-64"
                 @input="handleSearch"
               />
               <button
                 v-if="!currentSegment.isDynamic"
                 @click="addContacts"
-                class="btn btn-primary btn-sm"
+                class="btn btn-primary btn-sm whitespace-nowrap"
               >
                 <Iconify icon="mdi:account-plus" class="w-4 h-4 mr-1" />
                 {{ t('contacts.addContact') }}
@@ -179,24 +181,24 @@
             <table class="table table-zebra">
               <thead>
                 <tr>
-                  <th>{{ t('common.name') }}</th>
-                  <th>{{ t('common.email') }}</th>
-                  <th>{{ t('common.company') }}</th>
-                  <th>{{ t('common.status') }}</th>
-                  <th>{{ t('common.assignedTo') }}</th>
-                  <th>{{ t('segments.addedType') }}</th>
-                  <th>{{ t('common.actions') }}</th>
+                  <th class="min-w-[200px]">{{ t('common.name') }}</th>
+                  <th class="min-w-[200px]">{{ t('common.email') }}</th>
+                  <th class="min-w-[150px]">{{ t('common.company') }}</th>
+                  <th class="min-w-[100px]">{{ t('common.status') }}</th>
+                  <th class="min-w-[150px]">{{ t('common.assignedTo') }}</th>
+                  <th class="min-w-[100px]">{{ t('segments.addedType') }}</th>
+                  <th class="min-w-[100px]">{{ t('common.actions') }}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="contact in segmentContacts" :key="contact.id">
                   <td>
-                    <div class="flex items-center flex-col-spaced-sm">
+                    <div class="flex items-center gap-3">
                       <div class="avatar placeholder">
-                        <div class="bg-neutral text-neutral-content rounded-full w-8">
-                          <span class="text-xs"
-                            >{{ contact.firstName[0] }}{{ contact.lastName[0] }}</span
-                          >
+                        <div class="bg-neutral text-neutral-content rounded-full w-10 h-10">
+                          <span class="text-xs font-medium">
+                            {{ contact.firstName[0] }}{{ contact.lastName[0] }}
+                          </span>
                         </div>
                       </div>
                       <div>
@@ -210,7 +212,7 @@
                     </div>
                   </td>
                   <td>
-                    <span v-if="contact.email">{{ contact.email }}</span>
+                    <span v-if="contact.email" class="break-all">{{ contact.email }}</span>
                     <span v-else class="text-gray-400">{{ t('common.notProvided') }}</span>
                   </td>
                   <td>
@@ -262,7 +264,7 @@
           </div>
 
           <!-- Pagination -->
-          <div v-if="pagination.totalPages > 1" class="flex justify-center mt-4">
+          <div v-if="pagination.totalPages > 1" class="flex justify-center mt-6">
             <div class="join">
               <button
                 class="join-item btn btn-sm"

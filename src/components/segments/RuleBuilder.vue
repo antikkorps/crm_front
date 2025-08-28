@@ -7,20 +7,23 @@
 
     <!-- Règles existantes -->
     <div v-if="currentRule" class="space-y-3 mb-4">
-      <div class="card bg-base-100 border border-base-300">
+      <div class="card bg-base-100 border border-base-300 shadow-sm">
         <div class="card-body p-4">
-          <div class="flex justify-between items-start">
+          <div class="flex flex-col sm:flex-row justify-between gap-4">
             <div class="flex-1">
-              <div class="flex items-center flex-col-spaced-sm mb-2">
-                <span class="badge badge-sm" :class="getRuleTypeClass(currentRule)">
-                  {{ getRuleTypeLabel(currentRule) }}
-                </span>
-                <span v-if="currentRule.operator" class="text-sm text-gray-500">
-                  {{ getOperatorLabel(currentRule) }}
-                </span>
+              <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="badge badge-sm" :class="getRuleTypeClass(currentRule)">
+                    <Iconify :icon="isCondition(currentRule) ? 'mdi:filter' : 'mdi:group'" class="w-3 h-3 mr-1" />
+                    {{ getRuleTypeLabel(currentRule) }}
+                  </span>
+                  <span v-if="isConditionGroup(currentRule)" class="text-sm text-gray-500">
+                    ({{ currentRule.conditions.length }} condition{{ currentRule.conditions.length > 1 ? 's' : '' }})
+                  </span>
+                </div>
               </div>
 
-              <div v-if="isCondition(currentRule)" class="grid grid-cols-3 flex-col-spaced-sm">
+              <div v-if="isCondition(currentRule)" class="flex flex-col sm:grid sm:grid-cols-3 flex-col-spaced-sm gap-2 sm:gap-4">
                 <select
                   v-model="currentRule.field"
                   class="select select-bordered select-sm"
@@ -50,32 +53,45 @@
                   type="text"
                   class="input input-bordered input-sm"
                   :placeholder="getValuePlaceholder(currentRule.field)"
-                  @input="updateRule"
+                  @input="debouncedUpdateRule"
                 />
               </div>
 
               <div v-else-if="isConditionGroup(currentRule)" class="flex flex-col flex-col-spaced">
-                <div class="flex items-center flex-col-spaced-sm">
-                  <select
-                    v-model="currentRule.operator"
-                    class="select select-bordered select-sm"
-                    @change="updateRule"
-                  >
-                    <option value="AND">{{ t('segments.and') }}</option>
-                    <option value="OR">{{ t('segments.or') }}</option>
-                  </select>
-                  <span class="text-sm text-gray-600">{{ t('segments.group') }}</span>
+                <div class="bg-gradient-to-r from-base-200 to-base-300 rounded-lg p-4 mb-4">
+                  <div class="flex flex-col gap-3">
+                    <div class="flex items-center gap-2">
+                      <Iconify icon="mdi:link-variant" class="w-4 h-4 text-gray-600" />
+                      <span class="text-sm font-medium text-gray-700">Opérateur logique pour ce groupe :</span>
+                    </div>
+                    <select
+                      v-model="currentRule.operator"
+                      class="select select-bordered select-sm w-full sm:w-auto"
+                      @change="updateRule"
+                    >
+                      <option value="AND">
+                        <strong>ET</strong> - Toutes les conditions doivent être vraies
+                      </option>
+                      <option value="OR">
+                        <strong>OU</strong> - Au moins une condition doit être vraie
+                      </option>
+                    </select>
+                    <p class="text-xs text-gray-600 italic">
+                      ℹ️ {{ currentRule.operator === 'AND' ? 'Seuls les contacts qui remplissent TOUTES ces conditions seront inclus' : 'Les contacts qui remplissent AU MOINS UNE de ces conditions seront inclus' }}
+                    </p>
+                  </div>
                 </div>
 
-                <div class="ml-4 flex flex-col">
+                <div class="space-y-3">
                   <div
                     v-for="(condition, condIndex) in currentRule.conditions"
                     :key="condIndex"
-                    class="flex items-center flex-col-spaced-sm"
+                    class="bg-white border border-base-300 rounded-lg p-3"
                   >
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                     <div
                       v-if="isCondition(condition)"
-                      class="grid grid-cols-3 flex-col-spaced-sm flex-1"
+                      class="flex flex-col sm:grid sm:grid-cols-3 flex-col-spaced-sm flex-1 gap-2 sm:gap-4"
                     >
                       <select
                         v-model="condition.field"
@@ -110,50 +126,83 @@
                         type="text"
                         class="input input-bordered input-sm"
                         :placeholder="getValuePlaceholder(condition.field)"
-                        @input="updateConditionGroup"
+                        @input="debouncedUpdateConditionGroup"
                       />
                     </div>
 
-                    <button
-                      @click="removeConditionFromGroup(condIndex)"
-                      class="btn btn-ghost btn-sm text-error"
-                    >
-                      <Iconify icon="mdi:close" class="w-4 h-4" />
-                    </button>
+                      <button
+                        @click="removeConditionFromGroup(condIndex)"
+                        class="btn btn-ghost btn-sm text-error mt-2 sm:mt-0"
+                        :title="'Supprimer cette condition'"
+                      >
+                        <Iconify icon="mdi:close" class="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
-                  <button @click="addConditionToGroup" class="btn btn-outline btn-sm">
-                    <Iconify icon="mdi:plus" class="w-4 h-4 mr-1" />
-                    {{ t('segments.addCondition') }}
+                  <button @click="addConditionToGroup" class="btn btn-outline btn-sm w-full sm:w-auto">
+                    <Iconify icon="mdi:plus" class="w-4 h-4 mr-2" />
+                    Ajouter une condition à ce groupe
                   </button>
                 </div>
               </div>
             </div>
 
-            <button @click="removeRule" class="btn btn-ghost btn-sm text-error ml-2">
-              <Iconify icon="mdi:delete" class="w-4 h-4" />
-            </button>
+            <div class="flex flex-col gap-2">
+              <button 
+                @click="removeRule" 
+                class="btn btn-ghost btn-sm text-error"
+                :title="'Supprimer cette ' + (isCondition(currentRule) ? 'condition' : 'groupe')"
+              >
+                <Iconify icon="mdi:delete" class="w-4 h-4" />
+                <span class="hidden sm:inline ml-1">Supprimer</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Message quand aucune règle -->
-    <div v-else class="text-center py-8 text-gray-500">
+    <div v-else class="bg-base-200 rounded-lg p-6 text-center text-gray-500">
       <Iconify icon="mdi:filter-variant" class="w-12 h-12 mx-auto mb-4 opacity-50" />
       <p class="text-lg font-medium mb-2">{{ t('segments.noRulesDefined') }}</p>
-      <p class="text-sm">{{ t('segments.addFirstRule') }}</p>
+      <p class="text-sm mb-4">{{ t('segments.addFirstRule') }}</p>
+      <div class="flex flex-col sm:flex-row gap-2 justify-center">
+        <button @click="addCondition" class="btn btn-primary btn-sm">
+          <Iconify icon="mdi:filter-plus" class="w-4 h-4 mr-1" />
+          Condition simple
+        </button>
+        <button @click="addConditionGroup" class="btn btn-secondary btn-sm">
+          <Iconify icon="mdi:group" class="w-4 h-4 mr-1" />
+          Groupe de conditions
+        </button>
+      </div>
     </div>
 
     <!-- Boutons d'ajout -->
-    <div class="flex flex-wrap flex-col-spaced-sm mb-4">
-      <button @click="addCondition" class="btn btn-outline btn-sm">
-        <Iconify icon="mdi:plus" class="w-4 h-4 mr-1" />
-        {{ t('segments.addCondition') }}
-      </button>
-      <button @click="addConditionGroup" class="btn btn-outline btn-sm">
-        <Iconify icon="mdi:plus" class="w-4 h-4 mr-1" />
-        {{ t('segments.addGroup') }}
+    <div class="space-y-2 mb-4">
+      <div class="flex flex-col sm:flex-row gap-2">
+        <button @click="addCondition" class="btn btn-outline btn-sm flex-1 sm:flex-initial">
+          <Iconify icon="mdi:filter-plus" class="w-4 h-4 mr-2" />
+          <span class="hidden sm:inline">{{ t('segments.addCondition') }}</span>
+          <span class="sm:hidden">+ Condition simple</span>
+        </button>
+        <button @click="addConditionGroup" class="btn btn-outline btn-sm flex-1 sm:flex-initial">
+          <Iconify icon="mdi:group" class="w-4 h-4 mr-2" />
+          <span class="hidden sm:inline">{{ t('segments.addGroup') }}</span>
+          <span class="sm:hidden">+ Groupe de conditions</span>
+        </button>
+      </div>
+      <button
+        v-if="currentRule"
+        @click="triggerPreview"
+        class="btn btn-primary btn-sm w-full sm:w-auto"
+        :disabled="isPreviewLoading"
+      >
+        <span v-if="isPreviewLoading" class="loading loading-spinner loading-sm"></span>
+        <Iconify v-else icon="mdi:eye" class="w-4 h-4 mr-1" />
+        {{ t('segments.previewRules') }}
       </button>
     </div>
 
@@ -161,11 +210,11 @@
     <div v-if="preview" class="card bg-base-100 border border-base-300">
       <div class="card-body p-4">
         <h4 class="font-semibold mb-2">{{ t('segments.preview') }}</h4>
-        <div class="flex items-center flex-col-spaced-sm mb-2">
-          <span class="badge" :class="preview.isValid ? 'badge-success' : 'badge-error'">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+          <span class="badge text-base px-3 py-2" :class="preview.isValid ? 'badge-success' : 'badge-error'">
             {{ preview.contactCount }} {{ t('common.contacts') }}
           </span>
-          <span v-if="!preview.isValid" class="text-error text-sm">
+          <span v-if="!preview.isValid" class="text-error text-sm font-medium">
             {{ t('segments.invalidRules') }}
           </span>
         </div>
@@ -176,7 +225,7 @@
             <div
               v-for="contact in preview.sampleContacts.slice(0, 3)"
               :key="contact.id"
-              class="flex items-center flex-col-spaced-sm"
+              class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2"
             >
               <span>{{ contact.firstName }} {{ contact.lastName }}</span>
               <span v-if="contact.email" class="text-gray-500">({{ contact.email }})</span>
@@ -203,7 +252,7 @@
 
 <script setup lang="ts">
 import type { SegmentCondition, SegmentConditionGroup, SegmentRule } from '@/types/segment.types'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
@@ -219,7 +268,7 @@ const props = defineProps<{
     }>
     isValid: boolean
     errors?: string[]
-  }
+  } | null
 }>()
 
 const emit = defineEmits<{
@@ -231,6 +280,8 @@ const { t } = useI18n()
 
 // État local
 const currentRule = ref<SegmentRule | null>(props.modelValue || null)
+const isPreviewLoading = ref(false)
+const debounceTimeout = ref<ReturnType<typeof setTimeout> | null>(null)
 const availableFields = ref([
   { value: 'firstName', label: 'Prénom' },
   { value: 'lastName', label: 'Nom' },
@@ -277,12 +328,6 @@ const getRuleTypeLabel = (rule: SegmentRule) => {
   return t('segments.rule')
 }
 
-const getOperatorLabel = (rule: SegmentRule) => {
-  if (isConditionGroup(rule)) {
-    return rule.operator === 'AND' ? t('segments.and') : t('segments.or')
-  }
-  return ''
-}
 
 const getOperatorsForField = (field: string) => {
   // Tous les champs supportent les opérateurs de base
@@ -327,16 +372,23 @@ const addCondition = () => {
     value: '',
   }
   currentRule.value = newCondition
-  updateRule()
+  updateRulesOnly()
 }
 
 const addConditionGroup = () => {
   const newGroup: SegmentConditionGroup = {
     operator: 'AND',
-    conditions: [],
+    conditions: [
+      // Ajouter automatiquement une première condition vide
+      {
+        field: 'email',
+        operator: 'contains',
+        value: '',
+      }
+    ],
   }
   currentRule.value = newGroup
-  updateRule()
+  updateRulesOnly()
 }
 
 const addConditionToGroup = () => {
@@ -347,33 +399,103 @@ const addConditionToGroup = () => {
       value: '',
     }
     currentRule.value.conditions.push(newCondition)
-    updateRule()
+    updateRulesOnly()
   }
 }
 
 const removeRule = () => {
   currentRule.value = null
-  updateRules()
+  updateRulesOnly()
 }
 
 const removeConditionFromGroup = (conditionIndex: number) => {
   if (currentRule.value && isConditionGroup(currentRule.value)) {
     currentRule.value.conditions.splice(conditionIndex, 1)
-    updateRule()
+    
+    // Si le groupe n'a plus de conditions, le supprimer complètement
+    if (currentRule.value.conditions.length === 0) {
+      currentRule.value = null
+    }
+    
+    updateRulesOnly()
   }
 }
 
 const updateRule = () => {
-  updateRules()
+  updateRulesOnly()
 }
 
 const updateConditionGroup = () => {
-  updateRules()
+  updateRulesOnly()
 }
 
-const updateRules = () => {
+// Fonction pour mettre à jour seulement le model sans déclencher la prévisualisation
+const updateRulesOnly = () => {
   emit('update:modelValue', currentRule.value)
-  emit('preview', currentRule.value ? [currentRule.value] : [])
+}
+
+// Fonction pour déclencher manuellement la prévisualisation
+const triggerPreview = () => {
+  if (currentRule.value && isValidRule(currentRule.value)) {
+    isPreviewLoading.value = true
+    emit('preview', [currentRule.value])
+    // Réinitialiser le loading après un délai plus long ou quand le parent répond
+    setTimeout(() => {
+      isPreviewLoading.value = false
+    }, 3000) // Timeout de sécurité plus long
+  }
+}
+
+// Fonction debouncée pour les changements de valeur
+const debouncedUpdateRule = () => {
+  updateRulesOnly()
+  
+  // Annuler le timeout précédent s'il existe
+  if (debounceTimeout.value) {
+    clearTimeout(debounceTimeout.value)
+  }
+  
+  // Programmer une prévisualisation automatique seulement si la règle est complète et valide
+  debounceTimeout.value = setTimeout(() => {
+    if (currentRule.value && isValidRule(currentRule.value)) {
+      triggerPreview()
+    }
+  }, 1200) // Délai plus long pour éviter les requêtes pendant la saisie
+}
+
+const debouncedUpdateConditionGroup = () => {
+  updateRulesOnly()
+  
+  if (debounceTimeout.value) {
+    clearTimeout(debounceTimeout.value)
+  }
+  
+  debounceTimeout.value = setTimeout(() => {
+    if (currentRule.value && isValidRule(currentRule.value)) {
+      triggerPreview()
+    }
+  }, 1200)
+}
+
+// Validation des règles
+const isValidRule = (rule: SegmentRule): boolean => {
+  if (isCondition(rule)) {
+    // Une condition est valide si elle a tous les champs requis ET une valeur non vide
+    const hasAllFields = !!(rule.field && rule.operator && rule.value)
+    const hasNonEmptyValue = !!(rule.value && rule.value.trim().length > 0)
+    
+    return hasAllFields && hasNonEmptyValue
+  }
+  
+  if (isConditionGroup(rule)) {
+    // Un groupe est valide s'il a au moins une condition ET que toutes ses conditions sont valides
+    const hasConditions = rule.conditions && rule.conditions.length > 0
+    const allConditionsValid = hasConditions && rule.conditions.every(condition => isValidRule(condition))
+    
+    return hasConditions && allConditionsValid
+  }
+  
+  return false
 }
 
 // Watchers
@@ -385,10 +507,28 @@ watch(
   { deep: true },
 )
 
+// Watcher pour réinitialiser le loading quand le preview arrive
+watch(
+  () => props.preview,
+  (newPreview) => {
+    if (newPreview && isPreviewLoading.value) {
+      isPreviewLoading.value = false
+    }
+  },
+  { deep: true },
+)
+
+// Nettoyer les timeouts lors de la destruction du composant
+onUnmounted(() => {
+  if (debounceTimeout.value) {
+    clearTimeout(debounceTimeout.value)
+  }
+})
+
 // Charger les champs disponibles au montage
 onMounted(() => {
   // TODO: Charger les champs disponibles depuis l'API
-  updateRules()
+  // Pas de prévisualisation automatique au montage
 })
 </script>
 

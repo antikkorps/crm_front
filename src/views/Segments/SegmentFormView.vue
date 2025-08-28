@@ -5,13 +5,23 @@
       :back-to="'/segments'"
     />
 
-    <div class="max-w-4xl mx-auto">
-      <!-- Formulaire -->
+    <!-- Mode création : Wizard -->
+    <div v-if="!isEditing">
+      <SegmentWizard
+        :preview="preview"
+        @preview="handlePreview"
+        @create="handleCreate"
+        @cancel="router.back()"
+      />
+    </div>
+
+    <!-- Mode édition : Formulaire classique -->
+    <div v-else class="max-w-4xl mx-auto">
       <div class="card bg-base-100 shadow-md">
         <div class="card-body">
-          <form @submit.prevent="handleSubmit" class="flex flex-col flex-col-spaced">
+          <form @submit.prevent="handleSubmit" class="space-y-6">
             <!-- Informations de base -->
-            <div class="grid grid-cols-1 md:grid-cols-2 flex-col-spaced-md">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="form-control">
                 <label class="label">
                   <span class="label-text">{{ t('segments.segmentName') }} *</span>
@@ -29,7 +39,7 @@
                 <label class="label">
                   <span class="label-text">{{ t('segments.segmentType') }}</span>
                 </label>
-                <div class="flex flex-col-spaced-md">
+                <div class="flex items-center space-x-4">
                   <label class="label cursor-pointer">
                     <input
                       v-model="form.isDynamic"
@@ -66,57 +76,21 @@
 
             <!-- Règles (seulement pour les segments dynamiques) -->
             <div v-if="form.isDynamic">
-              <RuleBuilder v-model="form.rules" :preview="preview" @preview="handlePreview" />
+              <div class="divider">{{ t('segments.rulesConfiguration') }}</div>
+              <RuleBuilder v-model="currentRule" :preview="preview" @preview="handlePreview" />
             </div>
 
             <!-- Actions -->
-            <div class="flex justify-end flex-col-spaced-sm">
+            <div class="flex justify-end space-x-4">
               <button type="button" class="btn btn-outline" @click="router.back()">
                 {{ t('common.cancel') }}
               </button>
               <button type="submit" class="btn btn-primary" :disabled="loading">
                 <span v-if="loading" class="loading loading-spinner loading-sm"></span>
-                {{ isEditing ? t('common.update') : t('common.create') }}
+                {{ t('common.update') }}
               </button>
             </div>
           </form>
-        </div>
-      </div>
-
-      <!-- Informations sur les types de segments -->
-      <div class="mt-6 grid grid-cols-1 md:grid-cols-2 flex-col-spaced-md">
-        <div class="card bg-base-100 shadow-md">
-          <div class="card-body">
-            <h3 class="card-title text-primary">
-              <Iconify icon="mdi:refresh" class="w-5 h-5" />
-              {{ t('segments.dynamicSegments') }}
-            </h3>
-            <p class="text-sm text-gray-600">
-              {{ t('segments.dynamicSegmentsDescription') }}
-            </p>
-            <ul class="text-sm text-gray-600 mt-2 space-y-1">
-              <li>• {{ t('segments.dynamicFeature1') }}</li>
-              <li>• {{ t('segments.dynamicFeature2') }}</li>
-              <li>• {{ t('segments.dynamicFeature3') }}</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="card bg-base-100 shadow-md">
-          <div class="card-body">
-            <h3 class="card-title text-secondary">
-              <Iconify icon="mdi:account-multiple" class="w-5 h-5" />
-              {{ t('segments.manualSegments') }}
-            </h3>
-            <p class="text-sm text-gray-600">
-              {{ t('segments.manualSegmentsDescription') }}
-            </p>
-            <ul class="text-sm text-gray-600 mt-2 space-y-1">
-              <li>• {{ t('segments.manualFeature1') }}</li>
-              <li>• {{ t('segments.manualFeature2') }}</li>
-              <li>• {{ t('segments.manualFeature3') }}</li>
-            </ul>
-          </div>
         </div>
       </div>
     </div>
@@ -126,6 +100,7 @@
 <script setup lang="ts">
 import PageHeader from '@/components/common/PageHeader.vue'
 import RuleBuilder from '@/components/segments/RuleBuilder.vue'
+import SegmentWizard from '@/components/segments/SegmentWizard.vue'
 import { useSegmentStore } from '@/stores/segment'
 import type { SegmentCreateDto, SegmentRule, SegmentUpdateDto } from '@/types/segment.types'
 import { computed, onMounted, ref } from 'vue'
@@ -167,7 +142,36 @@ const form = ref<{
 // Computed
 const isEditing = computed(() => !!route.params.id)
 
+// Gestion de la règle unique pour le RuleBuilder
+const currentRule = computed({
+  get: () => {
+    // Si on a des règles, on prend la première, sinon null
+    return form.value.rules.length > 0 ? form.value.rules[0] : null
+  },
+  set: (newRule) => {
+    if (newRule) {
+      // Si on reçoit une nouvelle règle, on remplace le tableau
+      form.value.rules = [newRule]
+    } else {
+      // Si on reçoit null, on vide le tableau
+      form.value.rules = []
+    }
+  }
+})
+
 // Méthodes
+const handleCreate = async (data: SegmentCreateDto) => {
+  try {
+    loading.value = true
+    const newSegment = await segmentStore.createSegment(data)
+    router.push(`/segments/${newSegment.id}`)
+  } catch (error) {
+    console.error('Erreur lors de la création du segment:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
 const handleSubmit = async () => {
   loading.value = true
 
@@ -207,6 +211,9 @@ const handlePreview = async (rules: SegmentRule[]) => {
   }
 
   try {
+    // Réinitialiser l'état précédent
+    preview.value = null
+    
     const previewData = await segmentStore.previewSegmentRules(rules)
     preview.value = previewData
   } catch (error) {
@@ -215,7 +222,7 @@ const handlePreview = async (rules: SegmentRule[]) => {
       contactCount: 0,
       sampleContacts: [],
       isValid: false,
-      errors: ['Erreur lors de la prévisualisation'],
+      errors: ['Erreur lors de la prévisualisation: ' + (error instanceof Error ? error.message : String(error))],
     }
   }
 }

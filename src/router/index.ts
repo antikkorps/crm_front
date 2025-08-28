@@ -102,6 +102,13 @@ const routes = [
     meta: { layout: 'dashboard', requiresAuth: true },
   },
   {
+    path: '/segments/:id/edit',
+    name: 'segment-edit',
+    component: () => import('../views/Segments/SegmentEditView.vue'),
+    props: true,
+    meta: { layout: 'dashboard', requiresAuth: true },
+  },
+  {
     path: '/segments/:id',
     name: 'segment-detail',
     component: () => import('../views/Segments/SegmentDetailsView.vue'),

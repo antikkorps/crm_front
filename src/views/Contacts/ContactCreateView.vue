@@ -10,11 +10,13 @@
             <Iconify icon="mdi:office-building" class="w-5 h-5" />
             {{ t('contacts.selectCompany') }}
           </h3>
-          
+
           <CompanySearch
             v-model="selectedCompanyId"
             :label="t('common.company')"
-            :placeholder="t('contacts.selectCompanyPlaceholder', 'Rechercher et sélectionner une entreprise...')"
+            :placeholder="
+              t('contacts.selectCompanyPlaceholder', 'Rechercher et sélectionner une entreprise...')
+            "
             :error-message="!selectedCompanyId && showCompanyError ? t('validation.required') : ''"
             required
             @company-selected="onCompanySelected"
@@ -27,6 +29,7 @@
         <div class="card-body">
           <ContactForm
             :company-id="selectedCompanyId"
+            :companies="companies"
             :is-submitting="isSubmitting"
             @submit="handleSubmit"
             @cancel="handleCancel"
@@ -85,26 +88,25 @@ async function handleSubmit(data: ContactCreateDto) {
   }
 
   isSubmitting.value = true
-  
+
   try {
     const contactData = {
       ...data,
-      companyId: selectedCompanyId.value
+      companyId: selectedCompanyId.value,
     }
-    
+
     await contactService.createContact(contactData)
-    
+
     // Afficher le toast de succès
     showSuccessToast.value = true
     setTimeout(() => {
       showSuccessToast.value = false
     }, 3000)
-    
+
     // Rediriger vers la liste des contacts après un délai
     setTimeout(() => {
       router.push('/contacts/list')
     }, 1000)
-    
   } catch (error) {
     console.error('Erreur lors de la création du contact:', error)
     // TODO: Afficher un toast d'erreur
