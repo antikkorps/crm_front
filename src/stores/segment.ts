@@ -326,6 +326,31 @@ export const useSegmentStore = defineStore('segment', () => {
     segmentContacts.value = []
   }
 
+  const duplicateSegment = async (segmentId: string, newName: string) => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const duplicatedSegment = await segmentService.duplicateSegment(segmentId, newName)
+      segments.value.unshift(duplicatedSegment) // Ajouter en début de liste
+
+      const toastStore = useToastStore()
+      toastStore.success('Segment dupliqué avec succès')
+
+      return duplicatedSegment
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Erreur lors de la duplication du segment'
+      console.error('Erreur lors de la duplication du segment:', err)
+
+      const toastStore = useToastStore()
+      toastStore.error(error.value)
+
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     // État
     segments,
@@ -348,6 +373,7 @@ export const useSegmentStore = defineStore('segment', () => {
     createSegment,
     updateSegment,
     deleteSegment,
+    duplicateSegment,
     fetchSegmentContacts,
     evaluateSegment,
     previewSegmentRules,

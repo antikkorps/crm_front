@@ -372,8 +372,9 @@
     <!-- Contact Modal -->
     <ContactModal
       :is-open="showContactModal"
-      :contact="selectedContact"
+      :contact="selectedContactForModal"
       :company-id="companyId"
+      :companies="[]"
       :is-edit-mode="isEditingContact"
       :is-submitting="isSubmittingContact"
       @submit="handleContactSubmit"
@@ -416,6 +417,7 @@ import type {
   ContactUpdateDto,
   Speciality,
 } from '@/types/company.types'
+import type { Contact } from '@/types/contact.types'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -467,6 +469,7 @@ const isSubmittingNote = ref(false)
 // Computed properties
 const companyStatuses = computed(() => statusStore.getStatusesByType('COMPANY'))
 const users = computed(() => userStore.users)
+const selectedContactForModal = computed(() => selectedContact.value as Contact | null)
 const availableSpecialities = ref<Speciality[]>([])
 
 // Fetch specialities list

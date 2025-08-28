@@ -6,7 +6,7 @@
         <span v-if="required" class="text-error">*</span>
       </span>
     </label>
-    
+
     <div class="relative">
       <!-- Input de recherche -->
       <div class="relative">
@@ -23,11 +23,11 @@
           @keydown="onKeyDown"
           autocomplete="off"
         />
-        
+
         <!-- Boutons à droite -->
         <div class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
           <!-- Bouton clear (si sélection active) -->
-          <button 
+          <button
             v-if="selectedCompany || searchQuery"
             type="button"
             class="btn btn-ghost btn-xs btn-square"
@@ -36,9 +36,9 @@
           >
             <Iconify icon="mdi:close" class="w-3 h-3" />
           </button>
-          
+
           <!-- Bouton "Toutes les entreprises" (si allowAll et pas de sélection) -->
-          <button 
+          <button
             v-if="allowAll && !selectedCompany && !searchQuery"
             type="button"
             class="btn btn-ghost btn-xs text-xs px-2"
@@ -47,20 +47,16 @@
           >
             {{ t('companies.all', 'Toutes') }}
           </button>
-          
+
           <!-- Bouton dropdown -->
-          <button 
-            type="button" 
-            class="btn btn-ghost btn-xs btn-square"
-            @click="toggleDropdown"
-          >
+          <button type="button" class="btn btn-ghost btn-xs btn-square" @click="toggleDropdown">
             <Iconify icon="mdi:chevron-down" class="w-3 h-3" />
           </button>
         </div>
       </div>
 
       <!-- Dropdown avec résultats -->
-      <div 
+      <div
         v-if="showDropdown && (filteredCompanies.length > 0 || loading)"
         class="absolute z-50 w-full mt-1 bg-base-100 border border-base-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
       >
@@ -75,7 +71,7 @@
           <div v-if="filteredCompanies.length === 0" class="p-3 text-center text-base-content/70">
             {{ t('companies.noResults', 'Aucune entreprise trouvée') }}
           </div>
-          
+
           <button
             v-for="(company, index) in filteredCompanies"
             :key="company.id"
@@ -98,7 +94,7 @@
       </div>
 
       <!-- Entreprise sélectionnée (mode lecture seule) -->
-      <div 
+      <div
         v-if="!showDropdown && selectedCompany && !searchQuery"
         class="absolute inset-0 bg-base-100 border border-base-300 rounded-lg px-3 py-2 flex items-center space-x-3 pointer-events-none"
       >
@@ -116,7 +112,6 @@
     <label v-if="errorMessage" class="label">
       <span class="label-text-alt text-error">{{ errorMessage }}</span>
     </label>
-
   </div>
 </template>
 
@@ -140,13 +135,13 @@ const props = withDefaults(defineProps<Props>(), {
   placeholder: 'Rechercher une entreprise...',
   required: false,
   allowAll: false,
-  disabled: false
+  disabled: false,
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
   'company-selected': [company: Company | null]
-  'clear': []
+  clear: []
 }>()
 
 const { t } = useI18n()
@@ -169,49 +164,43 @@ const filteredCompanies = computed(() => {
   if (!searchQuery.value.trim()) {
     return companies.value.slice(0, 10) // Limite à 10 résultats par défaut
   }
-  
+
   const query = searchQuery.value.toLowerCase().trim()
   return companies.value
-    .filter(company => 
-      company.name.toLowerCase().includes(query) ||
-      company.industry?.toLowerCase().includes(query)
+    .filter(
+      (company) =>
+        company.name.toLowerCase().includes(query) ||
+        company.industry?.toLowerCase().includes(query),
     )
     .slice(0, 20) // Limite à 20 résultats de recherche
 })
 
-// Fonction debounce simple
-function debounce<T extends (...args: unknown[]) => unknown>(func: T, wait: number): T {
-  let timeout: number | null = null
-  return ((...args: unknown[]) => {
-    const later = () => {
-      timeout = null
-      func(...args)
-    }
-    if (timeout) clearTimeout(timeout)
-    timeout = setTimeout(later, wait)
-  }) as T
-}
-
 // Recherche avec debounce
-const debouncedSearch = debounce(async (query: string) => {
-  if (query.trim().length >= 2) {
-    await companyStore.searchCompanies({ name: query })
+const debouncedSearch = (() => {
+  let timeout: number | null = null
+  return (query: string) => {
+    if (timeout) clearTimeout(timeout)
+    timeout = setTimeout(() => {
+      if (query.trim().length >= 2) {
+        companyStore.searchCompanies({ name: query })
+      }
+    }, 300)
   }
-}, 300)
+})()
 
 // Gestionnaires d'événements
 function onInput() {
   selectedCompany.value = null
   emit('update:modelValue', '')
   emit('company-selected', null)
-  
+
   if (searchQuery.value.trim()) {
     showDropdown.value = true
     debouncedSearch(searchQuery.value)
   } else {
     showDropdown.value = false
   }
-  
+
   selectedIndex.value = -1
 }
 
@@ -261,7 +250,7 @@ function onKeyDown(event: KeyboardEvent) {
 
 function toggleDropdown() {
   if (props.disabled) return
-  
+
   showDropdown.value = !showDropdown.value
   if (showDropdown.value) {
     nextTick(() => {
@@ -278,7 +267,7 @@ function selectCompany(company: Company) {
   searchQuery.value = company.name
   showDropdown.value = false
   selectedIndex.value = -1
-  
+
   emit('update:modelValue', company.id)
   emit('company-selected', company)
 }
@@ -288,7 +277,7 @@ function clearSelection() {
   searchQuery.value = ''
   showDropdown.value = false
   selectedIndex.value = -1
-  
+
   emit('update:modelValue', '')
   emit('company-selected', null)
   emit('clear')
@@ -309,10 +298,10 @@ async function loadDefaultCompanies() {
 // Initialisation et watchers
 onMounted(async () => {
   await loadDefaultCompanies()
-  
+
   // Si on a une valeur initiale, trouvons l'entreprise correspondante
   if (props.modelValue) {
-    const company = companies.value.find(c => c.id === props.modelValue)
+    const company = companies.value.find((c) => c.id === props.modelValue)
     if (company) {
       selectedCompany.value = company
       searchQuery.value = company.name
@@ -321,18 +310,21 @@ onMounted(async () => {
 })
 
 // Watcher pour les changements externes du modelValue
-watch(() => props.modelValue, (newValue) => {
-  if (!newValue) {
-    selectedCompany.value = null
-    searchQuery.value = ''
-  } else if (newValue !== selectedCompany.value?.id) {
-    const company = companies.value.find(c => c.id === newValue)
-    if (company) {
-      selectedCompany.value = company
-      searchQuery.value = company.name
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (!newValue) {
+      selectedCompany.value = null
+      searchQuery.value = ''
+    } else if (newValue !== selectedCompany.value?.id) {
+      const company = companies.value.find((c) => c.id === newValue)
+      if (company) {
+        selectedCompany.value = company
+        searchQuery.value = company.name
+      }
     }
-  }
-})
+  },
+)
 </script>
 
 <style scoped>
