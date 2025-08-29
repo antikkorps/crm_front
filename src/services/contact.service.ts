@@ -120,9 +120,18 @@ class ContactService {
   }
 
   // Rechercher des contacts par nom ou email
-  async searchContacts(query: string, limit = 10): Promise<Contact[]> {
+  async searchContacts(query: string, limit = 10, excludeSegment?: string): Promise<Contact[]> {
+    const params = new URLSearchParams({
+      q: encodeURIComponent(query),
+      limit: limit.toString()
+    })
+    
+    if (excludeSegment) {
+      params.append('excludeSegment', excludeSegment)
+    }
+    
     const response = await apiRequest<{ items: Contact[] }>(
-      `${this.baseUrl}/search?q=${encodeURIComponent(query)}&limit=${limit}`,
+      `${this.baseUrl}/search?${params.toString()}`,
     )
     return response.items
   }
