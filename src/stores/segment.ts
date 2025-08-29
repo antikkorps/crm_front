@@ -351,6 +351,63 @@ export const useSegmentStore = defineStore('segment', () => {
     }
   }
 
+  const addContactsToSegment = async (segmentId: string, contactIds: string[]) => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const result = await segmentService.addContactsToSegment(segmentId, contactIds)
+
+      // Recharger le segment pour mettre à jour le compteur
+      await fetchSegment(segmentId)
+
+      const toastStore = useToastStore()
+      if (result.added > 0) {
+        const contactText = result.added === 1 ? 'contact ajouté' : 'contacts ajoutés'
+        toastStore.success(`${result.added} ${contactText} au segment`)
+      }
+      if (result.ignored > 0) {
+        toastStore.info(`${result.ignored} contact(s) déjà présent(s) dans le segment`)
+      }
+
+      return result
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Erreur lors de l\'ajout des contacts'
+      console.error('Erreur lors de l\'ajout des contacts:', err)
+
+      const toastStore = useToastStore()
+      toastStore.error(error.value)
+
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const exportSegment = async (segmentId: string, format: 'csv' | 'xlsx' | 'json' = 'csv', includeAll: boolean = false) => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const blob = await segmentService.exportSegment(segmentId, format, includeAll)
+      
+      const toastStore = useToastStore()
+      toastStore.success('Export réussi')
+      
+      return blob
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Erreur lors de l\'export'
+      console.error('Erreur lors de l\'export:', err)
+
+      const toastStore = useToastStore()
+      toastStore.error(error.value)
+
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     // État
     segments,
@@ -374,6 +431,8 @@ export const useSegmentStore = defineStore('segment', () => {
     updateSegment,
     deleteSegment,
     duplicateSegment,
+    addContactsToSegment,
+    exportSegment,
     fetchSegmentContacts,
     evaluateSegment,
     previewSegmentRules,

@@ -14,16 +14,24 @@
               <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
                 <div class="flex items-center gap-2">
                   <span class="badge badge-sm" :class="getRuleTypeClass(currentRule)">
-                    <Iconify :icon="isCondition(currentRule) ? 'mdi:filter' : 'mdi:group'" class="w-3 h-3 mr-1" />
+                    <Iconify
+                      :icon="isCondition(currentRule) ? 'mdi:filter' : 'mdi:group'"
+                      class="w-3 h-3 mr-1"
+                    />
                     {{ getRuleTypeLabel(currentRule) }}
                   </span>
                   <span v-if="isConditionGroup(currentRule)" class="text-sm text-gray-500">
-                    ({{ currentRule.conditions.length }} condition{{ currentRule.conditions.length > 1 ? 's' : '' }})
+                    ({{ currentRule.conditions.length }} condition{{
+                      currentRule.conditions.length > 1 ? 's' : ''
+                    }})
                   </span>
                 </div>
               </div>
 
-              <div v-if="isCondition(currentRule)" class="flex flex-col sm:grid sm:grid-cols-3 flex-col-spaced-sm gap-2 sm:gap-4">
+              <div
+                v-if="isCondition(currentRule)"
+                class="flex flex-col sm:grid sm:grid-cols-3 flex-col-spaced-sm gap-2 sm:gap-4"
+              >
                 <select
                   v-model="currentRule.field"
                   class="select select-bordered select-sm"
@@ -62,22 +70,25 @@
                   <div class="flex flex-col gap-3">
                     <div class="flex items-center gap-2">
                       <Iconify icon="mdi:link-variant" class="w-4 h-4 text-gray-600" />
-                      <span class="text-sm font-medium text-gray-700">Opérateur logique pour ce groupe :</span>
+                      <span class="text-sm font-medium text-gray-700"
+                        >Opérateur logique pour ce groupe :</span
+                      >
                     </div>
                     <select
                       v-model="currentRule.operator"
                       class="select select-bordered select-sm w-full sm:w-auto"
                       @change="updateRule"
                     >
-                      <option value="AND">
-                        <strong>ET</strong> - Toutes les conditions doivent être vraies
-                      </option>
-                      <option value="OR">
-                        <strong>OU</strong> - Au moins une condition doit être vraie
-                      </option>
+                      <option value="AND">ET - Toutes les conditions doivent être vraies</option>
+                      <option value="OR">OU - Au moins une condition doit être vraie</option>
                     </select>
                     <p class="text-xs text-gray-600 italic">
-                      ℹ️ {{ currentRule.operator === 'AND' ? 'Seuls les contacts qui remplissent TOUTES ces conditions seront inclus' : 'Les contacts qui remplissent AU MOINS UNE de ces conditions seront inclus' }}
+                      ℹ️
+                      {{
+                        currentRule.operator === 'AND'
+                          ? 'Seuls les contacts qui remplissent TOUTES ces conditions seront inclus'
+                          : 'Les contacts qui remplissent AU MOINS UNE de ces conditions seront inclus'
+                      }}
                     </p>
                   </div>
                 </div>
@@ -89,46 +100,46 @@
                     class="bg-white border border-base-300 rounded-lg p-3"
                   >
                     <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                    <div
-                      v-if="isCondition(condition)"
-                      class="flex flex-col sm:grid sm:grid-cols-3 flex-col-spaced-sm flex-1 gap-2 sm:gap-4"
-                    >
-                      <select
-                        v-model="condition.field"
-                        class="select select-bordered select-sm"
-                        @change="updateConditionGroup"
+                      <div
+                        v-if="isCondition(condition)"
+                        class="flex flex-col sm:grid sm:grid-cols-3 flex-col-spaced-sm flex-1 gap-2 sm:gap-4"
                       >
-                        <option
-                          v-for="field in availableFields"
-                          :key="field.value"
-                          :value="field.value"
+                        <select
+                          v-model="condition.field"
+                          class="select select-bordered select-sm"
+                          @change="updateConditionGroup"
                         >
-                          {{ field.label }}
-                        </option>
-                      </select>
+                          <option
+                            v-for="field in availableFields"
+                            :key="field.value"
+                            :value="field.value"
+                          >
+                            {{ field.label }}
+                          </option>
+                        </select>
 
-                      <select
-                        v-model="condition.operator"
-                        class="select select-bordered select-sm"
-                        @change="updateConditionGroup"
-                      >
-                        <option
-                          v-for="op in getOperatorsForField(condition.field)"
-                          :key="op.value"
-                          :value="op.value"
+                        <select
+                          v-model="condition.operator"
+                          class="select select-bordered select-sm"
+                          @change="updateConditionGroup"
                         >
-                          {{ op.label }}
-                        </option>
-                      </select>
+                          <option
+                            v-for="op in getOperatorsForField(condition.field)"
+                            :key="op.value"
+                            :value="op.value"
+                          >
+                            {{ op.label }}
+                          </option>
+                        </select>
 
-                      <input
-                        v-model="condition.value"
-                        type="text"
-                        class="input input-bordered input-sm"
-                        :placeholder="getValuePlaceholder(condition.field)"
-                        @input="debouncedUpdateConditionGroup"
-                      />
-                    </div>
+                        <input
+                          v-model="condition.value"
+                          type="text"
+                          class="input input-bordered input-sm"
+                          :placeholder="getValuePlaceholder(condition.field)"
+                          @input="debouncedUpdateConditionGroup"
+                        />
+                      </div>
 
                       <button
                         @click="removeConditionFromGroup(condIndex)"
@@ -140,7 +151,10 @@
                     </div>
                   </div>
 
-                  <button @click="addConditionToGroup" class="btn btn-outline btn-sm w-full sm:w-auto">
+                  <button
+                    @click="addConditionToGroup"
+                    class="btn btn-outline btn-sm w-full sm:w-auto"
+                  >
                     <Iconify icon="mdi:plus" class="w-4 h-4 mr-2" />
                     Ajouter une condition à ce groupe
                   </button>
@@ -149,8 +163,8 @@
             </div>
 
             <div class="flex flex-col gap-2">
-              <button 
-                @click="removeRule" 
+              <button
+                @click="removeRule"
                 class="btn btn-ghost btn-sm text-error"
                 :title="'Supprimer cette ' + (isCondition(currentRule) ? 'condition' : 'groupe')"
               >
@@ -180,30 +194,28 @@
       </div>
     </div>
 
-    <!-- Boutons d'ajout -->
+    <!-- Boutons d'actions -->
     <div class="space-y-2 mb-4">
       <div class="flex flex-col sm:flex-row gap-2">
-        <button @click="addCondition" class="btn btn-outline btn-sm flex-1 sm:flex-initial">
-          <Iconify icon="mdi:filter-plus" class="w-4 h-4 mr-2" />
-          <span class="hidden sm:inline">{{ t('segments.addCondition') }}</span>
-          <span class="sm:hidden">+ Condition simple</span>
+        <button
+          v-if="currentRule"
+          @click="triggerPreview"
+          class="btn btn-primary btn-sm flex-1 sm:flex-initial"
+          :disabled="isPreviewLoading"
+        >
+          <span v-if="isPreviewLoading" class="loading loading-spinner loading-sm"></span>
+          <Iconify v-else icon="mdi:eye" class="w-4 h-4 mr-1" />
+          {{ t('segments.previewRules') }}
         </button>
-        <button @click="addConditionGroup" class="btn btn-outline btn-sm flex-1 sm:flex-initial">
-          <Iconify icon="mdi:group" class="w-4 h-4 mr-2" />
-          <span class="hidden sm:inline">{{ t('segments.addGroup') }}</span>
-          <span class="sm:hidden">+ Groupe de conditions</span>
+        <button
+          v-if="currentRule"
+          @click="resetToInitialChoice"
+          class="btn btn-outline btn-sm flex-1 sm:flex-initial"
+        >
+          <Iconify icon="mdi:refresh" class="w-4 h-4 mr-1" />
+          Recommencer
         </button>
       </div>
-      <button
-        v-if="currentRule"
-        @click="triggerPreview"
-        class="btn btn-primary btn-sm w-full sm:w-auto"
-        :disabled="isPreviewLoading"
-      >
-        <span v-if="isPreviewLoading" class="loading loading-spinner loading-sm"></span>
-        <Iconify v-else icon="mdi:eye" class="w-4 h-4 mr-1" />
-        {{ t('segments.previewRules') }}
-      </button>
     </div>
 
     <!-- Prévisualisation -->
@@ -211,7 +223,10 @@
       <div class="card-body p-4">
         <h4 class="font-semibold mb-2">{{ t('segments.preview') }}</h4>
         <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-          <span class="badge text-base px-3 py-2" :class="preview.isValid ? 'badge-success' : 'badge-error'">
+          <span
+            class="badge text-base px-3 py-2"
+            :class="preview.isValid ? 'badge-success' : 'badge-error'"
+          >
             {{ preview.contactCount }} {{ t('common.contacts') }}
           </span>
           <span v-if="!preview.isValid" class="text-error text-sm font-medium">
@@ -328,7 +343,6 @@ const getRuleTypeLabel = (rule: SegmentRule) => {
   return t('segments.rule')
 }
 
-
 const getOperatorsForField = (field: string) => {
   // Tous les champs supportent les opérateurs de base
   if (
@@ -384,7 +398,7 @@ const addConditionGroup = () => {
         field: 'email',
         operator: 'contains',
         value: '',
-      }
+      },
     ],
   }
   currentRule.value = newGroup
@@ -408,15 +422,20 @@ const removeRule = () => {
   updateRulesOnly()
 }
 
+const resetToInitialChoice = () => {
+  currentRule.value = null
+  updateRulesOnly()
+}
+
 const removeConditionFromGroup = (conditionIndex: number) => {
   if (currentRule.value && isConditionGroup(currentRule.value)) {
     currentRule.value.conditions.splice(conditionIndex, 1)
-    
+
     // Si le groupe n'a plus de conditions, le supprimer complètement
     if (currentRule.value.conditions.length === 0) {
       currentRule.value = null
     }
-    
+
     updateRulesOnly()
   }
 }
@@ -449,12 +468,12 @@ const triggerPreview = () => {
 // Fonction debouncée pour les changements de valeur
 const debouncedUpdateRule = () => {
   updateRulesOnly()
-  
+
   // Annuler le timeout précédent s'il existe
   if (debounceTimeout.value) {
     clearTimeout(debounceTimeout.value)
   }
-  
+
   // Programmer une prévisualisation automatique seulement si la règle est complète et valide
   debounceTimeout.value = setTimeout(() => {
     if (currentRule.value && isValidRule(currentRule.value)) {
@@ -465,11 +484,11 @@ const debouncedUpdateRule = () => {
 
 const debouncedUpdateConditionGroup = () => {
   updateRulesOnly()
-  
+
   if (debounceTimeout.value) {
     clearTimeout(debounceTimeout.value)
   }
-  
+
   debounceTimeout.value = setTimeout(() => {
     if (currentRule.value && isValidRule(currentRule.value)) {
       triggerPreview()
@@ -483,18 +502,19 @@ const isValidRule = (rule: SegmentRule): boolean => {
     // Une condition est valide si elle a tous les champs requis ET une valeur non vide
     const hasAllFields = !!(rule.field && rule.operator && rule.value)
     const hasNonEmptyValue = !!(rule.value && rule.value.trim().length > 0)
-    
+
     return hasAllFields && hasNonEmptyValue
   }
-  
+
   if (isConditionGroup(rule)) {
     // Un groupe est valide s'il a au moins une condition ET que toutes ses conditions sont valides
     const hasConditions = rule.conditions && rule.conditions.length > 0
-    const allConditionsValid = hasConditions && rule.conditions.every(condition => isValidRule(condition))
-    
+    const allConditionsValid =
+      hasConditions && rule.conditions.every((condition) => isValidRule(condition))
+
     return hasConditions && allConditionsValid
   }
-  
+
   return false
 }
 

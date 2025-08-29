@@ -101,12 +101,6 @@
                     {{ t('common.duplicate') }}
                   </button>
                 </li>
-                <li>
-                  <button @click="exportSegment(segment.id)">
-                    <Iconify icon="mdi:download" class="w-4 h-4" />
-                    {{ t('common.export') }}
-                  </button>
-                </li>
                 <li class="divider"></li>
                 <li>
                   <button
@@ -217,7 +211,7 @@
 
           <!-- Actions rapides -->
           <div class="card-actions justify-between mt-4" @click.stop>
-            <div class="flex flex-col-spaced-xs">
+            <div class="flex flex-wrap gap-1">
               <button
                 v-if="segment.isDynamic"
                 @click="evaluateSegment(segment.id)"
@@ -232,6 +226,12 @@
                 <Iconify icon="mdi:pencil" class="w-3 h-3" />
                 {{ t('common.edit') }}
               </button>
+              <SegmentExportButton 
+                :segment-id="segment.id"
+                :segment-name="segment.name"
+                button-class="btn-xs"
+                :show-icon="false"
+              />
             </div>
 
             <button class="btn btn-primary btn-sm" @click="viewSegment(segment.id)">
@@ -278,6 +278,7 @@
 import PageHeader from '@/components/common/PageHeader.vue'
 import { useSegmentStore } from '@/stores/segment'
 import type { Segment, SegmentRule } from '@/types/segment.types'
+import SegmentExportButton from '@/components/segments/SegmentExportButton.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -337,14 +338,6 @@ const duplicateSegment = async (id: string) => {
   }
 }
 
-const exportSegment = async (id: string) => {
-  try {
-    // TODO: Implémenter l'export
-    console.log('Export du segment:', id)
-  } catch (error) {
-    console.error("Erreur lors de l'export du segment:", error)
-  }
-}
 
 const deleteSegment = async (id: string) => {
   if (confirm(t('common.thisActionCannotBeUndone'))) {

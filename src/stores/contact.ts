@@ -215,9 +215,9 @@ export const useContactStore = defineStore('contact', () => {
     }
   }
 
-  const searchContacts = async (query: string, limit = 10) => {
+  const searchContacts = async (query: string, limit = 10, excludeSegment?: string) => {
     try {
-      return await contactService.searchContacts(query, limit)
+      return await contactService.searchContacts(query, limit, excludeSegment)
     } catch (err) {
       console.error('Erreur lors de la recherche:', err)
       return []

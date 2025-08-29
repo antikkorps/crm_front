@@ -14,6 +14,7 @@ import type {
   SegmentUpdateDto,
 } from '@/types/segment.types'
 import { apiRequest } from './api.service'
+import { getToken } from '@/utils/token'
 
 class SegmentService {
   private readonly baseUrl = '/segments'
@@ -101,6 +102,24 @@ class SegmentService {
     })
   }
 
+  // Ajouter plusieurs contacts à un segment
+  async addContactsToSegment(segmentId: string, contactIds: string[]): Promise<{
+    added: number
+    updated: number
+    ignored: number
+    totalProcessed: number
+  }> {
+    return apiRequest<{
+      added: number
+      updated: number
+      ignored: number
+      totalProcessed: number
+    }>(`${this.baseUrl}/${segmentId}/contacts`, {
+      method: 'POST',
+      body: { contactIds },
+    })
+  }
+
   // Retirer un contact d'un segment
   async removeContactFromSegment(segmentId: string, contactId: string): Promise<void> {
     return apiRequest<void>(`${this.baseUrl}/${segmentId}/contacts/${contactId}`, {
@@ -127,6 +146,36 @@ class SegmentService {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify(options),
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error(`Erreur lors de l'export: ${response.status}`)
+    }
+
+    return response.blob()
+  }
+
+  // Exporter un segment avec les nouveaux paramètres
+  async exportSegment(segmentId: string, format: 'csv' | 'xlsx' | 'json' = 'csv', includeAll: boolean = false): Promise<Blob> {
+    const params = new URLSearchParams({
+      format,
+      ...(includeAll && { includeAll: 'true' })
+    })
+    
+    const token = getToken()
+    const headers: Record<string, string> = {}
+    
+    if (token) {
+      headers.Authorization = `Bearer ${token}`
+    }
+    
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL || 'http://localhost:3030/api'}${this.baseUrl}/${segmentId}/export?${params.toString()}`,
+      {
+        method: 'GET',
+        headers,
+        credentials: 'include',
       },
     )
 

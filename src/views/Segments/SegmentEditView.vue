@@ -161,16 +161,19 @@
             <!-- Exporter les contacts -->
             <div class="card bg-base-200 border">
               <div class="card-body p-4">
-                <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-3 mb-3">
                   <Iconify icon="mdi:download" class="w-8 h-8 text-secondary" />
-                  <div>
+                  <div class="flex-1">
                     <h4 class="font-semibold">{{ t('common.export') }}</h4>
                     <p class="text-xs text-gray-600">{{ t('segments.exportDescription') }}</p>
                   </div>
+                  <SegmentExportButton 
+                    v-if="segment"
+                    :segment-id="segment.id"
+                    :segment-name="segment.name"
+                    button-class="btn-sm"
+                  />
                 </div>
-                <button @click="exportContacts" class="btn btn-outline btn-sm mt-3 w-full">
-                  {{ t('common.export') }}
-                </button>
               </div>
             </div>
 
@@ -208,9 +211,10 @@
 <script setup lang="ts">
 import PageHeader from '@/components/common/PageHeader.vue'
 import RuleBuilder from '@/components/segments/RuleBuilder.vue'
+import SegmentExportButton from '@/components/segments/SegmentExportButton.vue'
 import { useSegmentStore } from '@/stores/segment'
 import type { SegmentRule, SegmentUpdateDto } from '@/types/segment.types'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -378,10 +382,6 @@ const duplicateSegment = async () => {
   }
 }
 
-const exportContacts = async () => {
-  // TODO: Implémenter l'export
-  console.log('Export des contacts du segment')
-}
 
 const confirmDelete = () => {
   if (!segment.value) return
